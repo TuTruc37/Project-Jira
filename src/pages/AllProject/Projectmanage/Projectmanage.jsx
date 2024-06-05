@@ -1,26 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { projectMan } from '../../../services/projectMan';
-import { Table, Tag, Avatar } from 'antd';
-import { AntDesignOutlined, UserOutlined } from '@ant-design/icons';
+import { Table, Tag, Avatar, message } from 'antd';
+import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 
-const Projectmanage = () => {
+const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState(null);
+
+  const showModal = projectId => {
+    console.log('show modal', projectId);
+    setIsModalVisible(true);
+    setEditingProjectId(projectId);
+  };
+
+  const handleCancel = () => {
+    console.log('Cancel modal');
+    setIsModalVisible(false);
+    setEditingProjectId(null);
+  };
 
   const handleGetAllProject = () => {
     projectMan
       .getAllProject()
       .then(res => {
-        console.log(res.data.content);
+        console.log('Projects fetched:', res.data.content);
         setArrProject(res.data.content);
       })
       .catch(err => {
-        console.log(err);
+        console.log('Error fetching projects:', err);
       });
   };
 
   useEffect(() => {
     handleGetAllProject();
   }, []);
+
+  const handleDeleteProject = projectId => {
+    projectMan
+      .deleteProject(projectId)
+      .then(res => {
+        message.success('Xóa thành công');
+        handleGetAllProject();
+      })
+      .catch(err => {
+        console.log('Error deleting project:', err);
+        message.error('Xóa không thành công !');
+      });
+  };
 
   const columns = [
     {
@@ -46,30 +73,34 @@ const Projectmanage = () => {
     {
       title: 'Members',
       dataIndex: 'members',
-      render: members => {
-        return (
-          <Avatar.Group>
-            {members.map(member => (
-              <Avatar
-                key={member.userId}
-                src={member.avatar}
-                style={{ backgroundColor: '#f56a00' }}
-              >
-                {member.name.charAt(0)}
-              </Avatar>
-            ))}
-          </Avatar.Group>
-        );
-      },
+      render: members => (
+        <Avatar.Group>
+          {members.map(member => (
+            <Avatar
+              key={member.userId}
+              src={member.avatar}
+              style={{ backgroundColor: '#f56a00' }}
+            >
+              {member.name.charAt(0)}
+            </Avatar>
+          ))}
+        </Avatar.Group>
+      ),
     },
     {
       title: 'Chức năng',
       render: (text, record) => (
         <div className="flex">
-          <button className="py-2 px-4 rounded text-white bg-yellow-300 mr-3">
+          <button
+            onClick={() => showModal(record.id)}
+            className="py-2 px-4 rounded text-white bg-yellow-300 mr-3"
+          >
             <i className="fa-solid fa-pen"></i>
           </button>
-          <button className="py-2 px-4 rounded text-white bg-red-500 mr-3">
+          <button
+            className="py-2 px-4 rounded text-white bg-red-500 mr-3"
+            onClick={() => handleDeleteProject(record.id)}
+          >
             <i className="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -80,10 +111,14 @@ const Projectmanage = () => {
   return (
     <div>
       <div className="text-2xl font-bold">Project management</div>
-      {/* table */}
       <Table columns={columns} dataSource={arrProject} rowKey="id" />
+      <CustomProjectModal
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        projectId={editingProjectId}
+      />
     </div>
   );
 };
 
-export default Projectmanage;
+export default ProjectManage;
