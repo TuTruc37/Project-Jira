@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { projectMan } from '../../../services/projectMan';
 import { Table, Tag, Avatar } from 'antd';
 import { AntDesignOutlined, UserOutlined } from '@ant-design/icons';
+
 const Projectmanage = () => {
   const [arrProject, setArrProject] = useState([]);
+
   const handleGetAllProject = () => {
     projectMan
       .getAllProject()
@@ -15,61 +17,49 @@ const Projectmanage = () => {
         console.log(err);
       });
   };
+
   useEffect(() => {
     handleGetAllProject();
   }, []);
+
   const columns = [
     {
-      title: 'id',
+      title: 'ID',
       dataIndex: 'id',
       sorter: (a, b) => a.id - b.id,
     },
     {
-      title: 'projectName',
+      title: 'Project',
       dataIndex: 'projectName',
       sorter: (a, b) => a.projectName.localeCompare(b.projectName),
     },
     {
-      title: 'categoryName',
+      title: 'Category Name',
       dataIndex: 'categoryName',
       sorter: (a, b) => a.categoryName.localeCompare(b.categoryName),
     },
     {
-      title: 'creator',
+      title: 'Creator',
       dataIndex: 'creator',
-      render: creator => {
-        return (
-          <Tag
-            color="#87d068
-        "
-          >
-            {creator.name}
-          </Tag>
-        );
-      },
+      render: creator => <Tag color="#87d068">{creator.name}</Tag>,
     },
     {
-      title: 'members',
+      title: 'Members',
       dataIndex: 'members',
       render: members => {
-        if (members.length > 0) {
-          return members.map(member => (
-            <Avatar.Group>
-              {members.map(member => (
-                <Avatar
-                  key={member.userId}
-                  src={member.avatar}
-                  style={{
-                    backgroundColor: '#f56a00',
-                  }}
-                >
-                  {member.name.charAt(0)}
-                </Avatar>
-              ))}
-            </Avatar.Group>
-          ));
-        }
-        return null;
+        return (
+          <Avatar.Group>
+            {members.map(member => (
+              <Avatar
+                key={member.userId}
+                src={member.avatar}
+                style={{ backgroundColor: '#f56a00' }}
+              >
+                {member.name.charAt(0)}
+              </Avatar>
+            ))}
+          </Avatar.Group>
+        );
       },
     },
     {
@@ -79,7 +69,6 @@ const Projectmanage = () => {
           <button className="py-2 px-4 rounded text-white bg-yellow-300 mr-3">
             <i className="fa-solid fa-pen"></i>
           </button>
-
           <button className="py-2 px-4 rounded text-white bg-red-500 mr-3">
             <i className="fa-solid fa-trash"></i>
           </button>
@@ -87,11 +76,12 @@ const Projectmanage = () => {
       ),
     },
   ];
+
   return (
     <div>
       <div className="text-2xl font-bold">Project management</div>
       {/* table */}
-      <Table columns={columns} dataSource={arrProject} rowKey="maPhim" />
+      <Table columns={columns} dataSource={arrProject} rowKey="id" />
     </div>
   );
 };
