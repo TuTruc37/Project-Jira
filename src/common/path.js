@@ -1,3 +1,9 @@
 export const path = {
-  trangChu: '/',
+  dangNhap: '/login',
+  dangKy: '/register',
+
+  account: {
+    trangChu: '/',
+    createProject: '/createProject',
+  },
 };
