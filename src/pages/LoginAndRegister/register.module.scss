@@ -1,0 +1,22 @@
+.gridAll {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem;
+}
+.centerLottieR {
+  width: 50%;
+  margin: 0 auto;
+}
+.centerForm {
+  padding-left: 20%;
+  border-left: 1px solid black;
+  width: 110%;
+}
+@media (max-width: 640px) {
+  .displayNone {
+    display: none;
+  }
+  .gridAll {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0px;
+  }
+}
