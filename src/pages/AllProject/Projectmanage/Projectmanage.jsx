@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { projectMan } from '../../../services/projectMan';
 import { Table, Tag, Avatar } from 'antd';
 import { AntDesignOutlined, UserOutlined } from '@ant-design/icons';
-const Projectmanage = () => {
+const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
   const handleGetAllProject = () => {
     projectMan
@@ -96,4 +96,4 @@ const Projectmanage = () => {
   );
 };
 
-export default Projectmanage;
+export default ProjectManage;
