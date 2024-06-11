@@ -18,7 +18,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <Projectmanage />,
+          element: <ProjectManage />,
         },
         {
           path: path.account.createProject,
