@@ -7,7 +7,7 @@ import MenuProject from '../../components/MenuProject/MenuProject';
 const { Content, Sider } = Layout;
 const arrMenu = [
   {
-    label: <Link>Create Task</Link>,
+    label: <Link path={path.account.createTask}>Create Task</Link>,
     icon: <i className="fa-solid fa-plus"></i>,
   },
   {

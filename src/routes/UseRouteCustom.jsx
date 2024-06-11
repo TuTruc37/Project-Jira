@@ -7,6 +7,7 @@ import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 import Projectmanage from '../pages/AllProject/Projectmanage/Projectmanage';
 import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import CreateTask from '../pages/CreateTask/CreateTask';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -22,8 +23,13 @@ const useRouteCustom = () => {
           path: path.account.createProject,
           element: <Createmanager />,
         },
+        {
+          path: path.account.createTask,
+          element: <CreateTask />,
+        },
       ],
     },
+
     {
       path: path.dangNhap,
       element: <Login />,
