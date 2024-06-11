@@ -5,7 +5,7 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-import Projectmanage from '../pages/AllProject/Projectmanage/Projectmanage';
+import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
 
 const useRouteCustom = () => {
@@ -16,7 +16,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <Projectmanage />,
+          element: <ProjectManage />,
         },
         {
           path: path.account.createProject,
