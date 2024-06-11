@@ -5,8 +5,10 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+
 import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+// import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -16,7 +18,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <ProjectManage />,
+          element: <Projectmanage />,
         },
         {
           path: path.account.createProject,
@@ -24,6 +26,10 @@ const useRouteCustom = () => {
         },
       ],
     },
+    // {
+    //   path: path.edit(":projectId"),
+    //   element: <EditProjectManager />,
+    // },
     {
       path: path.dangNhap,
       element: <Login />,
