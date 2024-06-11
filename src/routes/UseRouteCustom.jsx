@@ -5,8 +5,9 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-import Projectmanage from '../pages/AllProject/ProjectManage/ProjectManage';
+
 import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 // import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 
 const useRouteCustom = () => {
@@ -17,7 +18,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <Projectmanage />,
+          element: <ProjectManage />,
           // children: [{ path: path.edit, element: <EditProjectManager /> }],
         },
         {
