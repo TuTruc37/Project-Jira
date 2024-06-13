@@ -1,118 +1,66 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
 import Description from '../../components/Description/Description';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
-import { getAllCreateTask } from '../../services/getAllCreateTask';
-const CreateTask = () => {
-  const [gstatusName, SetStatusName] = useState([]);
-  console.log(gstatusName);
-  const [gpriority, setPriority] = useState([]);
-  console.log(gpriority);
-  useEffect(() => {
-    fetchData();
-    DataPriority();
-  }, []);
-  const fetchData = async () => {
-    try {
-      const response = await getAllCreateTask.getAllStatus();
-      const data = response.data.content;
-      SetStatusName(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+import { projectMan } from '../../services/projectMan';
 
-  const DataPriority = async () => {
-    try {
-      const repo = await getAllCreateTask.getAllPriority();
-      console.log(repo.data.content);
-      setPriority(repo.data.content);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+const CreateTask = () => {
   const { handleAlert } = useContext(AlertContext);
-  const { handleChange, handleBlur, errors, values, handleSubmit, touched } =
-    useFormik({
-      initialValues: {
-        listUserAsign: [0],
-        taskName: '',
-        description: '',
-        statusId: '',
-        originalEstimate: 0,
-        timeTrackingSpent: 0,
-        timeTrackingRemaining: 0,
-        projectId: 0,
-        typeId: 0,
-        priorityId: 0,
-      },
-      // onSubmit là phương thức chạy khi form được submit
-      onSubmit: async (values, { resetForm }) => {
-        console.log(values);
-        try {
-          // const res = await projectMan.createProjectAuthorize(values);
-          // console.log(res);
-          handleAlert('success', 'Tạo Task thành công');
-          resetForm();
-        } catch (err) {
-          console.log(err);
+
+  const formik = useFormik({
+    initialValues: {
+      taskName: '',
+      description: '',
+    },
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        console.log('Form values before sending:', values);
+        const res = await projectMan.createProjectAuthorize(values);
+        console.log('API response:', res);
+        handleAlert('success', 'Tạo Task thành công');
+        resetForm();
+      } catch (err) {
+        console.error('Error creating task:', err);
+        if (err.response && err.response.data && err.response.data.content) {
           handleAlert('error', err.response.data.content);
+        } else {
+          handleAlert(
+            'error',
+            'Đã xảy ra lỗi khi tạo task. Vui lòng thử lại sau.'
+          );
         }
-      },
-      validationSchema: Yup.object({
-        projectName: Yup.string()
-          .required('Vui lòng không bỏ trống')
-          .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
-      }),
-    });
+      }
+    },
+    validationSchema: Yup.object({
+      taskName: Yup.string()
+        .required('Vui lòng không bỏ trống')
+        .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
+    }),
+  });
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Create Task</h1>
-      <form onSubmit={handleSubmit} className="space-y-5 w-full ">
-        {/* <SelectCustom
-          label="Project"
-          name="listUserAsign"
-          handleChange={handleChange}
-          value={values.listUserAsign}
-          // options={projectCateName} // Truyền danh sách loại người dùng từ API vào options
-          labelColor="text-black"
-        /> */}
+      <form onSubmit={formik.handleSubmit} className="space-y-5 w-full">
         <InputCustom
-          label="task Name"
+          label="Task Name"
           name="taskName"
-          handleChange={handleChange}
-          handleBlur={handleBlur}
+          handleChange={formik.handleChange}
+          handleBlur={formik.handleBlur}
           placeholder="Vui lòng nhập tên"
-          error={errors.taskName}
-          touched={touched.taskName}
-          value={values.taskName}
-          labelColor="text-black"
-        />
-        <SelectCustom
-          label="Status"
-          name="statusId"
-          handleChange={handleChange}
-          value={values.statusId}
-          options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
-          labelColor="text-black"
-        />
-        <SelectCustom
-          label="Priority"
-          name="priorityId"
-          handleChange={handleChange}
-          value={values.priorityId}
-          options={gpriority} // Truyền danh sách loại người dùng từ API vào options
+          error={formik.errors.taskName}
+          touched={formik.touched.taskName}
+          value={formik.values.taskName}
           labelColor="text-black"
         />
 
-        {/* <SelectCustom /> */}
-        <InputCustom />
-        <InputCustom />
-        <InputCustom />
-        <Description />
+        <Description
+          value={formik.values.description}
+          handleChange={value => formik.setFieldValue('description', value)}
+        />
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
           type="submit"

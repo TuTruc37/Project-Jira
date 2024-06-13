@@ -7,16 +7,16 @@ import Description from '../../../components/Description/Description';
 import { projectCategory } from '../../../services/projectCategory';
 import SelectCustom from '../../../components/SelectCustom/SelectCustom';
 import { projectMan } from '../../../services/projectMan';
+
 const CreateManager = () => {
-  const [projectCateName, SetprojectCateName] = useState([]);
-  console.log(projectCateName);
+  const [projectCateName, setProjectCateName] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await projectCategory.GetProjectCategory();
         const data = response.data.content;
-        SetprojectCateName(data);
+        setProjectCateName(data);
       } catch (error) {
         console.error(error);
       }
@@ -24,63 +24,67 @@ const CreateManager = () => {
 
     fetchData();
   }, []);
+
   const { handleAlert } = useContext(AlertContext);
-  const { handleChange, handleBlur, errors, values, handleSubmit, touched } =
-    useFormik({
-      initialValues: {
-        projectName: '',
-        description: '',
-        categoryId: 0,
-        alias: '',
-      },
-      // onSubmit là phương thức chạy khi form được submit
-      onSubmit: async (values, { resetForm }) => {
-        console.log(values);
-        try {
-          const res = await projectMan.createProjectAuthorize(values);
-          console.log(res);
-          handleAlert('success', 'Tạo project thành công');
-          resetForm();
-        } catch (err) {
-          console.log(err);
+
+  const formik = useFormik({
+    initialValues: {
+      projectName: '',
+      description: '',
+      categoryId: '',
+      alias: '',
+    },
+    onSubmit: async (values, { resetForm }) => {
+      console.log('Submitting values:', values);
+      try {
+        const res = await projectMan.createProjectAuthorize(values);
+        console.log('API response:', res);
+        handleAlert('success', 'Tạo project thành công');
+        resetForm();
+      } catch (err) {
+        console.error('Error creating project:', err);
+        if (err.response && err.response.data && err.response.data.content) {
           handleAlert('error', err.response.data.content);
+        } else {
+          handleAlert('error', 'Đã xảy ra lỗi khi tạo project. Vui lòng thử lại sau.');
         }
-      },
-      validationSchema: Yup.object({
-        projectName: Yup.string()
-          .required('Vui lòng không bỏ trống')
-          .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
-      }),
-    });
+      }
+    },
+    validationSchema: Yup.object({
+      projectName: Yup.string()
+        .required('Vui lòng không bỏ trống')
+        .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
+    }),
+  });
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Create Project</h1>
-      <form onSubmit={handleSubmit} className="space-y-5 w-full ">
+      <form onSubmit={formik.handleSubmit} className="space-y-5 w-full">
         <InputCustom
           label="Name"
           name="projectName"
-          handleChange={handleChange}
-          handleBlur={handleBlur}
+          handleChange={formik.handleChange}
+          handleBlur={formik.handleBlur}
           placeholder="Vui lòng nhập tên"
-          error={errors.projectName}
-          touched={touched.projectName}
-          value={values.projectName}
+          error={formik.errors.projectName}
+          touched={formik.touched.projectName}
+          value={formik.values.projectName}
           labelColor="text-black"
         />
-        <h2 className="block mt-5 mb-3 font-medium text-black text-lg ">
-          Description
-        </h2>
+        <h2 className="block mt-5  mb-3 font-medium text-black text-lg">Description</h2>
         <Description
           name="description"
-          value={values.description}
-          handleChange={handleChange}
+          value={formik.values.description}
+          handleChange={(value) => formik.setFieldValue('description', value)}
+
         />
         <SelectCustom
-          label="project Category Name"
+          label="Project Category Name"
           name="categoryId"
-          handleChange={handleChange}
-          value={values.categoryId}
-          options={projectCateName} // Truyền danh sách loại người dùng từ API vào options
+          handleChange={formik.handleChange}
+          value={formik.values.categoryId}
+          options={projectCateName}
           labelColor="text-black"
         />
         <button
