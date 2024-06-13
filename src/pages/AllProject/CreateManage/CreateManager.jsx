@@ -82,6 +82,8 @@ const CreateManager = () => {
           value={values.categoryId}
           options={projectCateName} // Truyền danh sách loại người dùng từ API vào options
           labelColor="text-black"
+          valueProp="id"
+          labelProp="projectCategoryName"
         />
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
