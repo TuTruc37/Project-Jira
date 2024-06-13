@@ -7,6 +7,8 @@ const SelectCustom = ({
   value,
   options,
   labelColor,
+  valueProp, // Tên thuộc tính trong option để lấy giá trị
+  labelProp, // Tên thuộc tính trong option để hiển thị nhãn
 }) => {
   return (
     <div className="form-group ">
@@ -17,10 +19,10 @@ const SelectCustom = ({
         value={value}
         onChange={handleChange}
       >
-       
-        {options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.projectCategoryName}
+        {/* Render các tùy chọn từ danh sách options */}
+        {options.map(option => (
+          <option key={option[valueProp]} value={option[labelProp]}>
+            {option[labelProp]}
           </option>
         ))}
       </select>
