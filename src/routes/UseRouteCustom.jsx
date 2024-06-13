@@ -7,7 +7,8 @@ import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 
 import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
-import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+import ProjectManage from '../pages/AllProject/Projectmanage/Projectmanage';
+import UserManage from '../pages/AllProject/UserManage/UserManage';
 // import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 
 const useRouteCustom = () => {
@@ -23,6 +24,10 @@ const useRouteCustom = () => {
         {
           path: path.account.createProject,
           element: <Createmanager />,
+        },
+        {
+          path: path.users,
+          element: <UserManage />,
         },
       ],
     },

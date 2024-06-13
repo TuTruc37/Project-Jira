@@ -6,4 +6,5 @@ export const path = {
     trangChu: '/',
     createProject: '/createProject',
   },
+  users: '/users',
 };

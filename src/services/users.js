@@ -8,6 +8,18 @@ export const users = {
     console.log(data);
     return http.post('/Users/signup', data);
   },
+  getUsers: data => {
+    console.log(data);
+    return http.get('/Users/getUser', data);
+  },
+  editUser: data => {
+    console.log(data);
+    return http.put('/Users/editUser', data);
+  },
+  deleteUser: data => {
+    console.log(data);
+    return http.delete('/Users/deleteUser?id=' + data);
+  }
   //   LayDanhSachPhim: () => {
   //     return http.get('/QuanLyPhim/LayDanhSachPhim?maNhom=GP01');
   //   },
