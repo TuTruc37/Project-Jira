@@ -16,7 +16,10 @@ export const getAllCreateTask = {
   getAllProject: () => {
     return http.get('/Project/getAllProject');
   },
-  getCreateTask: data => {
+  postCreateTask: data => {
     return http.post('/Project/createTask', data);
+  },
+  postAssignUserTask: () => {
+    return http.post('Project/assignUserProject');
   },
 };

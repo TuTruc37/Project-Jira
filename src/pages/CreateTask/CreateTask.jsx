@@ -7,18 +7,16 @@ import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { TreeSelect, Slider } from 'antd';
-import "./createTask.scss"
+import './createTask.scss';
+
 const CreateTask = () => {
   const [gprojectId, setProjectId] = useState([]);
-  // console.log(gprojectId);
   const [gstatusName, SetStatusName] = useState([]);
-  // console.log(gstatusName);
   const [gpriority, setPriority] = useState([]);
-  // console.log(gpriority);
   const [gtaskType, setTaskType] = useState([]);
-  // console.log(gtaskType);
   const [userAsign, setUserAsign] = useState([]);
-  // console.log(userAsign);
+  const [timeTracking, setTimeTracking] = useState(0);
+
   useEffect(() => {
     DataProject();
     DataStatus();
@@ -26,6 +24,7 @@ const CreateTask = () => {
     DataTaskType();
     DataUserAsign();
   }, []);
+
   const DataProject = async () => {
     try {
       const response = await getAllCreateTask.getAllProject();
@@ -35,6 +34,7 @@ const CreateTask = () => {
       console.error(error);
     }
   };
+
   const DataStatus = async () => {
     try {
       const response = await getAllCreateTask.getAllStatus();
@@ -48,25 +48,24 @@ const CreateTask = () => {
   const DataPriority = async () => {
     try {
       const repo = await getAllCreateTask.getAllPriority();
-      // console.log(repo.data.content);
       setPriority(repo.data.content);
     } catch (err) {
       console.log(err);
     }
   };
+
   const DataTaskType = async () => {
     try {
       const repo = await getAllCreateTask.getAllTaskType();
-      // console.log(repo.data.content);
       setTaskType(repo.data.content);
     } catch (err) {
       console.log(err);
     }
   };
+
   const DataUserAsign = async () => {
     try {
       const repo = await getAllCreateTask.getAllUsers();
-      console.log(repo.data.content);
       setUserAsign(repo.data.content);
     } catch (err) {
       console.log(err);
@@ -74,39 +73,69 @@ const CreateTask = () => {
   };
 
   const { handleAlert } = useContext(AlertContext);
-  const { handleChange, handleBlur, errors, values, handleSubmit, touched } =
-    useFormik({
-      initialValues: {
-        listUserAsign: [0],
-        taskName: '',
-        description: '',
-        statusId: '',
-        originalEstimate: 0,
-        timeTrackingSpent: 0,
-        timeTrackingRemaining: 0,
-        projectId: 0,
-        typeId: 0,
-        priorityId: 0,
-      },
-      // onSubmit là phương thức chạy khi form được submit
-      onSubmit: async (values, { resetForm }) => {
-        console.log(values);
-        try {
-          const res = await getAllCreateTask.getcreateTask(values);
-          console.log(res);
-          handleAlert('success', 'Tạo Task thành công');
-          resetForm();
-        } catch (err) {
-          console.log(err);
-          handleAlert('error', err.response.data.content);
-        }
-      },
-      validationSchema: Yup.object({
-        projectName: Yup.string()
-          .required('Vui lòng không bỏ trống')
-          .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
-      }),
-    });
+  const {
+    handleChange,
+    handleBlur,
+    errors,
+    values,
+    handleSubmit,
+    touched,
+    setFieldValue,
+  } = useFormik({
+    initialValues: {
+      listUserAsign: [0],
+      taskName: '',
+      description: '',
+      statusId: '',
+      originalEstimate: 0,
+      timeTrackingSpent: 0,
+      timeTrackingRemaining: 0,
+      projectId: 0,
+      typeId: 0,
+      priorityId: 0,
+    },
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const res = await getAllCreateTask.getcreateTask(values);
+        handleAlert('success', 'Tạo Task thành công');
+        resetForm();
+      } catch (err) {
+        handleAlert('error', err.response.data.content);
+      }
+    },
+    validationSchema: Yup.object({
+      projectName: Yup.string()
+        .required('Vui lòng không bỏ trống')
+        .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
+    }),
+  });
+
+  const handleSliderChange = value => {
+    const newRemaining = values.originalEstimate - value;
+    setTimeTracking(value);
+    setFieldValue('timeTrackingSpent', value);
+    setFieldValue(
+      'timeTrackingRemaining',
+      newRemaining >= 0 ? newRemaining : 0
+    );
+  };
+
+  const handleTimeSpentChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    const newRemaining = values.originalEstimate - value;
+    setTimeTracking(value);
+    setFieldValue('timeTrackingSpent', value);
+    setFieldValue('timeTrackingRemaining', newRemaining >= 0 ? newRemaining : 0);
+  };
+
+  const handleTimeRemainingChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    const newSpent = values.originalEstimate - value;
+    setTimeTracking(newSpent);
+    setFieldValue('timeTrackingSpent', newSpent >= 0 ? newSpent : 0);
+    setFieldValue('timeTrackingRemaining', value);
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Create Task</h1>
@@ -121,7 +150,6 @@ const CreateTask = () => {
           <TreeSelect
             showSearch
             style={{ width: '100%' }}
-   
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             placeholder="Chọn dự án"
             allowClear
@@ -148,7 +176,6 @@ const CreateTask = () => {
           labelColor="text-black"
         />
         <SelectCustom
-        
           label="Status"
           name="statusId"
           handleChange={handleChange}
@@ -181,8 +208,6 @@ const CreateTask = () => {
             labelProp="taskType"
           />
 
-          {/* Component hai cái mới không tách riêng */}
-
           <div className="">
             <label
               className=" text-lg mb-2 block font-semibold text-black"
@@ -190,7 +215,6 @@ const CreateTask = () => {
             >
               Assignees
             </label>
-
             <TreeSelect
               showSearch
               style={{ width: '100%' }}
@@ -200,22 +224,37 @@ const CreateTask = () => {
               allowClear
               multiple
               treeDefaultExpandAll
-              onChange={DataTaskType}
-              treeData={userAsign}
+              onChange={value =>
+                handleChange({ target: { name: 'listUserAsign', value } })
+              }
+              treeData={userAsign.map(user => ({
+                ...user,
+                title: user.name,
+                value: user.userId,
+              }))}
             />
           </div>
           <div>
             <div>
-              <label className="text-lg mb-4 block text-black font-semibold" htmlFor="">
+              <label
+                className="text-lg  block text-black font-semibold"
+                htmlFor=""
+              >
                 Time tracking
               </label>
+
               <Slider
                 defaultValue={0}
+                value={timeTracking}
+                onChange={handleSliderChange}
                 tooltip={{
                   open: false,
-             
                 }}
               />
+              <div className="flex justify-between">
+                <p className="text-md font-medium">{values.timeTrackingSpent}h logged</p>
+                <p className="text-md font-medium">{values.timeTrackingRemaining}h remaining</p>
+              </div>
             </div>
           </div>
         </div>
@@ -232,20 +271,19 @@ const CreateTask = () => {
           />
           <div className="grid grid-cols-2 gap-5">
             <InputCustom
-              label="time Spent"
+              label="time Spent (Hours)"
               name="timeTrackingSpent"
-              handleChange={handleChange}
+              handleChange={handleTimeSpentChange}
               handleBlur={handleBlur}
               error={errors.timeTrackingSpent}
               touched={touched.timeTrackingSpent}
               value={values.timeTrackingSpent}
               labelColor="text-black"
             />
-
             <InputCustom
-              label="time Remaining"
+              label="time Remaining (Hours)"
               name="timeTrackingRemaining"
-              handleChange={handleChange}
+              handleChange={handleTimeRemainingChange}
               handleBlur={handleBlur}
               error={errors.timeTrackingRemaining}
               touched={touched.timeTrackingRemaining}
@@ -255,13 +293,13 @@ const CreateTask = () => {
           </div>
         </div>
         <Description />
+      </form>
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+          className="bg-blue-500 mt-20 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
           type="submit"
         >
           Submit
         </button>
-      </form>
     </div>
   );
 };
