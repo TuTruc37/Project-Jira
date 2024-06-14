@@ -7,21 +7,23 @@ const SelectCustom = ({
   value,
   options,
   labelColor,
-  valueProp, // Tên thuộc tính trong option để lấy giá trị
-  labelProp, // Tên thuộc tính trong option để hiển thị nhãn
+  valueProp,
+  labelProp,
 }) => {
   return (
     <div className="form-group ">
-      <label className={`block mb-2 font-medium mt-12 ${labelColor} text-lg`}>{label}</label>
+      <label className={`block mb-2 font-medium mt-12 ${labelColor} text-lg`}>
+        {label}
+      </label>
       <select
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
         name={name}
         value={value}
         onChange={handleChange}
       >
-        {/* Render các tùy chọn từ danh sách options */}
+        <option value="" label="Chọn danh mục dự án" />
         {options.map(option => (
-          <option key={option[valueProp]} value={option[labelProp]}>
+          <option key={option[valueProp]} value={option[valueProp]}>
             {option[labelProp]}
           </option>
         ))}

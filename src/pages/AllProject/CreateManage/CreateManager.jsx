@@ -18,7 +18,7 @@ const CreateManager = () => {
         const data = response.data.content;
         setProjectCateName(data);
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching project categories:', error);
       }
     };
 
@@ -46,7 +46,10 @@ const CreateManager = () => {
         if (err.response && err.response.data && err.response.data.content) {
           handleAlert('error', err.response.data.content);
         } else {
-          handleAlert('error', 'Đã xảy ra lỗi khi tạo project. Vui lòng thử lại sau.');
+          handleAlert(
+            'error',
+            'Đã xảy ra lỗi khi tạo project. Vui lòng thử lại sau.'
+          );
         }
       }
     },
@@ -72,12 +75,13 @@ const CreateManager = () => {
           value={formik.values.projectName}
           labelColor="text-black"
         />
-        <h2 className="block mt-5  mb-3 font-medium text-black text-lg">Description</h2>
+        <h2 className="block mt-5 mb-3 font-medium text-black text-lg">
+          Description
+        </h2>
         <Description
           name="description"
           value={formik.values.description}
-          handleChange={(value) => formik.setFieldValue('description', value)}
-
+          handleChange={value => formik.setFieldValue('description', value)}
         />
         <SelectCustom
           label="Project Category Name"

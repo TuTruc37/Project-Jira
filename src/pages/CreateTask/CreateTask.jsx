@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
 import Description from '../../components/Description/Description';
@@ -6,7 +6,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
-import { TreeSelect } from 'antd';
+import { TreeSelect, Slider } from 'antd';
+import "./createTask.scss"
 const CreateTask = () => {
   const [gprojectId, setProjectId] = useState([]);
   // console.log(gprojectId);
@@ -71,6 +72,7 @@ const CreateTask = () => {
       console.log(err);
     }
   };
+
   const { handleAlert } = useContext(AlertContext);
   const { handleChange, handleBlur, errors, values, handleSubmit, touched } =
     useFormik({
@@ -97,47 +99,56 @@ const CreateTask = () => {
         } catch (err) {
           console.log(err);
           handleAlert('error', err.response.data.content);
-        } else {
-          handleAlert(
-            'error',
-            'Đã xảy ra lỗi khi tạo task. Vui lòng thử lại sau.'
-          );
         }
-      }
-    },
-    validationSchema: Yup.object({
-      taskName: Yup.string()
-        .required('Vui lòng không bỏ trống')
-        .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
-    }),
-  });
-
+      },
+      validationSchema: Yup.object({
+        projectName: Yup.string()
+          .required('Vui lòng không bỏ trống')
+          .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
+      }),
+    });
   return (
     <div>
       <h1 className="text-2xl font-bold">Create Task</h1>
       <form onSubmit={handleSubmit} className="space-y-5 w-full ">
-        <SelectCustom
-          label="Project"
-          name="projectId"
-          handleChange={handleChange}
-          value={values.projectId}
-          options={gprojectId} // Truyền danh sách loại người dùng từ API vào options
-          labelColor="text-black"
-          valueProp="id"
-          labelProp="projectName"
-        />
+        <div>
+          <label
+            className="block text-lg mb-2 mt-6 font-semibold text-black"
+            htmlFor=""
+          >
+            Project
+          </label>
+          <TreeSelect
+            showSearch
+            style={{ width: '100%' }}
+   
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+            placeholder="Chọn dự án"
+            allowClear
+            treeDefaultExpandAll
+            onChange={value =>
+              handleChange({ target: { name: 'projectId', value } })
+            }
+            treeData={gprojectId.map(project => ({
+              ...project,
+              title: project.projectName,
+              value: project.id,
+            }))}
+          />
+        </div>
         <InputCustom
-          label="Task Name"
+          label="task Name"
           name="taskName"
-          handleChange={formik.handleChange}
-          handleBlur={formik.handleBlur}
+          handleChange={handleChange}
+          handleBlur={handleBlur}
           placeholder="Vui lòng nhập tên"
-          error={formik.errors.taskName}
-          touched={formik.touched.taskName}
-          value={formik.values.taskName}
+          error={errors.taskName}
+          touched={touched.taskName}
+          value={values.taskName}
           labelColor="text-black"
         />
         <SelectCustom
+        
           label="Status"
           name="statusId"
           handleChange={handleChange}
@@ -147,7 +158,7 @@ const CreateTask = () => {
           valueProp="statusId"
           labelProp="statusName"
         />
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-5 ">
           <SelectCustom
             label="Priority"
             name="priorityId"
@@ -172,18 +183,41 @@ const CreateTask = () => {
 
           {/* Component hai cái mới không tách riêng */}
 
-          <TreeSelect
-            showSearch
-            style={{ width: '100%' }}
-            value={values.userAsign}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder="Please select"
-            allowClear
-            multiple
-            treeDefaultExpandAll
-            onChange={DataTaskType}
-            treeData={userAsign}
-          />
+          <div className="">
+            <label
+              className=" text-lg mb-2 block font-semibold text-black"
+              htmlFor=""
+            >
+              Assignees
+            </label>
+
+            <TreeSelect
+              showSearch
+              style={{ width: '100%' }}
+              value={values.userAsign}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              placeholder="Please select"
+              allowClear
+              multiple
+              treeDefaultExpandAll
+              onChange={DataTaskType}
+              treeData={userAsign}
+            />
+          </div>
+          <div>
+            <div>
+              <label className="text-lg mb-4 block text-black font-semibold" htmlFor="">
+                Time tracking
+              </label>
+              <Slider
+                defaultValue={0}
+                tooltip={{
+                  open: false,
+             
+                }}
+              />
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-5">
           <InputCustom
