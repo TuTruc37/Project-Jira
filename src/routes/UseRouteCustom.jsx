@@ -5,10 +5,9 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-
-import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
 import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
-// import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
+import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import CreateTask from '../pages/CreateTask/CreateTask';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -19,18 +18,18 @@ const useRouteCustom = () => {
         {
           index: true,
           element: <ProjectManage />,
-          // children: [{ path: path.edit, element: <EditProjectManager /> }],
         },
         {
           path: path.account.createProject,
           element: <Createmanager />,
         },
+        {
+          path: path.account.createTask,
+          element: <CreateTask />,
+        },
       ],
     },
-    // {
-    //   path: path.edit(":projectId"),
-    //   element: <EditProjectManager />,
-    // },
+
     {
       path: path.dangNhap,
       element: <Login />,
