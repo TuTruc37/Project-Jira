@@ -5,5 +5,6 @@ export const path = {
     trangChu: '/',
     createProject: '/createProject',
     createTask: '/edit/task',
+    projectdetail: '/projectdetail',
   },
 };

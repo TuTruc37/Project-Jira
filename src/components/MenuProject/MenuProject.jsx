@@ -20,6 +20,12 @@ const MenuProject = () => {
       <div className="mt-14">
         <ul>
           <li>
+            <NavLink to={path.account.projectdetail}>
+              <i className="fa-solid fa-gear"></i> Cyber Board
+            </NavLink>
+          </li>
+
+          <li>
             <NavLink to={path.account.trangChu}>
               <i className="fa-solid fa-gear"></i> Project management
             </NavLink>
