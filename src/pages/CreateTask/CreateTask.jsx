@@ -18,57 +18,27 @@ const CreateTask = () => {
   const [timeTracking, setTimeTracking] = useState(0);
 
   useEffect(() => {
-    DataProject();
-    DataStatus();
-    DataPriority();
-    DataTaskType();
-    DataUserAsign();
+    fetchData();
   }, []);
 
-  const DataProject = async () => {
+  const fetchData = async () => {
     try {
-      const response = await getAllCreateTask.getAllProject();
-      const data = response.data.content;
-      setProjectId(data);
+      const [projects, statuses, priorities, taskTypes, users] =
+        await Promise.all([
+          getAllCreateTask.getAllProject(),
+          getAllCreateTask.getAllStatus(),
+          getAllCreateTask.getAllPriority(),
+          getAllCreateTask.getAllTaskType(),
+          getAllCreateTask.getAllUsers(),
+        ]);
+
+      setProjectId(projects.data.content);
+      SetStatusName(statuses.data.content);
+      setPriority(priorities.data.content);
+      setTaskType(taskTypes.data.content);
+      setUserAsign(users.data.content);
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const DataStatus = async () => {
-    try {
-      const response = await getAllCreateTask.getAllStatus();
-      const data = response.data.content;
-      SetStatusName(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const DataPriority = async () => {
-    try {
-      const repo = await getAllCreateTask.getAllPriority();
-      setPriority(repo.data.content);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const DataTaskType = async () => {
-    try {
-      const repo = await getAllCreateTask.getAllTaskType();
-      setTaskType(repo.data.content);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const DataUserAsign = async () => {
-    try {
-      const repo = await getAllCreateTask.getAllUsers();
-      setUserAsign(repo.data.content);
-    } catch (err) {
-      console.log(err);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -81,22 +51,23 @@ const CreateTask = () => {
     handleSubmit,
     touched,
     setFieldValue,
+    resetForm,
   } = useFormik({
     initialValues: {
-      listUserAsign: [0],
+      listUserAsign: [],
       taskName: '',
       description: '',
       statusId: '',
       originalEstimate: 0,
       timeTrackingSpent: 0,
       timeTrackingRemaining: 0,
-      projectId: 0,
-      typeId: 0,
-      priorityId: 0,
+      projectId: '',
+      typeId: '',
+      priorityId: '',
     },
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async values => {
       try {
-        const res = await getAllCreateTask.getcreateTask(values);
+        const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
         resetForm();
       } catch (err) {
@@ -104,9 +75,9 @@ const CreateTask = () => {
       }
     },
     validationSchema: Yup.object({
-      projectName: Yup.string()
+      taskName: Yup.string()
         .required('Vui lòng không bỏ trống')
-        .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
+        .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
     }),
   });
 
@@ -120,15 +91,18 @@ const CreateTask = () => {
     );
   };
 
-  const handleTimeSpentChange = (e) => {
+  const handleTimeSpentChange = e => {
     const value = parseInt(e.target.value, 10);
     const newRemaining = values.originalEstimate - value;
     setTimeTracking(value);
     setFieldValue('timeTrackingSpent', value);
-    setFieldValue('timeTrackingRemaining', newRemaining >= 0 ? newRemaining : 0);
+    setFieldValue(
+      'timeTrackingRemaining',
+      newRemaining >= 0 ? newRemaining : 0
+    );
   };
 
-  const handleTimeRemainingChange = (e) => {
+  const handleTimeRemainingChange = e => {
     const value = parseInt(e.target.value, 10);
     const newSpent = values.originalEstimate - value;
     setTimeTracking(newSpent);
@@ -136,10 +110,20 @@ const CreateTask = () => {
     setFieldValue('timeTrackingRemaining', value);
   };
 
+  const handleFieldChange = e => {
+    const { name, value } = e.target;
+    handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
+    if (name === 'timeTrackingSpent' || name === 'timeTrackingRemaining') {
+      const spent = parseInt(values.timeTrackingSpent, 10) || 0;
+      const remaining = parseInt(values.timeTrackingRemaining, 10) || 0;
+      setTimeTracking(spent + remaining); // Tính tổng và cập nhật timeTracking
+    }
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Create Task</h1>
-      <form onSubmit={handleSubmit} className="space-y-5 w-full ">
+      <h1 className="text-3xl font-bold">Create Task</h1>
+      <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
         <div>
           <label
             className="block text-lg mb-2 mt-6 font-semibold text-black"
@@ -165,9 +149,9 @@ const CreateTask = () => {
           />
         </div>
         <InputCustom
-          label="task Name"
+          label="Task Name"
           name="taskName"
-          handleChange={handleChange}
+          handleChange={handleFieldChange}
           handleBlur={handleBlur}
           placeholder="Vui lòng nhập tên"
           error={errors.taskName}
@@ -185,7 +169,7 @@ const CreateTask = () => {
           valueProp="statusId"
           labelProp="statusName"
         />
-        <div className="grid grid-cols-2 gap-5 ">
+        <div className="grid grid-cols-2 gap-5">
           <SelectCustom
             label="Priority"
             name="priorityId"
@@ -198,7 +182,7 @@ const CreateTask = () => {
           />
 
           <SelectCustom
-            label="Task type"
+            label="Task Type"
             name="typeId"
             handleChange={handleChange}
             value={values.typeId}
@@ -207,10 +191,11 @@ const CreateTask = () => {
             valueProp="id"
             labelProp="taskType"
           />
-
-          <div className="">
+        </div>
+        <div className="grid grid-cols-2 gap-5">
+          <div>
             <label
-              className=" text-lg mb-2 block font-semibold text-black"
+              className="text-lg mb-2 block font-semibold text-black"
               htmlFor=""
             >
               Assignees
@@ -235,32 +220,30 @@ const CreateTask = () => {
             />
           </div>
           <div>
-            <div>
-              <label
-                className="text-lg  block text-black font-semibold"
-                htmlFor=""
-              >
-                Time tracking
-              </label>
-
-              <Slider
-                defaultValue={0}
-                value={timeTracking}
-                onChange={handleSliderChange}
-                tooltip={{
-                  open: false,
-                }}
-              />
-              <div className="flex justify-between">
-                <p className="text-md font-medium">{values.timeTrackingSpent}h logged</p>
-                <p className="text-md font-medium">{values.timeTrackingRemaining}h remaining</p>
-              </div>
+            <label
+              className="text-lg block text-black font-semibold"
+              htmlFor=""
+            >
+              Time Tracking
+            </label>
+            <Slider
+              value={timeTracking}
+              onChange={handleSliderChange}
+              tooltipVisible={false}
+            />
+            <div className="flex justify-between">
+              <p className="text-md font-medium">
+                {values.timeTrackingSpent}h logged
+              </p>
+              <p className="text-md font-medium">
+                {values.timeTrackingRemaining}h remaining
+              </p>
             </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-5">
           <InputCustom
-            label="original Estimate"
+            label="Original Estimate"
             name="originalEstimate"
             handleChange={handleChange}
             handleBlur={handleBlur}
@@ -271,9 +254,9 @@ const CreateTask = () => {
           />
           <div className="grid grid-cols-2 gap-5">
             <InputCustom
-              label="time Spent (Hours)"
+              label="Time Spent (Hours)"
               name="timeTrackingSpent"
-              handleChange={handleTimeSpentChange}
+              handleChange={handleFieldChange}
               handleBlur={handleBlur}
               error={errors.timeTrackingSpent}
               touched={touched.timeTrackingSpent}
@@ -281,9 +264,9 @@ const CreateTask = () => {
               labelColor="text-black"
             />
             <InputCustom
-              label="time Remaining (Hours)"
+              label="Time Remaining (Hours)"
               name="timeTrackingRemaining"
-              handleChange={handleTimeRemainingChange}
+              handleChange={handleFieldChange}
               handleBlur={handleBlur}
               error={errors.timeTrackingRemaining}
               touched={touched.timeTrackingRemaining}
@@ -293,13 +276,13 @@ const CreateTask = () => {
           </div>
         </div>
         <Description />
-      </form>
         <button
           className="bg-blue-500 mt-20 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
           type="submit"
         >
           Submit
         </button>
+      </form>
     </div>
   );
 };

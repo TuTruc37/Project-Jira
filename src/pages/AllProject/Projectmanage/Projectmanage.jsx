@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Input, List, Avatar, Button, message, Modal, Table, Tag } from 'antd';
 import { projectMan } from '../../../services/projectMan';
-import { Table, Tag, Avatar, message, Modal, List } from 'antd';
-// import { AntDesignOutlined, UserOutlined } from '@ant-design/icons';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
+import { debounce } from 'lodash';
 
 const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
@@ -10,6 +10,8 @@ const ProjectManage = () => {
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [userList, setUserList] = useState([]);
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const showModal = projectId => {
     setIsModalVisible(true);
@@ -66,7 +68,7 @@ const ProjectManage = () => {
 
   const handleDeleteUserFromProject = (projectId, userId) => {
     projectMan
-      .deletetUserFromProject({ projectId, userId })
+      .removeUserFromProject({ projectId, userId })
       .then(res => {
         message.success('Xóa người dùng thành công');
         handleGetUsersByProjectId(projectId); // Refresh the user list
@@ -74,6 +76,42 @@ const ProjectManage = () => {
       .catch(err => {
         console.error('Error removing user from project:', err);
         message.error('Không thể xóa người dùng');
+      });
+  };
+
+  const handleSearchUser = searchKeyword => {
+    projectMan
+      .searchUser(searchKeyword)
+      .then(res => {
+        setSearchResult(res.data.content);
+      })
+      .catch(err => {
+        console.error('Error searching users:', err);
+        message.error('Error searching users');
+      });
+  };
+
+  // Sử dụng debounce để gọi API tìm kiếm sau 300ms kể từ lần gõ cuối cùng
+  const debouncedSearchUser = useCallback(debounce(handleSearchUser, 300), []);
+
+  const handleSearchChange = e => {
+    const { value } = e.target;
+    setSearchKeyword(value);
+    debouncedSearchUser(value);
+  };
+
+  const handleAddUserToProject = userId => {
+    projectMan
+      .assignUserToProject({ projectId: editingProjectId, userId })
+      .then(res => {
+        message.success('Thêm người dùng thành công');
+        handleGetUsersByProjectId(editingProjectId);
+        setSearchKeyword('');
+        setSearchResult([]);
+      })
+      .catch(err => {
+        console.error('Error adding user to project:', err);
+        message.error('Không thể thêm người dùng');
       });
   };
 
@@ -142,7 +180,7 @@ const ProjectManage = () => {
 
   return (
     <div>
-      <div className="text-2xl font-bold">Project Management</div>
+      <div className="text-3xl font-bold mb-4">Project Management</div>
       <Table columns={columns} dataSource={arrProject} rowKey="id" />
       <CustomProjectModal
         visible={isModalVisible}
@@ -150,29 +188,62 @@ const ProjectManage = () => {
         projectId={editingProjectId}
       />
       <Modal
-    
         title="Thành viên"
         visible={isUserModalVisible}
         onCancel={() => setIsUserModalVisible(false)}
         footer={null}
       >
-        <List className=''
-          dataSource={userList}
-          renderItem={item => (
-            <List.Item className='flex justify-center items-center'>
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} />}
-                title={item.name}
-              />
-              <i
-                className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
-                onClick={() =>
-                  handleDeleteUserFromProject(editingProjectId, item.userId)
-                }
-              />
-            </List.Item>
-          )}
+        <Input.Search
+          placeholder="Search users..."
+          value={searchKeyword}
+          onChange={handleSearchChange}
+          onSearch={handleSearchUser}
+          style={{ marginBottom: 16 }}
         />
+        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+          <List
+            dataSource={searchResult}
+            renderItem={item => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="primary"
+                    onClick={() => handleAddUserToProject(item.userId)}
+                  >
+                    Add
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={<Avatar src={item.avatar} />}
+                  title={item.name}
+                  description={item.email}
+                />
+              </List.Item>
+            )}
+          />
+        </div>
+        <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}>
+          <List
+            dataSource={userList}
+            renderItem={item => (
+              <List.Item className="flex justify-center items-center">
+                <List.Item.Meta
+                  avatar={<Avatar src={item.avatar} />}
+                  title={item.name}
+                />
+                <div className="space-x-2">
+                  <i
+                    className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
+                    onClick={() =>
+                      handleDeleteUserFromProject(editingProjectId, item.userId)
+                    }
+                  />
+                </div>
+              </List.Item>
+            )}
+          />
+        </div>
       </Modal>
     </div>
   );

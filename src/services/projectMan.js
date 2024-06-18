@@ -1,6 +1,5 @@
 import { http } from './config';
 
-
 export const projectMan = {
   getAllProject: () => {
     return http.get('/Project/getAllProject');
@@ -23,10 +22,16 @@ export const projectMan = {
   getProjectCategory: () => {
     return http.get('/ProjectCategory');
   },
-  deletetUserFromProject: () => {
-    return http.post('/Project/removeUserFromProject');
+  removeUserFromProject: data => {
+    return http.post('/Project/removeUserFromProject', data);
   },
   createProjectAuthorize: data => {
     return http.post('/Project/createProjectAuthorize', data);
+  },
+  searchUser: keyword => {
+    return http.get(`/Users/getUser?keyword=${keyword}`);
+  },
+  assignUserToProject: data => {
+    return http.post('/Project/assignUserProject', data);
   },
 };

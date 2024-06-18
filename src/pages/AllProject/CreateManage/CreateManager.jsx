@@ -82,6 +82,7 @@ const CreateManager = () => {
           name="description"
           value={formik.values.description}
           handleChange={value => formik.setFieldValue('description', value)}
+          
         />
         <SelectCustom
           label="Project Category Name"
