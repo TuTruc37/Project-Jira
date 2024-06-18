@@ -223,7 +223,9 @@ const ProjectManage = () => {
             )}
           />
         </div>
-        <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}>
+        <div
+          style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}
+        >
           <List
             dataSource={userList}
             renderItem={item => (
