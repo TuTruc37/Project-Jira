@@ -1,11 +1,11 @@
 import { http } from './config';
+
 export const getAllCreateTask = {
   getAllStatus: () => {
     return http.get('/Status/getAll');
   },
   getAllPriority: () => {
-    // console.log(priorityId);
-    return http.get(`/Priority/getAll?id=0`);
+    return http.get('/Priority/getAll?id=0');
   },
   getAllTaskType: () => {
     return http.get('/TaskType/getAll');
@@ -16,7 +16,17 @@ export const getAllCreateTask = {
   getAllProject: () => {
     return http.get('/Project/getAllProject');
   },
-  getCreateTask: data => {
+  postCreateTask: data => {
     return http.post('/Project/createTask', data);
   },
+  postAssignUserTask: data => {
+    return http.post('/Project/assignUserTask', data);
+  },
+  getUserByProject: projectId => {
+    return http.get(`/Users/getUserByProject/${projectId}`);
+  },
+  getTaskDetails: taskId => {
+    return http.get(`/Project/getTaskDetail?taskId=${taskId}`);
+  },
+  // Other methods as per your requirements
 };

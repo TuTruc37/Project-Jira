@@ -26,7 +26,7 @@ const FormLogin = () => {
           const res = await users.dangNhap(values);
           console.log(res);
           handleAlert('success', 'Đăng nhập thành công');
-          navigate(path.trangChu);
+          navigate(path.account.trangChu);
           handleSetValueLocalStore('dataUser', res.data.content);
           dispatch(handleGetValue(res.data.content));
         } catch (error) {

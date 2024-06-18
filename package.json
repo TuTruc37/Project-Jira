@@ -11,9 +11,10 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
-    "antd": "^5.17.2",
+    "antd": "^5.18.0",
     "axios": "^1.6.8",
     "formik": "^2.4.6",
+    "lodash": "^4.17.21",
     "lottie-react": "^2.4.0",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",

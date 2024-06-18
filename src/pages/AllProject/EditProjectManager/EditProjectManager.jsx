@@ -1,22 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
-import SelectCustom from '../../components/SelectCustom/SelectCustom';
-import InputCustom from '../../components/Input/InputCustom';
-import Description from '../../components/Description/Description';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { AlertContext } from '../../App';
-import { getAllCreateTask } from '../../services/getAllCreateTask';
+// import { path } from "../../../common/path";
+// import { projectMan } from "../../../services/projectMan";
 import { TreeSelect, Slider } from 'antd';
-import './createTask.scss';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import InputCustom from './../../../components/Input/InputCustom';
+import Description from './../../../components/Description/Description';
 
-const CreateTask = () => {
+import SelectCustom from './../../../components/SelectCustom/SelectCustom';
+import { useEffect, useState, useContext } from 'react';
+import { getAllCreateTask } from './../../../services/getAllCreateTask';
+import { AlertContext } from '../../../App';
+const EditProjectManager = () => {
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
   const [gpriority, setPriority] = useState([]);
   const [gtaskType, setTaskType] = useState([]);
   const [userAsign, setUserAsign] = useState([]);
   const [timeTracking, setTimeTracking] = useState(0);
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -99,10 +99,9 @@ const CreateTask = () => {
       setTimeTracking(spent + remaining); // Tính tổng và cập nhật timeTracking
     }
   };
-
   return (
     <div>
-      <h1 className="text-3xl font-bold">Create Task</h1>
+      <h1 className="text-3xl font-bold">Edit Task</h1>
       <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
         <div>
           <label
@@ -256,15 +255,17 @@ const CreateTask = () => {
           </div>
         </div>
         <Description />
-        <button
-          className="bg-blue-500 mt-20 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-          type="submit"
-        >
-          Submit
-        </button>
+        <div>
+          <button
+            className="bg-blue-500   mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default CreateTask;
+export default EditProjectManager;

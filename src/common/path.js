@@ -7,4 +7,5 @@ export const path = {
     createTask: '/edit/task',
     projectdetail: '/projectdetail',
   },
+  
 };

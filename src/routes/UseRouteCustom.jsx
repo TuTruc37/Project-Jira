@@ -6,9 +6,8 @@ import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
-import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
-import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -22,7 +21,7 @@ const useRouteCustom = () => {
         },
         {
           path: path.account.createProject,
-          element: <Createmanager />,
+          element: <CreateManager />,
         },
         {
           path: path.account.createTask,
@@ -32,6 +31,10 @@ const useRouteCustom = () => {
           path: path.account.projectdetail,
           element: <ProjectDetail />,
         },
+        // {
+        //   path: path.account.editTask,
+        //   element: <EditProjectManager />,
+        // },
       ],
     },
 
