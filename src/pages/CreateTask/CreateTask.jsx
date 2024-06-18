@@ -90,26 +90,6 @@ const CreateTask = () => {
       newRemaining >= 0 ? newRemaining : 0
     );
   };
-
-  const handleTimeSpentChange = e => {
-    const value = parseInt(e.target.value, 10);
-    const newRemaining = values.originalEstimate - value;
-    setTimeTracking(value);
-    setFieldValue('timeTrackingSpent', value);
-    setFieldValue(
-      'timeTrackingRemaining',
-      newRemaining >= 0 ? newRemaining : 0
-    );
-  };
-
-  const handleTimeRemainingChange = e => {
-    const value = parseInt(e.target.value, 10);
-    const newSpent = values.originalEstimate - value;
-    setTimeTracking(newSpent);
-    setFieldValue('timeTrackingSpent', newSpent >= 0 ? newSpent : 0);
-    setFieldValue('timeTrackingRemaining', value);
-  };
-
   const handleFieldChange = e => {
     const { name, value } = e.target;
     handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
