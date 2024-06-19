@@ -40,11 +40,7 @@ const MenuProject = () => {
               </div>
             </NavLink>
           </li>
-          <li
-            className={
-              location.pathname === path.account.trangChu ? 'active' : ''
-            }
-          >
+          <li>
             <NavLink
               to={path.account.users}
               onClick={() => handleClick(path.account.users)}
