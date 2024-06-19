@@ -41,10 +41,7 @@ const MenuProject = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink
-              to={path.account.users}
-              onClick={() => handleClick(path.account.users)}
-            >
+            <NavLink to={path.account.users}>
               <div className="text-lg font-semibold">
                 <i className="fa-solid fa-users"></i> Users Management
               </div>
