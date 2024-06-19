@@ -7,6 +7,6 @@ export const path = {
     createTask: '/create/task',
     editTask: '/edit/task',
     projectDetail: '/projectDetail',
+    users: '/users',
   },
-  users: '/users',
 };

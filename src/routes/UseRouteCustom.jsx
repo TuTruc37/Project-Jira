@@ -38,7 +38,7 @@ const useRouteCustom = () => {
           element: <EditProjectManager />,
         },
         {
-          path: path.users,
+          path: path.account.users,
           element: <UserManage />,
         },
       ],
