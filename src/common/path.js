@@ -4,7 +4,8 @@ export const path = {
   account: {
     trangChu: '/',
     createProject: '/createProject',
-    createTask: '/edit/task',
+    createTask: '/create/task',
+    editTask: '/edit/task',
     projectDetail: '/projectDetail',
   },
   users: '/users',

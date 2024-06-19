@@ -5,7 +5,12 @@ import { projectMan } from '../../services/projectMan';
 
 const { Option } = Select;
 
-const CustomProjectModal = ({ visible, onCancel, projectId }) => {
+const CustomProjectModal = ({
+  visible,
+  onCancel,
+  projectId,
+  onProjectUpdated,
+}) => {
   const [projectDetails, setProjectDetails] = useState({
     id: '',
     projectName: '',
@@ -29,29 +34,40 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
           });
         })
         .catch(err => {
-          console.error('Error fetching project details:', err);
-          message.error('Error fetching project details');
+          console.error('Error loading project details:', err);
+          message.error('Error loading project details');
         });
     }
 
-    // Fetch project categories
     projectMan
       .getProjectCategory()
       .then(res => {
-        const categoriesData = res.data.content; // Adjust based on your API response structure
+        const categoriesData = res.data.content;
         setCategories(categoriesData);
       })
       .catch(err => {
-        console.error('Error fetching project categories:', err);
-        message.error('Error fetching project categories');
+        console.error('Error loading project categories:', err);
+        message.error('Error loading project categories');
       });
   }, [projectId]);
 
   const handleSave = () => {
+    console.log('Saving project details:', projectDetails);
+  
+    // Ensure all required fields are filled
+    if (!projectDetails.projectName || !projectDetails.projectCategory.id || !projectDetails.description) {
+      message.error('Please fill out all required fields.');
+      return;
+    }
+  
+    // Update project details via API call
     projectMan
-      .updateProjectDetails(projectDetails.id, projectDetails)
+      .updateProject(projectDetails.id, projectDetails)
       .then(res => {
-        message.success('Successfully updated project');
+        message.success('Project updated successfully');
+        if (onProjectUpdated) {
+          onProjectUpdated();
+        }
         onCancel();
       })
       .catch(err => {
@@ -59,12 +75,14 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
         message.error('Error updating project');
       });
   };
+  
 
   const handleChange = (field, value) => {
     if (field === 'projectCategoryName') {
       const selectedCategory = categories.find(
         category => category.projectCategoryName === value
       );
+      console.log('Selected category:', selectedCategory);
       setProjectDetails({
         ...projectDetails,
         projectCategory: {
@@ -73,26 +91,23 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
         },
       });
     } else {
+      console.log('Field:', field, 'Value:', value);
       setProjectDetails({
         ...projectDetails,
         [field]: value,
       });
     }
   };
+  
 
   return (
     <div className="space-y-5">
       <AntdModal
         title="Edit Project"
-        style={{ fontSize: '48px' }}
         visible={visible}
         onCancel={onCancel}
         width={1000}
-        footer={
-          <Button type="primary" onClick={handleSave}>
-            Save
-          </Button>
-        }
+        footer={null}
       >
         <div className="flex justify-between w-full">
           <div className="w-[30%] space-y-2">
@@ -116,7 +131,7 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
             <Select
               value={projectDetails.projectCategory.name}
               onChange={value => handleChange('projectCategoryName', value)}
-              placeholder="Select category"
+              placeholder="Select Category"
             >
               {categories.map(category => (
                 <Option key={category.id} value={category.projectCategoryName}>
@@ -132,6 +147,9 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
             onChange={value => handleChange('description', value)}
           />
         </div>
+        <Button type="primary" onClick={handleSave}>
+          Save
+        </Button>
       </AntdModal>
     </div>
   );

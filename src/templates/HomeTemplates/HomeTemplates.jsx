@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu, theme } from 'antd';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { path } from '../../common/path';
 import { handleGetValueLocalStore } from '../../utils/utils';
 import MenuProject from '../../components/MenuProject/MenuProject';
 const { Content, Sider } = Layout;
 const arrMenu = [
   {
-    label: <Link path={path.account.createTask}>Create Task</Link>,
+    label: <NavLink NavLink path={path.account.createTask}>Create Task</NavLink>,
     icon: <i className="fa-solid fa-plus"></i>,
   },
   {

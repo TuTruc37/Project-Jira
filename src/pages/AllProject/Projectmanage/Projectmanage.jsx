@@ -3,7 +3,7 @@ import { Input, List, Avatar, Button, message, Modal, Table, Tag } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
-import "./projectManage.scss"
+import './projectManage.scss';
 
 const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
@@ -22,7 +22,7 @@ const ProjectManage = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setEditingProjectId(null);
-    handleGetAllProject(); // Reload the project list after closing the modal
+    handleGetAllProject(); // Tải lại danh sách dự án sau khi đóng modal
   };
 
   const handleGetAllProject = () => {
@@ -32,8 +32,8 @@ const ProjectManage = () => {
         setArrProject(res.data.content);
       })
       .catch(err => {
-        console.error('Error fetching project list:', err);
-        message.error('Error fetching project list');
+        console.error('Lỗi khi tải danh sách dự án:', err);
+        message.error('Lỗi khi tải danh sách dự án');
       });
   };
 
@@ -45,18 +45,18 @@ const ProjectManage = () => {
     projectMan
       .deleteProject(projectId)
       .then(res => {
-        message.success('Successfully deleted');
+        message.success('Xóa dự án thành công');
         handleGetAllProject();
       })
       .catch(err => {
-        console.error('Error deleting project:', err);
-        message.error('Failed to delete');
+        console.error('Lỗi khi xóa dự án:', err);
+        message.error('Không thể xóa dự án');
       });
   };
 
   const handleGetUsersByProjectId = projectId => {
     setIsUserModalVisible(true);
-    setEditingProjectId(projectId); // Ensure editingProjectId is set
+    setEditingProjectId(projectId); // Đảm bảo rằng editingProjectId được thiết lập
     setUserList([]);
 
     projectMan
@@ -65,13 +65,13 @@ const ProjectManage = () => {
         if (res.data && res.data.content) {
           setUserList(res.data.content);
         } else {
-          console.error('Unexpected response format:', res);
-          message.error('Unexpected response format');
+          console.error('Định dạng phản hồi không mong đợi:', res);
+          message.error('Định dạng phản hồi không mong đợi');
         }
       })
       .catch(err => {
-        console.error('Error fetching users:', err);
-        // message.error('Error fetching users');
+        console.error('Lỗi khi tải người dùng:', err);
+        message.error('Lỗi khi tải người dùng');
       });
   };
 
@@ -80,12 +80,12 @@ const ProjectManage = () => {
       .removeUserFromProject({ projectId, userId })
       .then(res => {
         message.success('Xóa người dùng thành công');
-        handleGetUsersByProjectId(projectId); // Refresh the user list
+        handleGetUsersByProjectId(projectId); // Cập nhật lại danh sách người dùng
 
-        // Update arrProject to reflect updated members list
+        // Cập nhật arrProject để phản ánh danh sách thành viên đã cập nhật
         const updatedArrProject = arrProject.map(project => {
           if (project.id === projectId) {
-            // Filter out the deleted user from members list
+            // Lọc ra người dùng bị xóa khỏi danh sách thành viên
             const updatedMembers = project.members.filter(
               member => member.userId !== userId
             );
@@ -100,7 +100,7 @@ const ProjectManage = () => {
         setArrProject(updatedArrProject);
       })
       .catch(err => {
-        console.error('Error removing user from project:', err);
+        console.error('Lỗi khi xóa người dùng khỏi dự án:', err);
         message.error('Không thể xóa người dùng');
       });
   };
@@ -112,10 +112,22 @@ const ProjectManage = () => {
         setSearchResult(res.data.content);
       })
       .catch(err => {
-        console.error('Error searching users:', err);
-        message.error('Error searching users');
+        console.error('Lỗi khi tìm kiếm người dùng:', err);
+        message.error('Lỗi khi tìm kiếm người dùng');
       });
   };
+
+  // const handleSearchUser = searchKeyword => {
+  //   projectMan
+  //     .searchUser(searchKeyword)
+  //     .then(res => {
+  //       setSearchResult(res.data.content);
+  //     })
+  //     .catch(err => {
+  //       console.error('Lỗi khi tìm kiếm người dùng:', err);
+  //       message.error('Lỗi khi tìm kiếm người dùng');
+  //     });
+  // };
 
   const debouncedSearchUser = useCallback(debounce(handleSearchUser, 300), []);
 
@@ -127,7 +139,7 @@ const ProjectManage = () => {
 
   const handleAddUserToProject = userId => {
     if (!editingProjectId) {
-      message.error('No project selected for adding user.');
+      message.error('Chưa chọn dự án để thêm người dùng.');
       return;
     }
 
@@ -135,26 +147,26 @@ const ProjectManage = () => {
       .assignUserToProject({ projectId: editingProjectId, userId })
       .then(res => {
         message.success('Thêm người dùng thành công');
-        handleGetUsersByProjectId(editingProjectId); // Refresh user list after adding user
+        handleGetUsersByProjectId(editingProjectId); // Cập nhật lại danh sách người dùng sau khi thêm
 
-        // Update arrProject to reflect updated members list
+        // Cập nhật arrProject để phản ánh danh sách thành viên đã cập nhật
         const updatedArrProject = arrProject.map(project => {
           if (project.id === editingProjectId) {
-            // Check if user already exists in members list
+            // Kiểm tra nếu người dùng đã tồn tại trong danh sách thành viên
             const existingUser = project.members.find(
               member => member.userId === userId
             );
             if (existingUser) {
-              return project; // User already exists, no need to update
+              return project; // Người dùng đã tồn tại, không cần cập nhật
             }
 
-            // Add new user to the members list
+            // Thêm người dùng mới vào danh sách thành viên
             return {
               ...project,
               members: [
                 ...project.members,
-                { userId, name: 'New Member', avatar: '' },
-              ], // Replace with actual member details if available
+                { userId, name: 'Thành viên mới', avatar: '' }, // Thay thế với thông tin thành viên thực nếu có
+              ],
             };
           }
           return project;
@@ -165,7 +177,7 @@ const ProjectManage = () => {
         setSearchResult([]);
       })
       .catch(err => {
-        console.error('Error adding user to project:', err);
+        console.error('Lỗi khi thêm người dùng vào dự án:', err);
         message.error('Không thể thêm người dùng');
       });
   };
@@ -177,22 +189,22 @@ const ProjectManage = () => {
       sorter: (a, b) => a.id - b.id,
     },
     {
-      title: 'Project',
+      title: 'Dự án',
       dataIndex: 'projectName',
       sorter: (a, b) => a.projectName.localeCompare(b.projectName),
     },
     {
-      title: 'Category Name',
+      title: 'Tên danh mục',
       dataIndex: 'categoryName',
       sorter: (a, b) => a.categoryName.localeCompare(b.categoryName),
     },
     {
-      title: 'Creator',
+      title: 'Người tạo',
       dataIndex: 'creator',
       render: creator => <Tag color="#87d068">{creator.name}</Tag>,
     },
     {
-      title: 'Members',
+      title: 'Thành viên',
       dataIndex: 'members',
       render: (members, record) => (
         <Avatar.Group className="flex items-center space-x-1">
@@ -213,7 +225,7 @@ const ProjectManage = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: 'Hành động',
       render: (text, record) => (
         <div className="flex">
           <button
@@ -235,21 +247,22 @@ const ProjectManage = () => {
 
   return (
     <div>
-      <div className="text-3xl font-bold mb-4">Project Management</div>
+      <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
       <Table columns={columns} dataSource={arrProject} rowKey="id" />
       <CustomProjectModal
         visible={isModalVisible}
         onCancel={handleCancel}
         projectId={editingProjectId}
+        onProjectUpdated={handleGetAllProject}
       />
       <Modal
-        title="Members"
+        title="Thành viên"
         visible={isUserModalVisible}
         onCancel={() => setIsUserModalVisible(false)}
         footer={null}
       >
         <Input.Search
-          placeholder="Search users..."
+          placeholder="Tìm kiếm người dùng..."
           value={searchKeyword}
           onChange={handleSearchChange}
           onSearch={handleSearchUser}
@@ -281,7 +294,7 @@ const ProjectManage = () => {
         <div
           style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}
         >
-          <h2 className="text-xl font-semibold">Users</h2>
+          <h2 className="text-xl font-semibold">Người dùng trong dự án</h2>
           <List
             dataSource={userList}
             renderItem={item => (

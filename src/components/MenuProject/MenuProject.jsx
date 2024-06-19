@@ -6,7 +6,7 @@ import { Avatar, Space } from 'antd';
 const MenuProject = () => {
   return (
     <div>
-      <div className="flex">
+      <div className="flex space-x-2">
         <Space direction="vertical" size={16}>
           <Space wrap size={16}>
             <Avatar size="large" icon={<UserOutlined />} />
@@ -18,10 +18,10 @@ const MenuProject = () => {
         </div>
       </div>
       <div className="mt-14">
-        <ul className='space-y-2'>
+        <ul className='space-y-3'>
           <li className="">
             <NavLink to={path.account.trangChu}>
-              <div className=" font-semibold text-xl">
+              <div className=" font-semibold text-lg">
                 <i className="fa-solid fa-list-check " /> Project Management
               </div>
             </NavLink>
@@ -29,15 +29,15 @@ const MenuProject = () => {
           <li>
             <NavLink to={path.account.projectDetail}>
               <div className=' text-lg font-semibold'>
-                <i className="fa-solid fa-file-lines " /> Project DeTail
+                <i className="fa-solid fa-file-lines " />  Project DeTail
               </div>
             </NavLink>
           </li>
           <li>
             <NavLink to={path.account.createProject}>
               <div className="text-lg font-semibold">
-                <i className="fa-solid fa-file-circle-plus mr-1 " />
-                Create Project
+            
+                <i className="fa-solid fa-file-circle-plus " />  Create Project
               </div>
             </NavLink>
           </li>
