@@ -54,15 +54,23 @@ const ProjectManage = () => {
   };
 
   const handleGetUsersByProjectId = projectId => {
+    setIsUserModalVisible(true);
+    setEditingProjectId(projectId); // Ensure editingProjectId is set
+    setUserList([]);
+
     projectMan
       .getUserProjectId(projectId)
       .then(res => {
-        setUserList(res.data.content);
-        setIsUserModalVisible(true);
+        if (res.data && res.data.content) {
+          setUserList(res.data.content);
+        } else {
+          console.error('Unexpected response format:', res);
+          message.error('Unexpected response format');
+        }
       })
       .catch(err => {
         console.error('Error fetching users:', err);
-        message.error('Error fetching users');
+        // message.error('Error fetching users');
       });
   };
 
@@ -72,6 +80,23 @@ const ProjectManage = () => {
       .then(res => {
         message.success('Xóa người dùng thành công');
         handleGetUsersByProjectId(projectId); // Refresh the user list
+
+        // Update arrProject to reflect updated members list
+        const updatedArrProject = arrProject.map(project => {
+          if (project.id === projectId) {
+            // Filter out the deleted user from members list
+            const updatedMembers = project.members.filter(
+              member => member.userId !== userId
+            );
+            return {
+              ...project,
+              members: updatedMembers,
+            };
+          }
+          return project;
+        });
+
+        setArrProject(updatedArrProject);
       })
       .catch(err => {
         console.error('Error removing user from project:', err);
@@ -91,7 +116,6 @@ const ProjectManage = () => {
       });
   };
 
-  // Sử dụng debounce để gọi API tìm kiếm sau 300ms kể từ lần gõ cuối cùng
   const debouncedSearchUser = useCallback(debounce(handleSearchUser, 300), []);
 
   const handleSearchChange = e => {
@@ -101,11 +125,41 @@ const ProjectManage = () => {
   };
 
   const handleAddUserToProject = userId => {
+    if (!editingProjectId) {
+      message.error('No project selected for adding user.');
+      return;
+    }
+
     projectMan
       .assignUserToProject({ projectId: editingProjectId, userId })
       .then(res => {
         message.success('Thêm người dùng thành công');
-        handleGetUsersByProjectId(editingProjectId);
+        handleGetUsersByProjectId(editingProjectId); // Refresh user list after adding user
+
+        // Update arrProject to reflect updated members list
+        const updatedArrProject = arrProject.map(project => {
+          if (project.id === editingProjectId) {
+            // Check if user already exists in members list
+            const existingUser = project.members.find(
+              member => member.userId === userId
+            );
+            if (existingUser) {
+              return project; // User already exists, no need to update
+            }
+
+            // Add new user to the members list
+            return {
+              ...project,
+              members: [
+                ...project.members,
+                { userId, name: 'New Member', avatar: '' },
+              ], // Replace with actual member details if available
+            };
+          }
+          return project;
+        });
+
+        setArrProject(updatedArrProject);
         setSearchKeyword('');
         setSearchResult([]);
       })
@@ -188,7 +242,7 @@ const ProjectManage = () => {
         projectId={editingProjectId}
       />
       <Modal
-        title="Thành viên"
+        title="Members"
         visible={isUserModalVisible}
         onCancel={() => setIsUserModalVisible(false)}
         footer={null}
@@ -210,7 +264,7 @@ const ProjectManage = () => {
                     type="primary"
                     onClick={() => handleAddUserToProject(item.userId)}
                   >
-                    Add
+                    <i className="fa-solid fa-user-plus" />
                   </Button>,
                 ]}
               >
@@ -226,6 +280,7 @@ const ProjectManage = () => {
         <div
           style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}
         >
+          <h2 className="text-xl font-semibold">Users</h2>
           <List
             dataSource={userList}
             renderItem={item => (

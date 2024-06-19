@@ -8,6 +8,8 @@ import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
+import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
+import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -28,13 +30,13 @@ const useRouteCustom = () => {
           element: <CreateTask />,
         },
         {
-          path: path.account.projectdetail,
+          path: path.account.projectDetail,
           element: <ProjectDetail />,
         },
-        // {
-        //   path: path.account.editTask,
-        //   element: <EditProjectManager />,
-        // },
+        {
+          path: path.account.editTask,
+          element: <EditProjectManager />,
+        },
       ],
     },
 

@@ -39,7 +39,6 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
       .getProjectCategory()
       .then(res => {
         const categoriesData = res.data.content; // Adjust based on your API response structure
-        console.log('Fetched categories:', categoriesData); // Check the structure of categoriesData
         setCategories(categoriesData);
       })
       .catch(err => {
@@ -84,7 +83,7 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
   return (
     <div className="space-y-5">
       <AntdModal
-        title="Edit Project "
+        title="Edit Project"
         style={{ fontSize: '48px' }}
         visible={visible}
         onCancel={onCancel}
@@ -95,9 +94,9 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
           </Button>
         }
       >
-        <div className="flex justify-between w-full ">
-          <div className="w-[30%]  space-y-2">
-            <label className="font-semibold ">ID</label>
+        <div className="flex justify-between w-full">
+          <div className="w-[30%] space-y-2">
+            <label className="font-semibold">ID</label>
             <Input
               style={{ color: 'black' }}
               value={projectDetails.id}
@@ -106,14 +105,14 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
             />
           </div>
           <div className="w-[30%] space-y-2">
-            <label className='font-semibold'>Project Name</label>
+            <label className="font-semibold">Project Name</label>
             <Input
               value={projectDetails.projectName}
               onChange={e => handleChange('projectName', e.target.value)}
             />
           </div>
           <div className="w-[30%] flex flex-col space-y-2">
-            <label className='font-semibold'>Project Category</label>
+            <label className="font-semibold">Project Category</label>
             <Select
               value={projectDetails.projectCategory.name}
               onChange={value => handleChange('projectCategoryName', value)}
@@ -127,7 +126,7 @@ const CustomProjectModal = ({ visible, onCancel, projectId }) => {
             </Select>
           </div>
         </div>
-        <div className='mt-4'>
+        <div className="mt-4">
           <TextEditor
             value={projectDetails.description}
             onChange={value => handleChange('description', value)}

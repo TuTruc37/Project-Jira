@@ -256,12 +256,14 @@ const CreateTask = () => {
           </div>
         </div>
         <Description />
-        <button
-          className="bg-blue-500 mt-20 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-          type="submit"
-        >
-          Submit
-        </button>
+        <div className="">
+          <button
+            className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
