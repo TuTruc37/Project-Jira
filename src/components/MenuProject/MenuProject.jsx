@@ -35,6 +35,18 @@ const MenuProject = () => {
               <i className="fa-solid fa-gear"></i> Create management
             </NavLink>
           </li>
+          <li
+            className={
+              location.pathname === path.account.trangChu ? 'active' : ''
+            }
+          >
+            <Link
+              to={path.users}
+              onClick={() => handleClick(path.users)}
+            >
+              <i className="fa-solid fa-users"></i> Users Management
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

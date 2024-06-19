@@ -10,7 +10,7 @@ import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
-
+import UserManage from '../pages/AllProject/UserManage/UserManage';
 const useRouteCustom = () => {
   const route = useRoutes([
     {
@@ -37,6 +37,10 @@ const useRouteCustom = () => {
           path: path.account.editTask,
           element: <EditProjectManager />,
         },
+        {
+          path: path.users,
+          element: <UserManage />,
+        },
       ],
     },
 
@@ -51,6 +55,10 @@ const useRouteCustom = () => {
     {
       path: '*',
       element: <NotFound />,
+    },
+    {
+      path: path.users,
+      element: <UserManage />,
     },
   ]);
   return route;
