@@ -3,6 +3,7 @@ import { Input, List, Avatar, Button, message, Modal, Table, Tag } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
+import "./projectManage.scss"
 
 const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
