@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react';
 import { Button, Table, Modal, message, Input, Typography } from 'antd';
 import Swal from 'sweetalert2';
-import { users } from '../../../services/users'
+import { users } from '../../../services/users';
 
 const UserManage = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -17,15 +17,15 @@ const UserManage = () => {
 
   const fetchUsers = () => {
     users
-    .getUsers()
-    .then(res => {
-      setDataUsers(res.data.content);
-    })
-    .catch(err => {
-      console.log(err);
-      message.error('Error fetching users');
-    });
-  }
+      .getUsers()
+      .then(res => {
+        setDataUsers(res.data.content);
+      })
+      .catch(err => {
+        console.log(err);
+        message.error('Error fetching users');
+      });
+  };
 
   const columns = [
     {
@@ -54,8 +54,21 @@ const UserManage = () => {
       key: 'x',
       render: (text, record) => (
         <div className="flex space-x-3">
-          <Button onClick={() => handleEditUser(record)} type="primary" className="bg-info-400 text-white">Edit User</Button>
-          <Button onClick={() => deleteUser(record)} type="secondary" className="bg-red-400 text-white hover:bg-red-600">Delete User</Button>
+          <Button
+            onClick={() => handleEditUser(record)}
+            type="primary"
+            className="bg-info-400 text-white"
+          >
+            <i className="fa-solid fa-user-pen" />
+          </Button>
+          <Button
+            onClick={() => deleteUser(record)}
+            type="secondary"
+            className="bg-red-400 text-white hover:bg-red-600"
+          >
+   <i className="fa-solid fa-trash-can" />
+
+          </Button>
         </div>
       ),
     },
@@ -72,18 +85,18 @@ const UserManage = () => {
     });
   });
 
-  const handleEditUser = (record) => {
-    setIsOpenModal(true)
+  const handleEditUser = record => {
+    setIsOpenModal(true);
     setCurrentUser(record);
 
-    setEmail(record.email)
-    setName(record.name)
-    setPhone(record.phone)
-  }
+    setEmail(record.email);
+    setName(record.name);
+    setPhone(record.phone);
+  };
 
   useEffect(() => {
     if (currentUser) {
-      console.log(currentUser)
+      console.log(currentUser);
       setEmail(currentUser.email);
       setName(currentUser.name);
       setPhone(currentUser.phone);
@@ -96,40 +109,42 @@ const UserManage = () => {
       email: email != '' ? email : currentUser.email,
       name: name != '' ? name : currentUser.name,
       phoneNumber: phone != '' ? phone : currentUser.phone,
-    }
+    };
 
-    users.editUser(payload)
-      .then(res => {
-        if (res.data.statusCode == 200) {
-          message.success("Cập nhật thành công");
-          fetchUsers();
-          setIsOpenModal(false)
-        } else {
-          message.error('Có lỗi');
-        }
-      })
-  }
-
-  const deleteUser = (record) => {
-    Swal.fire({
-      title: "Delete this user?",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        users.deleteUser(record.id).then((response) => {
-          message.success("Deleted user successfully");
-          fetchUsers();
-        }).catch(err => {
-          if (err.response && err.response.status === 400) {
-            message.error(err.response.data.content)
-          } else {
-            message.error('Có lỗi!')
-          }
-        })
+    users.editUser(payload).then(res => {
+      if (res.data.statusCode == 200) {
+        message.success('Cập nhật thành công');
+        fetchUsers();
+        setIsOpenModal(false);
+      } else {
+        message.error('Có lỗi');
       }
     });
-  }
+  };
+
+  const deleteUser = record => {
+    Swal.fire({
+      title: 'Delete this user?',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    }).then(result => {
+      if (result.isConfirmed) {
+        users
+          .deleteUser(record.id)
+          .then(response => {
+            message.success('Deleted user successfully');
+            fetchUsers();
+          })
+          .catch(err => {
+            if (err.response && err.response.status === 400) {
+              message.error(err.response.data.content);
+            } else {
+              message.error('Có lỗi!');
+            }
+          });
+      }
+    });
+  };
 
   return (
     <>
@@ -138,28 +153,48 @@ const UserManage = () => {
         dataSource={dataSource}
         pagination={{
           showQuickJumper: false,
-          size: "small",
+          size: 'small',
           defaultPageSize: 10,
           showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "30", "40", "50", "100"],
-          showTotal: (total) => {
-            return `Total: ${total}`
-          }
+          pageSizeOptions: ['10', '20', '30', '40', '50', '100'],
+          showTotal: total => {
+            return `Total: ${total}`;
+          },
         }}
       />
 
-      <Modal title="Edit user" open={isOpenModal} onOk={() => saveDataUser()} onCancel={() => setIsOpenModal(false)}>
+      <Modal
+        title="Edit user"
+        open={isOpenModal}
+        onOk={() => saveDataUser()}
+        onCancel={() => setIsOpenModal(false)}
+      >
         <Typography.Title level={5}>Email</Typography.Title>
-        <Input type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Email" value={email} />
+        <Input
+          type="email"
+          onChange={e => setEmail(e.target.value)}
+          placeholder="Email"
+          value={email}
+        />
 
         <Typography.Title level={5}>Name</Typography.Title>
-        <Input type="text" onChange={(e) => setName(e.target.value)} placeholder="Name" value={name} />
+        <Input
+          type="text"
+          onChange={e => setName(e.target.value)}
+          placeholder="Name"
+          value={name}
+        />
 
         <Typography.Title level={5}>Phone</Typography.Title>
-        <Input type="phone" onChange={(e) => setPhone(e.target.value)} placeholder="Phone" value={phone} />
+        <Input
+          type="phone"
+          onChange={e => setPhone(e.target.value)}
+          placeholder="Phone"
+          value={phone}
+        />
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default UserManage
+export default UserManage;

@@ -1,40 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { projectMan } from '../../services/projectMan';
 
 const ProjectDetail = () => {
-  const [tasks, setTasks] = useState([
-    { id: 'task1', content: 'Task 1', column: 'column1' },
-    { id: 'task2', content: 'Task 2', column: 'column1' },
-    { id: 'task3', content: 'Task 3', column: 'column2' },
-    { id: 'task4', content: 'Task 4', column: 'column2' },
-    { id: 'task5', content: 'Task 5', column: 'column3' },
-    { id: 'task6', content: 'Task 6', column: 'column3' },
-    { id: 'task7', content: 'Task 7', column: 'column4' },
-    { id: 'task8', content: 'Task 8', column: 'column4' },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [columns, setColumns] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const [columns, setColumns] = useState({
-    column1: {
-      id: 'column1',
-      title: 'BACKLOG',
-      taskIds: ['task1', 'task2'],
-    },
-    column2: {
-      id: 'column2',
-      title: 'SELECTED FOR DEVELOPMENT',
-      taskIds: ['task3', 'task4'],
-    },
-    column3: {
-      id: 'column3',
-      title: 'IN PROGRESS',
-      taskIds: ['task5', 'task6'],
-    },
-    column4: {
-      id: 'column4',
-      title: 'DONE',
-      taskIds: ['task7', 'task8'],
-    },
-  });
+  useEffect(() => {
+    const projectId = 15644; // Chỉ định ID dự án của bạn
+    projectMan.getProjectDetails(projectId).then((response) => {
+      const project = response.data.content;
+
+      if (!project || !project.lstTask) {
+        console.error("Project or lstTask not found in response");
+        setLoading(false);
+        return;
+      }
+
+      // Extract tasks from lstTask and lstTaskDeTail
+      const newTasks = [];
+      const newColumns = {};
+
+      project.lstTask.forEach(column => {
+        const columnId = `column-${column.statusId}`;
+        const taskIds = column.lstTaskDeTail.map(task => {
+          const taskId = `task-${task.taskId}`;
+          newTasks.push({
+            id: taskId,
+            content: task.taskName,
+            column: columnId,
+          });
+          return taskId;
+        });
+
+        newColumns[columnId] = {
+          id: columnId,
+          title: column.statusName,
+          taskIds: taskIds,
+        };
+      });
+
+      setTasks(newTasks);
+      setColumns(newColumns);
+      setLoading(false);
+    }).catch(error => {
+      console.error("Error fetching project details:", error);
+      setLoading(false);
+    });
+  }, []);
 
   const handleDragEnd = result => {
     if (!result.destination) return;
@@ -83,6 +97,10 @@ const ProjectDetail = () => {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="ProjectDetail">
       <h1 className="text-center text-2xl font-bold pb-20">Kanban Board</h1>
@@ -99,6 +117,7 @@ const ProjectDetail = () => {
                   <h2>{column.title}</h2>
                   {column.taskIds.map((taskId, index) => {
                     const task = tasks.find(task => task.id === taskId);
+                    if (!task) return null;
 
                     return (
                       <Draggable

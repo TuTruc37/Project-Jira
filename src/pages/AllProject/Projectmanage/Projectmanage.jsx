@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Input, List, Avatar, Button, message, Modal, Table, Tag } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, message, Modal, Avatar, Input, List, Tag } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
+import { path } from '../../../common/path';
+import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
 import './projectManage.scss';
 
 const ProjectManage = () => {
@@ -22,7 +24,7 @@ const ProjectManage = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setEditingProjectId(null);
-    handleGetAllProject(); // Tải lại danh sách dự án sau khi đóng modal
+    handleGetAllProject();
   };
 
   const handleGetAllProject = () => {
@@ -56,7 +58,7 @@ const ProjectManage = () => {
 
   const handleGetUsersByProjectId = projectId => {
     setIsUserModalVisible(true);
-    setEditingProjectId(projectId); // Đảm bảo rằng editingProjectId được thiết lập
+    setEditingProjectId(projectId);
     setUserList([]);
 
     projectMan
@@ -71,7 +73,6 @@ const ProjectManage = () => {
       })
       .catch(err => {
         console.error('Lỗi khi tải người dùng:', err);
-        message.error('Lỗi khi tải người dùng');
       });
   };
 
@@ -80,12 +81,10 @@ const ProjectManage = () => {
       .removeUserFromProject({ projectId, userId })
       .then(res => {
         message.success('Xóa người dùng thành công');
-        handleGetUsersByProjectId(projectId); // Cập nhật lại danh sách người dùng
+        handleGetUsersByProjectId(projectId);
 
-        // Cập nhật arrProject để phản ánh danh sách thành viên đã cập nhật
         const updatedArrProject = arrProject.map(project => {
           if (project.id === projectId) {
-            // Lọc ra người dùng bị xóa khỏi danh sách thành viên
             const updatedMembers = project.members.filter(
               member => member.userId !== userId
             );
@@ -117,19 +116,7 @@ const ProjectManage = () => {
       });
   };
 
-  // const handleSearchUser = searchKeyword => {
-  //   projectMan
-  //     .searchUser(searchKeyword)
-  //     .then(res => {
-  //       setSearchResult(res.data.content);
-  //     })
-  //     .catch(err => {
-  //       console.error('Lỗi khi tìm kiếm người dùng:', err);
-  //       message.error('Lỗi khi tìm kiếm người dùng');
-  //     });
-  // };
-
-  const debouncedSearchUser = useCallback(debounce(handleSearchUser, 300), []);
+  const debouncedSearchUser = debounce(handleSearchUser, 300);
 
   const handleSearchChange = e => {
     const { value } = e.target;
@@ -147,25 +134,22 @@ const ProjectManage = () => {
       .assignUserToProject({ projectId: editingProjectId, userId })
       .then(res => {
         message.success('Thêm người dùng thành công');
-        handleGetUsersByProjectId(editingProjectId); // Cập nhật lại danh sách người dùng sau khi thêm
+        handleGetUsersByProjectId(editingProjectId);
 
-        // Cập nhật arrProject để phản ánh danh sách thành viên đã cập nhật
         const updatedArrProject = arrProject.map(project => {
           if (project.id === editingProjectId) {
-            // Kiểm tra nếu người dùng đã tồn tại trong danh sách thành viên
             const existingUser = project.members.find(
               member => member.userId === userId
             );
             if (existingUser) {
-              return project; // Người dùng đã tồn tại, không cần cập nhật
+              return project;
             }
 
-            // Thêm người dùng mới vào danh sách thành viên
             return {
               ...project,
               members: [
                 ...project.members,
-                { userId, name: 'Thành viên mới', avatar: '' }, // Thay thế với thông tin thành viên thực nếu có
+                { userId, name: 'Thành viên mới', avatar: '' },
               ],
             };
           }
@@ -191,6 +175,11 @@ const ProjectManage = () => {
     {
       title: 'Dự án',
       dataIndex: 'projectName',
+      render: (text, record) => (
+        <NavLink to={`${path.account.projectDetail}/${record.id}`}>
+          {text}
+        </NavLink>
+      ),
       sorter: (a, b) => a.projectName.localeCompare(b.projectName),
     },
     {

@@ -1,3 +1,4 @@
+// projectMan.js
 import { http } from './config';
 
 export const projectMan = {
@@ -28,4 +29,7 @@ export const projectMan = {
   searchUser: (keyword) => {
     return http.get(`/Users/getUser?keyword=${keyword}`);
   },
+  createProjectAuthorize: (data) => {
+    return http.post("/Project/createProjectAuthorize", data);
+  }
 };

@@ -6,7 +6,7 @@ export const path = {
     createProject: '/createProject',
     createTask: '/create/task',
     editTask: '/edit/task',
-    projectDetail: '/projectDetail',
+    projectDetail: '/projectDetail/:id', // Dynamic segment for project ID
   },
   users: '/users',
 };

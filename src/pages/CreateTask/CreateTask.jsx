@@ -66,6 +66,7 @@ const CreateTask = () => {
       priorityId: '',
     },
     onSubmit: async values => {
+      console.log('Submitted values:', values); // Log dữ liệu đã gửi đi
       try {
         const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
@@ -90,6 +91,7 @@ const CreateTask = () => {
       newRemaining >= 0 ? newRemaining : 0
     );
   };
+
   const handleFieldChange = e => {
     const { name, value } = e.target;
     handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
@@ -118,8 +120,9 @@ const CreateTask = () => {
             placeholder="Chọn dự án"
             allowClear
             treeDefaultExpandAll
+            value={values.projectId} // Gán giá trị hiện tại từ formik
             onChange={value =>
-              handleChange({ target: { name: 'projectId', value } })
+              setFieldValue('projectId', value) // Cập nhật giá trị cho formik
             }
             treeData={gprojectId.map(project => ({
               ...project,
@@ -183,14 +186,14 @@ const CreateTask = () => {
             <TreeSelect
               showSearch
               style={{ width: '100%' }}
-              value={values.userAsign}
+              value={values.listUserAsign}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder="Please select"
               allowClear
               multiple
               treeDefaultExpandAll
               onChange={value =>
-                handleChange({ target: { name: 'listUserAsign', value } })
+                setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
               }
               treeData={userAsign.map(user => ({
                 ...user,
@@ -255,7 +258,11 @@ const CreateTask = () => {
             />
           </div>
         </div>
-        <Description />
+        <Description
+          name="description"
+          handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+          value={values.description}
+        />
         <div className="">
           <button
             className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"

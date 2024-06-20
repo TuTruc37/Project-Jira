@@ -53,17 +53,22 @@ const CustomProjectModal = ({
 
   const handleSave = () => {
     console.log('Saving project details:', projectDetails);
-  
+
     // Ensure all required fields are filled
-    if (!projectDetails.projectName || !projectDetails.projectCategory.id || !projectDetails.description) {
+    if (
+      !projectDetails.projectName ||
+      !projectDetails.projectCategory.id ||
+      !projectDetails.description
+    ) {
       message.error('Please fill out all required fields.');
       return;
     }
-  
+
     // Update project details via API call
     projectMan
       .updateProject(projectDetails.id, projectDetails)
       .then(res => {
+        console.log('API response:', res);
         message.success('Project updated successfully');
         if (onProjectUpdated) {
           onProjectUpdated();
@@ -75,7 +80,6 @@ const CustomProjectModal = ({
         message.error('Error updating project');
       });
   };
-  
 
   const handleChange = (field, value) => {
     if (field === 'projectCategoryName') {
@@ -98,7 +102,6 @@ const CustomProjectModal = ({
       });
     }
   };
-  
 
   return (
     <div className="space-y-5">
@@ -107,7 +110,11 @@ const CustomProjectModal = ({
         visible={visible}
         onCancel={onCancel}
         width={1000}
-        footer={null}
+        footer={
+          <Button className='mt-10' type="primary" onClick={handleSave}>
+            Save
+          </Button>
+        }
       >
         <div className="flex justify-between w-full">
           <div className="w-[30%] space-y-2">
@@ -147,9 +154,7 @@ const CustomProjectModal = ({
             onChange={value => handleChange('description', value)}
           />
         </div>
-        <Button type="primary" onClick={handleSave}>
-          Save
-        </Button>
+        <div className=""></div>
       </AntdModal>
     </div>
   );
