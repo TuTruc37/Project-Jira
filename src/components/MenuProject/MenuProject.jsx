@@ -18,7 +18,7 @@ const MenuProject = () => {
         </div>
       </div>
       <div className="mt-14">
-        <ul className='space-y-3'>
+        <ul className="space-y-3">
           <li className="">
             <NavLink to={path.account.trangChu}>
               <div className=" font-semibold text-lg">
@@ -28,25 +28,20 @@ const MenuProject = () => {
           </li>
           <li>
             <NavLink to={path.account.projectDetail}>
-              <div className=' text-lg font-semibold'>
-                <i className="fa-solid fa-file-lines " />  Project DeTail
+              <div className=" text-lg font-semibold">
+                <i className="fa-solid fa-file-lines " /> Project DeTail
               </div>
             </NavLink>
           </li>
           <li>
             <NavLink to={path.account.createProject}>
               <div className="text-lg font-semibold">
-            
-                <i className="fa-solid fa-file-circle-plus " />  Create Project
+                <i className="fa-solid fa-file-circle-plus " /> Create Project
               </div>
             </NavLink>
           </li>
-          <li
-            className={
-              location.pathname === path.account.trangChu ? 'active' : ''
-            }
-          >
-            <NavLink to={path.users} onClick={() => handleClick(path.users)}>
+          <li>
+            <NavLink to={path.account.users}>
               <div className="text-lg font-semibold">
                 <i className="fa-solid fa-users"></i> Users Management
               </div>
