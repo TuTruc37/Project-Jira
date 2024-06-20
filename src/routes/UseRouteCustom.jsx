@@ -5,12 +5,22 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
+<<<<<<< HEAD
 import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
+=======
+
+// import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
+import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+import UserManage from '../pages/AllProject/UserManage/UserManage';
+import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
+// import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
+
+>>>>>>> e6276f923e365004d8b99bf30dffeb9a52087fdb
 const useRouteCustom = () => {
   const route = useRoutes([
     {
@@ -24,6 +34,7 @@ const useRouteCustom = () => {
         {
           path: path.account.createProject,
           element: <CreateManager />,
+<<<<<<< HEAD
         },
         {
           path: path.account.createTask,
@@ -36,6 +47,8 @@ const useRouteCustom = () => {
         {
           path: path.account.editTask,
           element: <EditProjectManager />,
+=======
+>>>>>>> e6276f923e365004d8b99bf30dffeb9a52087fdb
         },
         {
           path: path.users,

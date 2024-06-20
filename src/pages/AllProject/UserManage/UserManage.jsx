@@ -10,6 +10,7 @@ const UserManage = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -111,16 +112,17 @@ const UserManage = () => {
       phoneNumber: phone != '' ? phone : currentUser.phone,
     };
 
-    users.editUser(payload).then(res => {
-      if (res.data.statusCode == 200) {
-        message.success('Cập nhật thành công');
-        fetchUsers();
-        setIsOpenModal(false);
-      } else {
-        message.error('Có lỗi');
-      }
-    });
-  };
+    users.editUser(payload)
+      .then(res => {
+        if (res.data.statusCode == 200) {
+          message.success("Updated successfully!");
+          fetchUsers();
+          setIsOpenModal(false)
+        } else {
+          message.error('Error!');
+        }
+      })
+  }
 
   const deleteUser = record => {
     Swal.fire({
@@ -129,25 +131,30 @@ const UserManage = () => {
       confirmButtonText: 'Yes',
     }).then(result => {
       if (result.isConfirmed) {
-        users
-          .deleteUser(record.id)
-          .then(response => {
-            message.success('Deleted user successfully');
-            fetchUsers();
-          })
-          .catch(err => {
-            if (err.response && err.response.status === 400) {
-              message.error(err.response.data.content);
-            } else {
-              message.error('Có lỗi!');
-            }
-          });
+        users.deleteUser(record.id).then((response) => {
+          message.success("Deleted user successfully");
+          fetchUsers();
+        }).catch(err => {
+          if (err.response && err.response.status === 400) {
+            message.error(err.response.data.content)
+          } else {
+            message.error('Error!')
+          }
+        })
       }
     });
-  };
+  }
+
+  dataSource = dataSource.filter(item =>
+    Object.values(item).some(value =>
+      value?.toString()?.toLowerCase()?.includes(search.toLowerCase())
+    )
+  )
 
   return (
     <>
+      <Input type="text" onChange={(e) => setSearch(e.target.value)} className="flex justify-end mb-5 w-1/4" size="medium" placeholder="Full name..." />
+
       <Table
         columns={columns}
         dataSource={dataSource}
