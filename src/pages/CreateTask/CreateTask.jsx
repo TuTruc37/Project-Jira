@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
 import Description from '../../components/Description/Description';
@@ -7,9 +8,11 @@ import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { TreeSelect, Slider } from 'antd';
+import { addTask } from './../../redux/slice/taskSlice';
 import './createTask.scss';
 
 const CreateTask = () => {
+  const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
   const [gpriority, setPriority] = useState([]);
@@ -71,6 +74,14 @@ const CreateTask = () => {
         const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
         resetForm();
+
+        // Dispatch addTask to Redux store
+        const newTask = {
+          id: `task-${res.data.taskId}`,
+          content: values.taskName,
+          column: `column-${values.statusId}`,
+        };
+        dispatch(addTask(newTask));
       } catch (err) {
         handleAlert('error', err.response.data.content);
       }

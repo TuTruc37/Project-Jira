@@ -31,8 +31,8 @@ export const getAllCreateTask = {
   postUpdateTask: data => {
     return http.post(`/Project/updateTask/${data.taskId}`, data);
   },
-  getProjectDetails: () => {
-    return http.get(`Project/getProjectDetail?id=15642`);
+  getProjectDetails: projectId => {
+    return http.get(`Project/getProjectDetail?id=${projectId}`);
   },
 
   // Other methods as per your requirements
