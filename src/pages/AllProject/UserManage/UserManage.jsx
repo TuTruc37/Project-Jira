@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Table, Modal, message, Input, Typography } from 'antd';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import { users } from '../../../services/users'
 
 const UserManage = () => {
