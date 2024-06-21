@@ -7,7 +7,7 @@ import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 
 // import Createmanager from '../pages/AllProject/CreateManage/CreateManager';
-import ProjectManage from '../pages/AllProject/Projectmanage/Projectmanage';
+import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 // import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
