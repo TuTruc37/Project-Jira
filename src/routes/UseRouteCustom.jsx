@@ -11,6 +11,7 @@ import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
+
 const useRouteCustom = () => {
   const route = useRoutes([
     {
@@ -30,7 +31,11 @@ const useRouteCustom = () => {
           element: <CreateTask />,
         },
         {
-          path: path.account.projectDetail,
+          path: `${path.account.projectDetail}/:projectId`,  // Update this line
+          element: <ProjectDetail />,
+        },
+        {
+          path: path.account.projectDetail,  // Update this line
           element: <ProjectDetail />,
         },
         {
@@ -43,7 +48,6 @@ const useRouteCustom = () => {
         },
       ],
     },
-
     {
       path: path.dangNhap,
       element: <Login />,
@@ -55,10 +59,6 @@ const useRouteCustom = () => {
     {
       path: '*',
       element: <NotFound />,
-    },
-    {
-      path: path.users,
-      element: <UserManage />,
     },
   ]);
   return route;
