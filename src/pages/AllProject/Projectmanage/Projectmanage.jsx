@@ -15,7 +15,23 @@ const ProjectManage = () => {
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
+  // search dự án
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchedProjects, setSearchedProjects] = useState([]);
+  const handleSearchTermChange = event => {
+    setSearchTerm(event.target.value);
+  };
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      const filteredProjects = arrProject.filter(project =>
+        project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchedProjects(filteredProjects);
+    }, 300);
 
+    return () => clearTimeout(delaySearch);
+  }, [searchTerm]);
+  //
   const showModal = projectId => {
     setIsModalVisible(true);
     setEditingProjectId(projectId);
@@ -237,7 +253,19 @@ const ProjectManage = () => {
   return (
     <div>
       <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
-      <Table columns={columns} dataSource={arrProject} rowKey="id" />
+
+      {/* Search dự án */}
+      <Input.Search
+        placeholder="Tìm kiếm dự án..."
+        onChange={handleSearchTermChange}
+        style={{ marginBottom: 16 }}
+      />
+      <Table
+        columns={columns}
+        dataSource={searchedProjects.length > 0 ? searchedProjects : arrProject}
+        rowKey="id"
+      />
+      {/*  */}
       <CustomProjectModal
         visible={isModalVisible}
         onCancel={handleCancel}

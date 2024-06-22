@@ -136,7 +136,6 @@ const EditProjectManager = () => {
           error={errors.taskName}
           touched={touched.taskName}
           value={values.taskName}
-
           labelColor="text-black"
         />
         <SelectCustom
