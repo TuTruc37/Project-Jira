@@ -5,7 +5,7 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+import Projectmanage from '../pages/AllProject/Projectmanage/Projectmanage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
@@ -20,7 +20,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <ProjectManage />,
+          element: <Projectmanage />,
         },
         {
           path: path.account.createProject,
@@ -31,11 +31,11 @@ const useRouteCustom = () => {
           element: <CreateTask />,
         },
         {
-          path: `${path.account.projectDetail}/:projectId`,  // Update this line
+          path: `${path.account.projectDetail}/:projectId`, // Update this line
           element: <ProjectDetail />,
         },
         {
-          path: path.account.projectDetail,  // Update this line
+          path: path.account.projectDetail, // Update this line
           element: <ProjectDetail />,
         },
         {
