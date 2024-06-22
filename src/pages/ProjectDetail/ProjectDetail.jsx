@@ -3,6 +3,7 @@ import { NavLink, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { path } from '../../common/path';
+import './projectDetail.scss';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -23,6 +24,9 @@ const ProjectDetail = () => {
               id: task.taskId.toString(),
               content: task.taskName,
               column: status.statusId,
+              assignees: task.assigness,
+              taskType: task.taskTypeDetail.taskType,
+              priority: task.priorityTask.priority, // Add priority field
             };
           });
         });
@@ -96,13 +100,50 @@ const ProjectDetail = () => {
     }
   };
 
+  const getTaskTypeIcon = taskType => {
+    switch (taskType.toLowerCase()) {
+      case 'bug':
+        return (
+          <i className="fa-solid fa-xmark bg-red-500 py-1 px-2 rounded text-white"></i>
+        );
+      case 'new task':
+        return (
+          <i className="fa-solid fa-font-awesome bg-green-500 py-1 px-2 rounded text-white"></i>
+        );
+      default:
+        return <i className="fa-solid fa-square-check"></i>;
+    }
+  };
+
+  const getPriorityIcon = priority => {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return <i className="fa-solid fa-arrow-up py-2 px-2 priority-high"></i>;
+
+      case 'medium':
+        return <i className="fa-solid fa-arrow-up priority-medium"></i>;
+      case 'low':
+        return <i className="fa-solid fa-arrow-down priority-low"></i>;
+
+      case 'lowest':
+        return <i className="fa-solid fa-arrow-down priority-lowest"></i>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="ProjectDetail">
-      <h1 className="text-center text-2xl font-bold pb-20">Kanban Board</h1>
-      <div className='flex justify-end mb-3'>
-      <NavLink to={path.account.createTask} className="py-2 hover:text-white  px-5 bg-blue-500 text-white font-semibold text-md rounded-md">Create task</NavLink>
+      <h1 className="text-center text-2xl font-bold pb-20">Project Detail</h1>
+      <div className="flex justify-end mb-3">
+        <NavLink
+          to={path.account.createTask}
+          className="py-2 hover:text-white px-5 bg-blue-500 text-white font-semibold text-md rounded-md"
+        >
+          Create task
+        </NavLink>
       </div>
-      <div className="grid grid-cols-4 gap-5 shadow-2xl">
+      <div className="grid grid-cols-4 gap-5">
         <DragDropContext onDragEnd={handleDragEnd}>
           {Object.values(columns).map(column => (
             <Droppable key={column.id} droppableId={column.id}>
@@ -110,9 +151,9 @@ const ProjectDetail = () => {
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="column divide-y p-5 bg-gray-400 text-center"
+                  className="column droppable-column space-y-2 divide-y p-5 text-center"
                 >
-                  <h2>{column.title}</h2>
+                  <h2 className="text-left mb-2 font-medium">{column.title}</h2>
                   {column.taskIds.map((taskId, index) => {
                     const task = tasks.find(task => task.id === taskId);
 
@@ -127,9 +168,31 @@ const ProjectDetail = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             ref={provided.innerRef}
-                            className="task p-5 bg-white"
+                            className="task p-5 bg-white shadow-md rounded-md"
                           >
-                            {task.content}
+                            <div className="text-left text-md font-normal">
+                              {task.content}
+                            </div>
+                            <div className="flex mt-4 justify-between items-center">
+                              <div className="flex space-x-2">
+                                <div className="task-type">
+                                  {getTaskTypeIcon(task.taskType)}
+                                </div>
+                                <div className="task-priority">
+                                  {getPriorityIcon(task.priority)}
+                                </div>
+                              </div>
+                              <div className="flex mt-2 justify-end">
+                                {task.assignees.map(assignee => (
+                                  <img
+                                    key={assignee.id}
+                                    src={assignee.avatar}
+                                    alt={assignee.name}
+                                    className="w-7 h-7 rounded-full mr-2"
+                                  />
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         )}
                       </Draggable>
