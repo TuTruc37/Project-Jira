@@ -182,7 +182,7 @@ const ProjectDetail = () => {
                                   {getPriorityIcon(task.priority)}
                                 </div>
                               </div>
-                              <div className="flex mt-2 justify-end">
+                              <div className="flex flex-wrap gap-y-2 mt-2 justify-end">
                                 {task.assignees.map(assignee => (
                                   <img
                                     key={assignee.id}
