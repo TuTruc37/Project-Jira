@@ -12,8 +12,8 @@ export const users = {
   getUsers: () => {
     return http.get('/Users/getUser');
   },
-  editUser: (id, data) => {
-    return http.put(`/Users/editUser/${id}`, data);
+  editUser: (data) => {
+    return http.put(`/Users/editUser`, data);
   },
   deleteUser: id => {
     return http.delete(`/Users/deleteUser?id=${id}`);
