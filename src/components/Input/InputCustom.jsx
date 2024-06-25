@@ -13,6 +13,8 @@ const InputCustom = ({
   value,
   labelColor,
 }) => {
+  const inputValue = value || ''; // Kiểm tra và đưa ra giá trị mặc định nếu không tồn tại
+
   return (
     <div className={className}>
       <label
@@ -28,7 +30,7 @@ const InputCustom = ({
         type={type}
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
         placeholder={placeholder}
-        value={value}
+        value={inputValue} // Sử dụng giá trị đã kiểm tra
       />
       {touched && error && <p className="text-red-500 text-sm">{error}</p>}
     </div>

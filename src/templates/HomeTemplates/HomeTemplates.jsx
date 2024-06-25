@@ -7,7 +7,11 @@ import MenuProject from '../../components/MenuProject/MenuProject';
 const { Content, Sider } = Layout;
 const arrMenu = [
   {
-    label: <NavLink NavLink path={path.account.createTask}>Create Task</NavLink>,
+    label: (
+      <NavLink NavLink path={path.account.createTask}>
+        Create Task
+      </NavLink>
+    ),
     icon: <i className="fa-solid fa-plus"></i>,
   },
   {
@@ -17,26 +21,27 @@ const arrMenu = [
 ];
 const HomeTemplates = () => {
   const [collapsed, setCollapsed] = useState(false);
+  // Lấy dữ liệu ở dataUser lúc đăng ký và khi đăng nhập sẽ hiện lên
+  const [addDataUser, setAddDataUser] = useState(null);
+  // console.log(addDataUser.accessToken);
+  //
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // useEffect(() => {
-  //   // lấy dữ liệu từ local lên để kiểm tra
-  //   // Nếu như localStore không có dữ liệu ==> Đá mông người dùng đi mất
-  //   // Nếu như có dữ liệu và maLoaiNguoiDung không đúng ==> Đá mông người dùng đi mất
-  //   const dataUser = handleGetValueLocalStore('dataUser');
-  //   if (!dataUser) {
-  //     window.location.href = 'https://google.com';
-  //   } else {
-  //     if (dataUser.maLoaiNguoiDung !== 'QuanTri') {
-  //       window.location.href = 'https://google.com';
-  //     }
-  //   }
-  //   // return () => {
+  useEffect(() => {
+    const dataUser = handleGetValueLocalStore('dataUser');
+    console.log(dataUser);
+    if (!dataUser) {
+      window.location.href = path.dangNhap;
+    } else {
+      setAddDataUser(dataUser);
+    }
 
-  //   // }
-  // }, []);
+    // return () => {
+
+    // }
+  }, []);
 
   return (
     <Layout
@@ -71,7 +76,7 @@ const HomeTemplates = () => {
               width: '17%',
             }}
           >
-            <MenuProject />
+            {addDataUser && <MenuProject addDataUserLocal={addDataUser} />}
           </div>
           <div
             style={{
