@@ -11,6 +11,7 @@ const UserManage = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [search, setSearch] = useState('');
+  const [isValid, setIsValid] = useState(true);
 
   useEffect(() => {
     fetchUsers();
@@ -112,7 +113,8 @@ const UserManage = () => {
       phoneNumber: phone != '' ? phone : currentUser.phone,
     };
 
-    users.editUser(payload)
+    if (isValid) {
+      users.editUser(payload)
       .then(res => {
         if (res.data.statusCode == 200) {
           message.success("Updated successfully!");
@@ -122,6 +124,7 @@ const UserManage = () => {
           message.error('Error!');
         }
       })
+    }
   }
 
   const deleteUser = record => {
@@ -143,6 +146,13 @@ const UserManage = () => {
         })
       }
     });
+  }
+
+  const checkPhoneValid = (e) => {
+    const phoneRegex = /^(03|09|\+84)/;
+    const value = e.target.value;
+    setPhone(value);
+    setIsValid(phoneRegex.test(value));
   }
 
   dataSource = dataSource.filter(item =>
@@ -195,10 +205,15 @@ const UserManage = () => {
         <Typography.Title level={5}>Phone</Typography.Title>
         <Input
           type="phone"
-          onChange={e => setPhone(e.target.value)}
+          onChange={e => checkPhoneValid(e)}
           placeholder="Phone"
           value={phone}
+          style={{
+            borderColor: isValid ? 'initial' : 'bg-red-400',
+            outline: isValid ? 'initial' : 'bg-red-400',
+          }}
         />
+        {!isValid && <p style={{ color: 'red' }}>Invalid phone number. Must start with 03, 09, or +84.</p>}
       </Modal>
     </>
   );
