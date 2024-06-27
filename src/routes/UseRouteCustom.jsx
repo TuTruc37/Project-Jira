@@ -27,15 +27,19 @@ const useRouteCustom = () => {
           element: <CreateManager />,
         },
         {
-          path: path.account.createTask,
+          path: `${path.account.createTask}/:projectId`,
           element: <CreateTask />,
         },
+        // {
+        //   path: path.account.createTask,
+        //   element: <CreateTask />,
+        // },
         {
-          path: `${path.account.projectDetail}/:projectId`,  // Update this line
+          path: `${path.account.projectDetail}/:projectId`, // Update this line
           element: <ProjectDetail />,
         },
         {
-          path: path.account.projectDetail,  // Update this line
+          path: path.account.projectDetail, // Update this line
           element: <ProjectDetail />,
         },
         {

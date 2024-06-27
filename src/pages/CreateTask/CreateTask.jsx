@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useParams, Link } from 'react-router-dom'; // Import useParams và Link
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
 import Description from '../../components/Description/Description';
@@ -7,11 +8,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
-import { TreeSelect, Slider } from 'antd';
+import { TreeSelect, Slider, Breadcrumb } from 'antd';
 import { addTask } from './../../redux/slice/taskSlice';
 import './createTask.scss';
-  
+import { path } from '../../common/path';
+
 const CreateTask = () => {
+  const { projectId } = useParams(); // Lấy projectId từ URL
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
@@ -64,7 +67,7 @@ const CreateTask = () => {
       originalEstimate: 0,
       timeTrackingSpent: 0,
       timeTrackingRemaining: 0,
-      projectId: '',
+      projectId: projectId, // Đặt giá trị projectId từ URL vào initialValues
       typeId: '',
       priorityId: '',
     },
@@ -83,13 +86,17 @@ const CreateTask = () => {
         };
         dispatch(addTask(newTask));
       } catch (err) {
-        handleAlert('error', err.response.data.content);
+        if (err.response && err.response.data && err.response.data.content) {
+          handleAlert('error', err.response.data.content);
+        } else {
+          handleAlert('error', 'Vui lòng không bỏ trống trường dữ liệu nào');
+        }
       }
     },
     validationSchema: Yup.object({
-      taskName: Yup.string()
-        .required('Vui lòng không bỏ trống')
-        .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
+      // taskName: Yup.string()
+      //   .required('Vui lòng không bỏ trống')
+      //   .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
     }),
   });
 
@@ -113,8 +120,18 @@ const CreateTask = () => {
     }
   };
 
+  const filterTreeNode = (inputValue, treeNode) => {
+    return treeNode.title.toLowerCase().includes(inputValue.toLowerCase());
+  };
+
   return (
     <div>
+      <Breadcrumb separator="/">
+        <Breadcrumb.Item>
+          <Link to={`${path.account.projectDetail}/${projectId}`} className=''>Project details</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Create task</Breadcrumb.Item>
+      </Breadcrumb>
       <h1 className="text-3xl font-bold">Create Task</h1>
       <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
         <div>
@@ -133,9 +150,10 @@ const CreateTask = () => {
            
             treeDefaultExpandAll
             value={values.projectId} // Gán giá trị hiện tại từ formik
-            onChange={value =>
-              setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+            onChange={
+              value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
             }
+            filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
             treeData={gprojectId.map(project => ({
               ...project,
               title: project.projectName,
@@ -204,9 +222,10 @@ const CreateTask = () => {
               allowClear
               multiple
               treeDefaultExpandAll
-              onChange={value =>
-                setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
+              onChange={
+                value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
               }
+              filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
               treeData={userAsign.map(user => ({
                 ...user,
                 title: user.name,

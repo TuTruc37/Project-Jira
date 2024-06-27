@@ -7,6 +7,7 @@ import Description from '../../../components/Description/Description';
 import { projectCategory } from '../../../services/projectCategory';
 import SelectCustom from '../../../components/SelectCustom/SelectCustom';
 import { projectMan } from '../../../services/projectMan';
+import "./createManager.scss"
 
 const CreateManager = () => {
   const [projectCateName, setProjectCateName] = useState([]);
@@ -62,8 +63,8 @@ const CreateManager = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Create Project</h1>
-      <form onSubmit={formik.handleSubmit} className="space-y-5 w-full">
+      <h1 className="text-2xl font-bold mb-12">Create Project</h1>
+      <form onSubmit={formik.handleSubmit} className="space-y-3 w-full">
         <InputCustom
           label="Name"
           name="projectName"
@@ -83,8 +84,12 @@ const CreateManager = () => {
           value={formik.values.description}
           handleChange={value => formik.setFieldValue('description', value)}
         />
+        <h2 className="block heading mt-28 mb-3 font-medium text-black text-lg">
+          Project Category 
+        </h2>
         <SelectCustom
-          label="Project Category Name"
+          className=" "
+          label=""
           name="categoryId"
           handleChange={formik.handleChange}
           value={formik.values.categoryId}
@@ -93,6 +98,7 @@ const CreateManager = () => {
           valueProp="id"
           labelProp="projectCategoryName"
         />
+
         <div>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"

@@ -27,13 +27,6 @@ const MenuProject = () => {
             </NavLink>
           </li>
           <li>
-            {/* <NavLink to={path.account.projectDetail}>
-              <div className=" text-lg font-semibold">
-                <i className="fa-solid fa-file-lines " /> Project DeTail
-              </div>
-            </NavLink> */}
-          </li>
-          <li>
             <NavLink to={path.account.createProject}>
               <div className="text-lg font-semibold">
                 <i className="fa-solid fa-file-circle-plus " /> Create Project
