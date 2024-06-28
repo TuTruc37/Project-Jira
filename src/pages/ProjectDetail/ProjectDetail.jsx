@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { addTask } from './../../redux/slice/taskSlice';
+import EditorTiny from '../../components/EditorTiny/EditorTiny';
 // import './createTask.scss';
 
 const ProjectDetail = () => {
@@ -23,6 +24,8 @@ const ProjectDetail = () => {
   const [tasks, setTasks] = useState([]);
   const [columns, setColumns] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   // const { projectId } = useParams(); // Lấy projectId từ URL
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
@@ -55,7 +58,15 @@ const ProjectDetail = () => {
       console.error('Error fetching data:', error);
     }
   };
+  const showLoading = () => {
+    setOpen(true);
+    setLoading(true);
 
+    // Simple loading mock. You should add cleanup logic in real world.
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
   const { handleAlert } = useContext(AlertContext);
   const {
     handleChange,
@@ -88,7 +99,7 @@ const ProjectDetail = () => {
 
         // Dispatch addTask to Redux store
         const newTask = {
-          id: `task-${res.data.taskId}`,
+          id: `task-${res.data.taskId}`, // Sử dụng template literals để format chuỗi
           content: values.taskName,
           column: `column-${values.statusId}`,
         };
@@ -234,7 +245,7 @@ const ProjectDetail = () => {
         );
       case 'new task':
         return (
-          <i className="fa-solid fa-font-awesome bg-green-500 py-1 px-2 rounded text-white"></i>
+          <i className="fa-solid fa-font-awesome bg-green-500 py-1 px-2 text-sm rounded text-white"></i>
         );
       default:
         return <i className="fa-solid fa-square-check"></i>;
@@ -244,15 +255,33 @@ const ProjectDetail = () => {
   const getPriorityIcon = priority => {
     switch (priority.toLowerCase()) {
       case 'high':
-        return <i className="fa-solid fa-arrow-up py-2 px-2 priority-high"></i>;
-
+        return (
+          <span className="flex items-center space-x-1">
+            <i className="fa-solid fa-arrow-up py-2 px-2 priority-high text-red-500"></i>
+            <span>High</span>
+          </span>
+        );
       case 'medium':
-        return <i className="fa-solid fa-arrow-up priority-medium"></i>;
+        return (
+          <span className="flex items-center space-x-1">
+            <i className="fa-solid fa-arrow-up priority-medium text-pink-500"></i>
+            <span>Medium</span>
+          </span>
+        );
       case 'low':
-        return <i className="fa-solid fa-arrow-down priority-low"></i>;
-
+        return (
+          <span className="flex items-center space-x-1">
+            <i className="fa-solid fa-arrow-down priority-low text-blue-500"></i>
+            <span>Low</span>
+          </span>
+        );
       case 'lowest':
-        return <i className="fa-solid fa-arrow-down priority-lowest"></i>;
+        return (
+          <span className="flex items-center space-x-1">
+            <i className="fa-solid fa-arrow-down priority-lowest text-green-500"></i>
+            <span>Lowest</span>
+          </span>
+        );
       default:
         return null;
     }
@@ -270,7 +299,9 @@ const ProjectDetail = () => {
       </Breadcrumb>
       <h1 className="text-left text-2xl font-bold pb-8 pt-4">Project Detail</h1>
       <div className="flex justify-end mb-3">
-        {/* Create task */}
+        {/* <button className="py-2 hover:text-white px-5 bg-blue-500 text-white font-semibold text-md rounded-md">
+          Create task
+        </button> */}
         <>
           <Button
             className="py-4 px-4 font-semibold text-md bg-blue-500 flex justify-center items-center text-white hover:text-white "
@@ -444,7 +475,12 @@ const ProjectDetail = () => {
                     />
                   </div>
                 </div>
-                <Description
+                {/* <Description
+                  name="description"
+                  handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+                  value={values.description}
+                /> */}
+                <EditorTiny
                   name="description"
                   handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
                   value={values.description}
@@ -461,7 +497,45 @@ const ProjectDetail = () => {
             </div>
           </Modal>
         </>
-        {/* End create task */}
+        <Modal
+  title="Loading Modal"
+  width={1000}
+  visible={open}
+  onCancel={() => setOpen(false)}
+  loading={loading}
+  footer={null}
+>
+  {loading ? (
+    <div>Loading...</div>
+  ) : (
+    <div className="task-details">
+      <h2 className="text-2xl font-bold mb-4">Task Details</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <p className="text-lg font-semibold mb-2">Task Name:</p>
+          <p className="text-lg"></p>
+        </div>
+        <div>
+          <p className="text-lg font-semibold mb-2">Task Type:</p>
+        </div>
+        <div>
+          <p className="text-lg font-semibold mb-2">Priority:</p>
+        </div>
+        <div>
+          <p className="text-lg font-semibold mb-2">Assignees:</p>
+          <div className="flex flex-wrap gap-y-2">
+          
+          </div>
+        </div>
+        <div className="col-span-2">
+          <p className="text-lg font-semibold mb-2">Description:</p>
+         
+        </div>
+      </div>
+    </div>
+  )}
+</Modal>
+
       </div>
       <div className="grid grid-cols-4 gap-5">
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -488,9 +562,10 @@ const ProjectDetail = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             ref={provided.innerRef}
-                            className="task hover:bg-gray-300 p-5 bg-white shadow-md rounded-md"
+                            onClick={showLoading}
+                            className="task hover:bg-gray-300 pt-5 px-5 pb-3 bg-white shadow-md rounded-md"
                           >
-                            <div className="text-left text-md font-normal">
+                            <div className="text-left text-md font-medium">
                               {task.content}
                             </div>
                             <div className="flex mt-4 justify-between items-center">
@@ -500,6 +575,9 @@ const ProjectDetail = () => {
                                 </div>
                                 <div className="task-priority">
                                   {getPriorityIcon(task.priority)}
+                                </div>
+                                <div className="task-priority">
+                                  {/* {getPriorityIcon(task.priorityId)} */}
                                 </div>
                               </div>
                               <div className="flex flex-wrap gap-y-2 mt-2 justify-end">

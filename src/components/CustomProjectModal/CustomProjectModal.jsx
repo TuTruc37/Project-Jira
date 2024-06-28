@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal as AntdModal, Input, Button, message, Select } from 'antd';
 import TextEditor from '../TextEditor/TextEditor';
 import { projectMan } from '../../services/projectMan';
+import EditorTiny from '../EditorTiny/EditorTiny';
 
 const { Option } = Select;
 
@@ -106,12 +107,13 @@ const CustomProjectModal = ({
   return (
     <div className="space-y-5">
       <AntdModal
+      // loading={loading}
         title="Edit Project"
         visible={visible}
         onCancel={onCancel}
         width={1000}
         footer={
-          <Button className='mt-10' type="primary" onClick={handleSave}>
+          <Button className="mt-10" type="primary" onClick={handleSave}>
             Save
           </Button>
         }
@@ -149,9 +151,13 @@ const CustomProjectModal = ({
           </div>
         </div>
         <div className="mt-4">
-          <TextEditor
+          {/* <TextEditor
             value={projectDetails.description}
             onChange={value => handleChange('description', value)}
+          /> */}
+          <EditorTiny
+            value={projectDetails.description}
+            handleChange={value => handleChange('description', value)}
           />
         </div>
         <div className=""></div>

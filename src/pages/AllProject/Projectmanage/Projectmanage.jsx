@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, message, Modal, Avatar, Input, List, Tag } from 'antd';
+import { Table, Button, message, Modal, Avatar, Input, List, Tag, Spin } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
 import { path } from '../../../common/path';
 import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
+import EditorTiny from '../../../components/EditorTiny/EditorTiny';
 import './projectManage.scss';
 
 const ProjectManage = () => {
@@ -15,6 +16,7 @@ const ProjectManage = () => {
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
+
   // search dự án
   const [searchTerm, setSearchTerm] = useState('');
   const [searchedProjects, setSearchedProjects] = useState([]);
@@ -31,6 +33,7 @@ const ProjectManage = () => {
 
     return () => clearTimeout(delaySearch);
   }, [searchTerm]);
+
   //
   const showModal = projectId => {
     setIsModalVisible(true);
@@ -253,7 +256,7 @@ const ProjectManage = () => {
   return (
     <div>
       <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
-
+      
       {/* Search dự án */}
       <Input.Search
         placeholder="Tìm kiếm dự án..."
@@ -264,6 +267,7 @@ const ProjectManage = () => {
         columns={columns}
         dataSource={searchedProjects.length > 0 ? searchedProjects : arrProject}
         rowKey="id"
+        
       />
       {/*  */}
       <CustomProjectModal
