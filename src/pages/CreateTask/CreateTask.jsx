@@ -145,8 +145,9 @@ const CreateTask = () => {
             showSearch
             style={{ width: '100%' }}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder="Chọn dự án"
+            placeholder="Please select a project"
             allowClear
+           
             treeDefaultExpandAll
             value={values.projectId} // Gán giá trị hiện tại từ formik
             onChange={

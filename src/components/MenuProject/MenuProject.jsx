@@ -26,7 +26,6 @@ const MenuProject = () => {
               </div>
             </NavLink>
           </li>
-
           <li>
             <NavLink to={path.account.createProject}>
               <div className="text-lg font-semibold">
