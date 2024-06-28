@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { path } from '../../common/path';
 import { handleGetValueLocalStore } from '../../utils/utils';
 import MenuProject from '../../components/MenuProject/MenuProject';
+
 const { Content, Sider } = Layout;
 const arrMenu = [
   {
@@ -31,16 +32,12 @@ const HomeTemplates = () => {
 
   useEffect(() => {
     const dataUser = handleGetValueLocalStore('dataUser');
-    console.log(dataUser);
+    // console.log(dataUser);
     if (!dataUser) {
       window.location.href = path.dangNhap;
     } else {
       setAddDataUser(dataUser);
     }
-
-    // return () => {
-
-    // }
   }, []);
 
   return (

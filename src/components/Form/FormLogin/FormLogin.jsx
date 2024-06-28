@@ -11,6 +11,11 @@ import { handleGetValue } from '../../../redux/slice/userSlice';
 import styles from '../FormRegister/formRegister.module.scss';
 import { users } from '../../../services/users';
 const FormLogin = () => {
+  function Main_reload() {
+    setInterval(function () {
+      window.location.reload();
+    }, 2000);
+  }
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { handleAlert } = useContext(AlertContext);
@@ -27,11 +32,15 @@ const FormLogin = () => {
           console.log(res);
           handleAlert('success', 'Đăng nhập thành công');
           navigate(path.account.trangChu);
-          handleSetValueLocalStore('dataUser', res.data.content);
+          let dataUser = handleSetValueLocalStore('dataUser', res.data.content);
+          if (dataUser == null) {
+            Main_reload();
+          }
+
           dispatch(handleGetValue(res.data.content));
         } catch (error) {
-          console.log(error);
-          handleAlert('error', error.response.data.content);
+          console.log(error.response.data.message);
+          handleAlert('error', error.response.data.message);
         }
       },
       validationSchema: Yup.object({
@@ -46,6 +55,7 @@ const FormLogin = () => {
           ),
       }),
     });
+
   return (
     <div
       className={`flex items-center justify-center h-full lg:w-11/12 text-black md:w-11/12 ${styles.endBeautiful}`}
