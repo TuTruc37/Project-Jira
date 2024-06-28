@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { useRoutes } from 'react-router-dom';
 import { path } from '../common/path';
 import Login from '../pages/LoginAndRegister/Login';
@@ -8,6 +8,9 @@ import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
 import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
+import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
+import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
+import UserManage from '../pages/AllProject/UserManage/UserManage';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -27,9 +30,24 @@ const useRouteCustom = () => {
           path: path.account.createTask,
           element: <CreateTask />,
         },
+        {
+          path: `${path.account.projectDetail}/:projectId`, // Update this line
+          element: <ProjectDetail />,
+        },
+        {
+          path: path.account.projectDetail, // Update this line
+          element: <ProjectDetail />,
+        },
+        {
+          path: path.account.editTask,
+          element: <EditProjectManager />,
+        },
+        {
+          path: path.account.users,
+          element: <UserManage />,
+        },
       ],
     },
-
     {
       path: path.dangNhap,
       element: <Login />,

@@ -1,25 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import SelectCustom from '../../components/SelectCustom/SelectCustom';
-import InputCustom from '../../components/Input/InputCustom';
-import Description from '../../components/Description/Description';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { AlertContext } from '../../App';
-import { getAllCreateTask } from '../../services/getAllCreateTask';
+// import { path } from "../../../common/path";
+// import { projectMan } from "../../../services/projectMan";
 import { TreeSelect, Slider } from 'antd';
-import { addTask } from './../../redux/slice/taskSlice';
-import './createTask.scss';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import InputCustom from './../../../components/Input/InputCustom';
+import Description from './../../../components/Description/Description';
 
-const CreateTask = () => {
-  const dispatch = useDispatch();
+import SelectCustom from './../../../components/SelectCustom/SelectCustom';
+import { useEffect, useState, useContext } from 'react';
+import { getAllCreateTask } from './../../../services/getAllCreateTask';
+import { AlertContext } from '../../../App';
+const EditProjectManager = () => {
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
   const [gpriority, setPriority] = useState([]);
   const [gtaskType, setTaskType] = useState([]);
   const [userAsign, setUserAsign] = useState([]);
   const [timeTracking, setTimeTracking] = useState(0);
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -69,19 +66,10 @@ const CreateTask = () => {
       priorityId: '',
     },
     onSubmit: async values => {
-      console.log('Submitted values:', values); // Log dữ liệu đã gửi đi
       try {
         const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
         resetForm();
-
-        // Dispatch addTask to Redux store
-        const newTask = {
-          id: `task-${res.data.taskId}`,
-          content: values.taskName,
-          column: `column-${values.statusId}`,
-        };
-        dispatch(addTask(newTask));
       } catch (err) {
         handleAlert('error', err.response.data.content);
       }
@@ -102,7 +90,6 @@ const CreateTask = () => {
       newRemaining >= 0 ? newRemaining : 0
     );
   };
-
   const handleFieldChange = e => {
     const { name, value } = e.target;
     handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
@@ -112,10 +99,9 @@ const CreateTask = () => {
       setTimeTracking(spent + remaining); // Tính tổng và cập nhật timeTracking
     }
   };
-
   return (
     <div>
-      <h1 className="text-3xl font-bold">Create Task</h1>
+      <h1 className="text-3xl font-bold">Edit Task</h1>
       <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
         <div>
           <label
@@ -131,9 +117,8 @@ const CreateTask = () => {
             placeholder="Chọn dự án"
             allowClear
             treeDefaultExpandAll
-            value={values.projectId} // Gán giá trị hiện tại từ formik
             onChange={value =>
-              setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+              handleChange({ target: { name: 'projectId', value } })
             }
             treeData={gprojectId.map(project => ({
               ...project,
@@ -197,14 +182,14 @@ const CreateTask = () => {
             <TreeSelect
               showSearch
               style={{ width: '100%' }}
-              value={values.listUserAsign}
+              value={values.userAsign}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               placeholder="Please select"
               allowClear
               multiple
               treeDefaultExpandAll
               onChange={value =>
-                setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
+                handleChange({ target: { name: 'listUserAsign', value } })
               }
               treeData={userAsign.map(user => ({
                 ...user,
@@ -269,14 +254,10 @@ const CreateTask = () => {
             />
           </div>
         </div>
-        <Description
-          name="description"
-          handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-          value={values.description}
-        />
-        <div className="">
+        <Description />
+        <div>
           <button
-            className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+            className="bg-blue-500   mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
             type="submit"
           >
             Submit
@@ -287,4 +268,4 @@ const CreateTask = () => {
   );
 };
 
-export default CreateTask;
+export default EditProjectManager;

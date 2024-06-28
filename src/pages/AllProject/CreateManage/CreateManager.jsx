@@ -93,12 +93,14 @@ const CreateManager = () => {
           valueProp="id"
           labelProp="projectCategoryName"
         />
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-          type="submit"
-        >
-          Create Project
-        </button>
+        <div>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+            type="submit"
+          >
+            Create Project
+          </button>
+        </div>
       </form>
     </div>
   );

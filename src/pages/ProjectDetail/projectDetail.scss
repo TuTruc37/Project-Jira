@@ -1,0 +1,16 @@
+.droppable-column {
+  background: #f4f5f7;
+}
+.task {
+}
+.priority-high,
+.priority-medium {
+  color: red !important;
+}
+
+.priority-low {
+  @apply text-green-300;
+}
+.priority-lowest {
+  @apply text-green-600;
+}

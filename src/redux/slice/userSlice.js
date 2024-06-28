@@ -5,7 +5,6 @@ const initialState = {
   // user: null,
   user: handleGetValueLocalStore('dataUser'),
 };
-
 const userSlice = createSlice({
   name: 'user',
   initialState,
