@@ -113,17 +113,21 @@ const UserManage = () => {
       phoneNumber: phone != '' ? phone : currentUser.phone,
     };
 
-    if (isValid) {
-      users.editUser(payload)
-      .then(res => {
-        if (res.data.statusCode == 200) {
-          message.success("Updated successfully!");
-          fetchUsers();
-          setIsOpenModal(false)
-        } else {
-          message.error('Error!');
-        }
-      })
+    if (name.length == 0) {
+      message.error("Name can not be empty!");
+    } else {
+      if (isValid) {
+        users.editUser(payload)
+        .then(res => {
+          if (res.data.statusCode == 200) {
+            message.success("Updated successfully!");
+            fetchUsers();
+            setIsOpenModal(false)
+          } else {
+            message.error('Error!');
+          }
+        })
+      }
     }
   }
 
@@ -149,7 +153,7 @@ const UserManage = () => {
   }
 
   const checkPhoneValid = (e) => {
-    const phoneRegex = /^(03|09|\+84)/;
+    const phoneRegex = /^(03\d{8}|09\d{8}|\+84\d{8})$/;
     const value = e.target.value;
     setPhone(value);
     setIsValid(phoneRegex.test(value));
@@ -192,6 +196,7 @@ const UserManage = () => {
           onChange={e => setEmail(e.target.value)}
           placeholder="Email"
           value={email}
+          disabled
         />
 
         <Typography.Title level={5}>Name</Typography.Title>
@@ -213,7 +218,7 @@ const UserManage = () => {
             outline: isValid ? 'initial' : 'bg-red-400',
           }}
         />
-        {!isValid && <p style={{ color: 'red' }}>Invalid phone number. Must start with 03, 09, or +84.</p>}
+        {!isValid && <p style={{ color: 'red' }}>Invalid phone number. Must start with 03, 09, or +84 and 10 characters.</p>}
       </Modal>
     </>
   );
