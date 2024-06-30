@@ -10,7 +10,7 @@ import { Button } from 'antd/es/radio';
 import { useDispatch } from 'react-redux';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
-import Description from '../../components/Description/Description';
+// import Description from '../../components/Description/Description';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
@@ -21,6 +21,7 @@ import EditorTiny from '../../components/EditorTiny/EditorTiny';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
+  const [taskDetails, setTaskDetails] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [columns, setColumns] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,9 +35,25 @@ const ProjectDetail = () => {
   const [gtaskType, setTaskType] = useState([]);
   const [userAsign, setUserAsign] = useState([]);
   const [timeTracking, setTimeTracking] = useState(0);
+  const [selectedTask, setSelectedTask] = useState(null);
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleTaskClick = async taskId => {
+    try {
+      const res = await getAllCreateTask.getTaskDetails(taskId);
+      setSelectedTask(res.data.content); // Lưu task đã chọn vào state selectedTask
+      setIsModalOpen(true); // Mở modal "Task Details"
+    } catch (error) {
+      console.error('Error fetching task details:', error);
+    }
+  };
+  const openTaskModal = taskId => {
+    const selected = tasks.find(task => task.id === taskId);
+    setSelectedTask(selected);
+    setIsModalOpen(true); // Ensure this opens the modal with the selected task
+  };
 
   const fetchData = async () => {
     try {
@@ -65,7 +82,7 @@ const ProjectDetail = () => {
     // Simple loading mock. You should add cleanup logic in real world.
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 1000);
   };
   const { handleAlert } = useContext(AlertContext);
   const {
@@ -302,240 +319,195 @@ const ProjectDetail = () => {
         {/* <button className="py-2 hover:text-white px-5 bg-blue-500 text-white font-semibold text-md rounded-md">
           Create task
         </button> */}
-        <>
-          <Button
-            className="py-4 px-4 font-semibold text-md bg-blue-500 flex justify-center items-center text-white hover:text-white "
-            onClick={showModal}
-          >
-            Create task
-          </Button>
-          <Modal
-            width={900}
-            style={{ top: 20 }}
-            // title="Create task"
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            footer={null}
-          >
-            <div>
-              <h1 className="text-3xl font-bold">Create Task</h1>
-              <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
+        <Button
+          className="py-4 px-4 font-semibold text-md bg-blue-500 flex justify-center items-center text-white hover:text-white "
+          onClick={showModal}
+        >
+          Create task
+        </Button>
+        <Modal
+          width={900}
+          style={{ top: 20 }}
+          // title="Create task"
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          <div>
+            <h1 className="text-3xl font-bold">Create Task</h1>
+            <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
+              <div>
+                <label
+                  className="block text-lg mb-2 mt-6 font-semibold text-black"
+                  htmlFor=""
+                >
+                  Project
+                </label>
+                <TreeSelect
+                  showSearch
+                  style={{ width: '100%' }}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  placeholder="Chọn dự án"
+                  allowClear
+                  treeDefaultExpandAll
+                  value={values.projectId} // Gán giá trị hiện tại từ formik
+                  onChange={
+                    value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+                  }
+                  filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
+                  treeData={gprojectId.map(project => ({
+                    ...project,
+                    title: project.projectName,
+                    value: project.id,
+                  }))}
+                />
+              </div>
+              <InputCustom
+                label="Task Name"
+                name="taskName"
+                handleChange={handleFieldChange}
+                handleBlur={handleBlur}
+                placeholder="Vui lòng nhập tên"
+                error={errors.taskName}
+                touched={touched.taskName}
+                value={values.taskName}
+                labelColor="text-black"
+              />
+              <SelectCustom
+                label="Status"
+                name="statusId"
+                handleChange={handleChange}
+                value={values.statusId}
+                options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+                labelColor="text-black"
+                valueProp="statusId"
+                labelProp="statusName"
+              />
+              <div className="grid grid-cols-2 gap-5">
+                <SelectCustom
+                  label="Priority"
+                  name="priorityId"
+                  handleChange={handleChange}
+                  value={values.priorityId}
+                  options={gpriority} // Truyền danh sách loại người dùng từ API vào options
+                  labelColor="text-black"
+                  valueProp="priorityId"
+                  labelProp="priority"
+                />
+
+                <SelectCustom
+                  label="Task Type"
+                  name="typeId"
+                  handleChange={handleChange}
+                  value={values.typeId}
+                  options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
+                  labelColor="text-black"
+                  valueProp="id"
+                  labelProp="taskType"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label
-                    className="block text-lg mb-2 mt-6 font-semibold text-black"
+                    className="text-lg mb-2 block font-semibold text-black"
                     htmlFor=""
                   >
-                    Project
+                    Assignees
                   </label>
                   <TreeSelect
                     showSearch
                     style={{ width: '100%' }}
+                    value={values.listUserAsign}
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    placeholder="Chọn dự án"
+                    placeholder="Please select"
                     allowClear
+                    multiple
                     treeDefaultExpandAll
-                    value={values.projectId} // Gán giá trị hiện tại từ formik
                     onChange={
-                      value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+                      value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
                     }
                     filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
-                    treeData={gprojectId.map(project => ({
-                      ...project,
-                      title: project.projectName,
-                      value: project.id,
+                    treeData={userAsign.map(user => ({
+                      ...user,
+                      title: user.name,
+                      value: user.userId,
                     }))}
                   />
                 </div>
+                <div>
+                  <label
+                    className="text-lg block text-black font-semibold"
+                    htmlFor=""
+                  >
+                    Time Tracking
+                  </label>
+                  <Slider
+                    value={timeTracking}
+                    onChange={handleSliderChange}
+                    tooltipVisible={false}
+                  />
+                  <div className="flex justify-between">
+                    <p className="text-md font-medium">
+                      {values.timeTrackingSpent}h logged
+                    </p>
+                    <p className="text-md font-medium">
+                      {values.timeTrackingRemaining}h remaining
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-5">
                 <InputCustom
-                  label="Task Name"
-                  name="taskName"
-                  handleChange={handleFieldChange}
-                  handleBlur={handleBlur}
-                  placeholder="Vui lòng nhập tên"
-                  error={errors.taskName}
-                  touched={touched.taskName}
-                  value={values.taskName}
-                  labelColor="text-black"
-                />
-                <SelectCustom
-                  label="Status"
-                  name="statusId"
+                  label="Original Estimate"
+                  name="originalEstimate"
                   handleChange={handleChange}
-                  value={values.statusId}
-                  options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+                  handleBlur={handleBlur}
+                  error={errors.originalEstimate}
+                  touched={touched.originalEstimate}
+                  value={values.originalEstimate}
                   labelColor="text-black"
-                  valueProp="statusId"
-                  labelProp="statusName"
                 />
-                <div className="grid grid-cols-2 gap-5">
-                  <SelectCustom
-                    label="Priority"
-                    name="priorityId"
-                    handleChange={handleChange}
-                    value={values.priorityId}
-                    options={gpriority} // Truyền danh sách loại người dùng từ API vào options
-                    labelColor="text-black"
-                    valueProp="priorityId"
-                    labelProp="priority"
-                  />
-
-                  <SelectCustom
-                    label="Task Type"
-                    name="typeId"
-                    handleChange={handleChange}
-                    value={values.typeId}
-                    options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
-                    labelColor="text-black"
-                    valueProp="id"
-                    labelProp="taskType"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-5">
-                  <div>
-                    <label
-                      className="text-lg mb-2 block font-semibold text-black"
-                      htmlFor=""
-                    >
-                      Assignees
-                    </label>
-                    <TreeSelect
-                      showSearch
-                      style={{ width: '100%' }}
-                      value={values.listUserAsign}
-                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                      placeholder="Please select"
-                      allowClear
-                      multiple
-                      treeDefaultExpandAll
-                      onChange={
-                        value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
-                      }
-                      filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
-                      treeData={userAsign.map(user => ({
-                        ...user,
-                        title: user.name,
-                        value: user.userId,
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className="text-lg block text-black font-semibold"
-                      htmlFor=""
-                    >
-                      Time Tracking
-                    </label>
-                    <Slider
-                      value={timeTracking}
-                      onChange={handleSliderChange}
-                      tooltipVisible={false}
-                    />
-                    <div className="flex justify-between">
-                      <p className="text-md font-medium">
-                        {values.timeTrackingSpent}h logged
-                      </p>
-                      <p className="text-md font-medium">
-                        {values.timeTrackingRemaining}h remaining
-                      </p>
-                    </div>
-                  </div>
-                </div>
                 <div className="grid grid-cols-2 gap-5">
                   <InputCustom
-                    label="Original Estimate"
-                    name="originalEstimate"
-                    handleChange={handleChange}
+                    label="Time Spent (Hours)"
+                    name="timeTrackingSpent"
+                    handleChange={handleFieldChange}
                     handleBlur={handleBlur}
-                    error={errors.originalEstimate}
-                    touched={touched.originalEstimate}
-                    value={values.originalEstimate}
+                    error={errors.timeTrackingSpent}
+                    touched={touched.timeTrackingSpent}
+                    value={values.timeTrackingSpent}
                     labelColor="text-black"
                   />
-                  <div className="grid grid-cols-2 gap-5">
-                    <InputCustom
-                      label="Time Spent (Hours)"
-                      name="timeTrackingSpent"
-                      handleChange={handleFieldChange}
-                      handleBlur={handleBlur}
-                      error={errors.timeTrackingSpent}
-                      touched={touched.timeTrackingSpent}
-                      value={values.timeTrackingSpent}
-                      labelColor="text-black"
-                    />
-                    <InputCustom
-                      label="Time Remaining (Hours)"
-                      name="timeTrackingRemaining"
-                      handleChange={handleFieldChange}
-                      handleBlur={handleBlur}
-                      error={errors.timeTrackingRemaining}
-                      touched={touched.timeTrackingRemaining}
-                      value={values.timeTrackingRemaining}
-                      labelColor="text-black"
-                    />
-                  </div>
+                  <InputCustom
+                    label="Time Remaining (Hours)"
+                    name="timeTrackingRemaining"
+                    handleChange={handleFieldChange}
+                    handleBlur={handleBlur}
+                    error={errors.timeTrackingRemaining}
+                    touched={touched.timeTrackingRemaining}
+                    value={values.timeTrackingRemaining}
+                    labelColor="text-black"
+                  />
                 </div>
-                {/* <Description
-                  name="description"
-                  handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-                  value={values.description}
-                /> */}
-                <EditorTiny
-                  name="description"
-                  handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-                  value={values.description}
-                />
-                <div className="">
-                  <button
-                    className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-                    type="submit"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </form>
-            </div>
-          </Modal>
-        </>
-        <Modal
-  title="Loading Modal"
-  width={1000}
-  visible={open}
-  onCancel={() => setOpen(false)}
-  loading={loading}
-  footer={null}
->
-  {loading ? (
-    <div>Loading...</div>
-  ) : (
-    <div className="task-details">
-      <h2 className="text-2xl font-bold mb-4">Task Details</h2>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-lg font-semibold mb-2">Task Name:</p>
-          <p className="text-lg"></p>
-        </div>
-        <div>
-          <p className="text-lg font-semibold mb-2">Task Type:</p>
-        </div>
-        <div>
-          <p className="text-lg font-semibold mb-2">Priority:</p>
-        </div>
-        <div>
-          <p className="text-lg font-semibold mb-2">Assignees:</p>
-          <div className="flex flex-wrap gap-y-2">
-          
-          </div>
-        </div>
-        <div className="col-span-2">
-          <p className="text-lg font-semibold mb-2">Description:</p>
-         
-        </div>
-      </div>
-    </div>
-  )}
-</Modal>
+              </div>
 
+              <EditorTiny
+                name="description"
+                handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+                value={values.description}
+              />
+              <div className="">
+                <button
+                  className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
       </div>
       <div className="grid grid-cols-4 gap-5">
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -550,7 +522,7 @@ const ProjectDetail = () => {
                   <h2 className="text-left mb-2 font-medium">{column.title}</h2>
                   {column.taskIds.map((taskId, index) => {
                     const task = tasks.find(task => task.id === taskId);
-
+                   
                     return (
                       <Draggable
                         key={task.id}
@@ -562,7 +534,8 @@ const ProjectDetail = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             ref={provided.innerRef}
-                            onClick={showLoading}
+                            // onClick={showLoading}
+                            // onClick={() => handleTaskClick(task.taskId)}
                             className="task hover:bg-gray-300 pt-5 px-5 pb-3 bg-white shadow-md rounded-md"
                           >
                             <div className="text-left text-md font-medium">
@@ -603,6 +576,7 @@ const ProjectDetail = () => {
           ))}
         </DragDropContext>
       </div>
+     
     </div>
   );
 };
