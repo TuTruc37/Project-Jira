@@ -90,7 +90,7 @@ const HomeTemplates = () => {
         centered
         title="Vui lòng đăng nhập để trải nghiệm đầy đủ tính năng"
         visible={isModalVisible}
-        // onOk={handleOk}
+        onOk={handleOk}
         onCancel={handleCancel}
         okText="Đăng ký"
         cancelText="Đăng nhập"

@@ -29,7 +29,14 @@ const MenuProject = addDataUserLocal => {
       </div>
       <div className="mt-14">
         <ul className="space-y-3">
-          <li className="">
+          <li>
+            <NavLink to={path.account.profile}>
+              <div className=" font-semibold text-lg">
+                <i className="fa-solid fa-user"></i> Profile
+              </div>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to={path.account.trangChu}>
               <div className=" font-semibold text-lg">
                 <i className="fa-solid fa-list-check " /> Project Management

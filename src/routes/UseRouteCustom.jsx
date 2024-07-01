@@ -5,12 +5,13 @@ import Login from '../pages/LoginAndRegister/Login';
 import Register from '../pages/LoginAndRegister/Register';
 import NotFound from '../pages/NotFound/NotFound';
 import HomeTemplates from '../templates/HomeTemplates/HomeTemplates';
-import ProjectManage from '../pages/AllProject/ProjectManage/ProjectManage';
+import Projectmanage from '../pages/AllProject/Projectmanage/Projectmanage';
 import CreateManager from '../pages/AllProject/CreateManage/CreateManager';
 import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
+import Profile from '../pages/Profile/Profile';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -20,7 +21,7 @@ const useRouteCustom = () => {
       children: [
         {
           index: true,
-          element: <ProjectManage />,
+          element: <Projectmanage />,
         },
         {
           path: path.account.createProject,
@@ -45,6 +46,10 @@ const useRouteCustom = () => {
         {
           path: path.account.users,
           element: <UserManage />,
+        },
+        {
+          path: path.account.profile,
+          element: <Profile />,
         },
       ],
     },

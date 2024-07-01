@@ -2,7 +2,7 @@ import axios from 'axios';
 import { handleGetValueLocalStore } from '../utils/utils';
 
 const dataUser = handleGetValueLocalStore('dataUser');
-console.log(dataUser); // vấn đề là lúc đầu nó là null hoặc giữ lại data cũ mới đăng nhập trước đó thôi khi reset lại trang
+// console.log(dataUser); // vấn đề là lúc đầu nó là null hoặc giữ lại data cũ mới đăng nhập trước đó thôi khi reset lại trang
 let accessToken =
   'eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ0dWFuc29mZWFyMDNAZ21haWwuY29tIiwibmJmIjoxNzE5NDEzMDM3LCJleHAiOjE3MTk0MTY2Mzd9.5BVcR1iTZsQcx2j9bxQRJNdq_8SSteCSB6fBJnQ9rQs'; // Token mặc định
 // console.log(accessToken, 'data cũ là tuấn'); // để duy trì các hoạt động của trang web
