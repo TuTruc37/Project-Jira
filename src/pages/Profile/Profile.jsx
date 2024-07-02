@@ -4,14 +4,18 @@ import { users } from '../../services/users';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
-import InputCustom from '../../components/Input/InputCustom';
+import InputProfile from '../../components/Input/InputProfile';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
 const Profile = () => {
   const dataUsers = handleGetValueLocalStore('dataUser');
   const [dataUser, setDataUser] = useState([]);
   const [matchedUser, setMatchedUser] = useState(null);
-
+  //cập nhập lại dữ liệu localStorage Khi đã bấm sửa
+  const handleSetValueLocalStore = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+  //
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -41,6 +45,11 @@ const Profile = () => {
       const res = await users.editUser(values);
       console.log('Phản hồi API:', res);
       handleAlert('success', 'Sửa thông tin thành công');
+      // Cập nhật dữ liệu trong localStorage
+      const updatedDataUsers = { ...dataUsers, ...values };
+      handleSetValueLocalStore('dataUser', updatedDataUsers);
+      // Reload lại trang
+      window.location.reload();
     } catch (err) {
       console.error('Lỗi khi sửa thông tin:', err);
     }
@@ -97,29 +106,31 @@ const Profile = () => {
             </Space>
           </div>
           <div>
-            <InputCustom
+            <InputProfile
               label="ID"
               name="id"
               value={values.id}
               onChange={handleChange}
               onBlur={handleBlur}
+              readOnly
             />
 
-            <InputCustom
+            <InputProfile
               label="Email"
               name="email"
               value={values.email}
               onChange={handleChange}
               onBlur={handleBlur}
+              readOnly
             />
-            <InputCustom
+            <InputProfile
               label="Tên"
               name="name"
               value={values.name}
               onChange={handleChange}
               onBlur={handleBlur}
             />
-            <InputCustom
+            <InputProfile
               label="Số điện thoại"
               name="phoneNumber"
               value={values.phoneNumber}
@@ -129,7 +140,7 @@ const Profile = () => {
 
             <button
               type="submit"
-              className="bg-yellow-500 hover:bg-yellow-700 py-3 px-8 rounded-lg mt-3"
+              className="bg-yellow-500 hover:bg-yellow-700 py-3 px-60 rounded-lg mt-3"
             >
               Sửa
             </button>
