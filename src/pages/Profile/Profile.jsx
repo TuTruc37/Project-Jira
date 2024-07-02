@@ -15,6 +15,12 @@ const Profile = () => {
   const handleSetValueLocalStore = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
+  //cập nhập lại reload localStorage
+  function Main_reload() {
+    setInterval(function () {
+      window.location.reload();
+    }, 2000);
+  }
   //
   useEffect(() => {
     fetchUsers();
@@ -49,7 +55,7 @@ const Profile = () => {
       const updatedDataUsers = { ...dataUsers, ...values };
       handleSetValueLocalStore('dataUser', updatedDataUsers);
       // Reload lại trang
-      window.location.reload();
+      Main_reload();
     } catch (err) {
       console.error('Lỗi khi sửa thông tin:', err);
     }
@@ -65,17 +71,28 @@ const Profile = () => {
     },
     onSubmit: onSubmit,
     validationSchema: Yup.object({
-      email: Yup.string()
-        .email('Địa chỉ email không hợp lệ')
-        .required('Bắt buộc'),
-      name: Yup.string().required('Bắt buộc'),
-      phoneNumber: Yup.string().required('Bắt buộc'),
+      name: Yup.string()
+        .required('Vui lòng không bỏ trống')
+        .min(5, 'Vui lòng nhập tối thiêu 5 ký tự'),
+      phoneNumber: Yup.string()
+        .required('Vui lòng không bỏ trống')
+        .matches(
+          /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+          'Đây không phải số điện thoại'
+        ),
     }),
   });
 
   // Giải phóng các thuộc tính cần thiết từ formik
-  const { values, handleChange, handleBlur, handleSubmit, setFieldValue } =
-    formik;
+  const {
+    values,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    errors,
+    touched,
+  } = formik;
 
   useEffect(() => {
     if (matchedUser) {
@@ -129,6 +146,9 @@ const Profile = () => {
               value={values.name}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Vui lòng nhập tên"
+              error={errors.name}
+              touched={touched.name}
             />
             <InputProfile
               label="Số điện thoại"
@@ -136,6 +156,9 @@ const Profile = () => {
               value={values.phoneNumber}
               onChange={handleChange}
               onBlur={handleBlur}
+              placeholder="Vui lòng nhập số điện thoại"
+              error={errors.phoneNumber}
+              touched={touched.phoneNumber}
             />
 
             <button
