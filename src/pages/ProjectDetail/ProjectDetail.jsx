@@ -1,33 +1,31 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, NavLink, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { path } from '../../common/path';
 import { Breadcrumb, Modal, TreeSelect, Slider } from 'antd';
 import './projectDetail.scss';
 import { Button } from 'antd/es/radio';
-//
 import { useDispatch } from 'react-redux';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
-// import Description from '../../components/Description/Description';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { addTask } from './../../redux/slice/taskSlice';
 import EditorTiny from '../../components/EditorTiny/EditorTiny';
-// import './createTask.scss';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
-  const [taskDetails, setTaskDetails] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [columns, setColumns] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  // const { projectId } = useParams(); // Lấy projectId từ URL
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
@@ -35,25 +33,10 @@ const ProjectDetail = () => {
   const [gtaskType, setTaskType] = useState([]);
   const [userAsign, setUserAsign] = useState([]);
   const [timeTracking, setTimeTracking] = useState(0);
-  const [selectedTask, setSelectedTask] = useState(null);
+
   useEffect(() => {
     fetchData();
   }, []);
-
-  const handleTaskClick = async taskId => {
-    try {
-      const res = await getAllCreateTask.getTaskDetails(taskId);
-      setSelectedTask(res.data.content); // Lưu task đã chọn vào state selectedTask
-      setIsModalOpen(true); // Mở modal "Task Details"
-    } catch (error) {
-      console.error('Error fetching task details:', error);
-    }
-  };
-  const openTaskModal = taskId => {
-    const selected = tasks.find(task => task.id === taskId);
-    setSelectedTask(selected);
-    setIsModalOpen(true); // Ensure this opens the modal with the selected task
-  };
 
   const fetchData = async () => {
     try {
@@ -82,7 +65,7 @@ const ProjectDetail = () => {
     // Simple loading mock. You should add cleanup logic in real world.
     setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 2000);
   };
   const { handleAlert } = useContext(AlertContext);
   const {
@@ -103,20 +86,19 @@ const ProjectDetail = () => {
       originalEstimate: 0,
       timeTrackingSpent: 0,
       timeTrackingRemaining: 0,
-      projectId: projectId, // Đặt giá trị projectId từ URL vào initialValues
+      projectId: projectId,
       typeId: '',
       priorityId: '',
     },
     onSubmit: async values => {
-      console.log('Submitted values:', values); // Log dữ liệu đã gửi đi
+      console.log('Submitted values:', values);
       try {
         const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
         resetForm();
 
-        // Dispatch addTask to Redux store
         const newTask = {
-          id: `task-${res.data.taskId}`, // Sử dụng template literals để format chuỗi
+          id: `task-${res.data.taskId}`,
           content: values.taskName,
           column: `column-${values.statusId}`,
         };
@@ -126,11 +108,16 @@ const ProjectDetail = () => {
       }
     },
     validationSchema: Yup.object({
-      // taskName: Yup.string()
-      //   .required('Vui lòng không bỏ trống')
-      //   .min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
+      // taskName: Yup.string().required('Vui lòng không bỏ trống').min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
     }),
   });
+  // const handleAssigneesChange = value => {
+  //   const selectedUsers = value.map(userId => userAsign.find(user => user.userId === userId));
+  //   setSelectedTask(prevTask => ({
+  //     ...prevTask,
+  //     assignees: selectedUsers,
+  //   }));
+  // };
 
   const handleSliderChange = value => {
     const newRemaining = values.originalEstimate - value;
@@ -144,33 +131,56 @@ const ProjectDetail = () => {
 
   const handleFieldChange = e => {
     const { name, value } = e.target;
-    handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
+    handleChange(e);
     if (name === 'timeTrackingSpent' || name === 'timeTrackingRemaining') {
       const spent = parseInt(values.timeTrackingSpent, 10) || 0;
       const remaining = parseInt(values.timeTrackingRemaining, 10) || 0;
-      setTimeTracking(spent + remaining); // Tính tổng và cập nhật timeTracking
+      setTimeTracking(spent + remaining);
     }
   };
 
   const filterTreeNode = (inputValue, treeNode) => {
     return treeNode.title.toLowerCase().includes(inputValue.toLowerCase());
   };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
-    setIsModalOpen(false);
+
+  const handleOk = async () => {
+    try {
+      // Save the updated assignees (you might need to call an API to update the task details)
+      const updatedTask = {
+        ...selectedTask,
+        assignees: selectedTask.assignees,
+        description: selectedTask.description,
+      };
+
+      // Assuming you have an updateTask API function
+      await projectMan.updateTask(updatedTask);
+
+      // Update the state with the updated task
+      setTasks(prevTasks =>
+        prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
+      );
+
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
+    setTaskModalOpen(false);
   };
+
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
         const res = await projectMan.getProjectDetails(projectId);
         const projectData = res.data.content;
 
-        // Transform the data to match the format needed for the Kanban board
         const taskMap = {};
         projectData.lstTask.forEach(status => {
           status.lstTaskDeTail.forEach(task => {
@@ -180,7 +190,7 @@ const ProjectDetail = () => {
               column: status.statusId,
               assignees: task.assigness,
               taskType: task.taskTypeDetail.taskType,
-              priority: task.priorityTask.priority, // Add priority field
+              priority: task.priorityTask.priority,
             };
           });
         });
@@ -254,6 +264,12 @@ const ProjectDetail = () => {
     }
   };
 
+  const handleTaskClick = taskId => {
+    const selected = tasks.find(task => task.id === taskId);
+    setSelectedTask(selected);
+    setTaskModalOpen(true);
+  };
+
   const getTaskTypeIcon = taskType => {
     switch (taskType.toLowerCase()) {
       case 'bug':
@@ -273,30 +289,23 @@ const ProjectDetail = () => {
     switch (priority.toLowerCase()) {
       case 'high':
         return (
-          <span className="flex items-center space-x-1">
-            <i className="fa-solid fa-arrow-up py-2 px-2 priority-high text-red-500"></i>
+          <span className="flex items-center space-x-1 ml-2">
+            <i className="fa-solid fa-arrow-up priority-high text-red-500"></i>
             <span>High</span>
           </span>
         );
       case 'medium':
         return (
-          <span className="flex items-center space-x-1">
-            <i className="fa-solid fa-arrow-up priority-medium text-pink-500"></i>
+          <span className="flex items-center space-x-1 ml-2">
+            <i className="fa-solid fa-arrow-up  priority-medium text-yellow-500"></i>
             <span>Medium</span>
           </span>
         );
       case 'low':
         return (
-          <span className="flex items-center space-x-1">
-            <i className="fa-solid fa-arrow-down priority-low text-blue-500"></i>
+          <span className="flex items-center space-x-1 ml-2">
+            <i className="fa-solid fa-arrow-down priority-low text-green-500"></i>
             <span>Low</span>
-          </span>
-        );
-      case 'lowest':
-        return (
-          <span className="flex items-center space-x-1">
-            <i className="fa-solid fa-arrow-down priority-lowest text-green-500"></i>
-            <span>Lowest</span>
           </span>
         );
       default:
@@ -305,264 +314,273 @@ const ProjectDetail = () => {
   };
 
   return (
-    <div className="ProjectDetail">
-      <Breadcrumb separator="/">
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-semibold mb-4">Project Detail</h1>
+      <Breadcrumb className="mb-4">
         <Breadcrumb.Item>
-          <Link to={path.account.trangChu} className="">
-            Home
-          </Link>
+          <Link to={path.dashboard}>Dashboard</Link>
         </Breadcrumb.Item>
-        <Breadcrumb.Item>Project details</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={path.projects}>Projects</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Project Detail</Breadcrumb.Item>
       </Breadcrumb>
-      <h1 className="text-left text-2xl font-bold pb-8 pt-4">Project Detail</h1>
-      <div className="flex justify-end mb-3">
-        {/* <button className="py-2 hover:text-white px-5 bg-blue-500 text-white font-semibold text-md rounded-md">
-          Create task
-        </button> */}
+
+      <div className="flex flex-row-reverse items-center mb-3 ">
         <Button
-          className="py-4 px-4 font-semibold text-md bg-blue-500 flex justify-center items-center text-white hover:text-white "
-          onClick={showModal}
+          className="py-3 px-4 bg-blue-500 text-white font-semibold rounded-sm flex items-center hover:text-white "
+          type="primary"
+          onClick={() => {
+            showModal();
+            showLoading();
+          }}
         >
-          Create task
+          Create Task
         </Button>
-        <Modal
-          width={900}
-          style={{ top: 20 }}
-          // title="Create task"
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <div>
-            <h1 className="text-3xl font-bold">Create Task</h1>
-            <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
+      </div>
+      <Modal
+        width={900}
+        style={{ top: 20 }}
+        // title="Create task"
+        loading={loading}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div>
+          <h1 className="text-3xl font-bold">Create Task</h1>
+          <form onSubmit={handleSubmit} className="space-y-3 mt-6 w-full">
+            <div>
+              <label
+                className="block text-lg mb-2 mt-6 font-semibold text-black"
+                htmlFor=""
+              >
+                Project
+              </label>
+              <TreeSelect
+                showSearch
+                style={{ width: '100%' }}
+                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                placeholder="Chọn dự án"
+                allowClear
+                treeDefaultExpandAll
+                value={values.projectId} // Gán giá trị hiện tại từ formik
+                onChange={
+                  value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+                }
+                filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
+                treeData={gprojectId.map(project => ({
+                  ...project,
+                  title: project.projectName,
+                  value: project.id,
+                }))}
+              />
+            </div>
+            <InputCustom
+              label="Task Name"
+              name="taskName"
+              handleChange={handleFieldChange}
+              handleBlur={handleBlur}
+              placeholder="Vui lòng nhập tên"
+              error={errors.taskName}
+              touched={touched.taskName}
+              value={values.taskName}
+              labelColor="text-black"
+            />
+            <SelectCustom
+              label="Status"
+              name="statusId"
+              handleChange={handleChange}
+              value={values.statusId}
+              options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+              labelColor="text-black"
+              valueProp="statusId"
+              labelProp="statusName"
+            />
+            <div className="grid grid-cols-2 gap-5">
+              <SelectCustom
+                label="Priority"
+                name="priorityId"
+                handleChange={handleChange}
+                value={values.priorityId}
+                options={gpriority} // Truyền danh sách loại người dùng từ API vào options
+                labelColor="text-black"
+                valueProp="priorityId"
+                labelProp="priority"
+              />
+
+              <SelectCustom
+                label="Task Type"
+                name="typeId"
+                handleChange={handleChange}
+                value={values.typeId}
+                options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
+                labelColor="text-black"
+                valueProp="id"
+                labelProp="taskType"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-5">
               <div>
                 <label
-                  className="block text-lg mb-2 mt-6 font-semibold text-black"
+                  className="text-lg mb-2 block font-semibold text-black"
                   htmlFor=""
                 >
-                  Project
+                  Assignees
                 </label>
                 <TreeSelect
                   showSearch
                   style={{ width: '100%' }}
+                  value={values.listUserAsign}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  placeholder="Chọn dự án"
+                  placeholder="Please select"
                   allowClear
+                  multiple
                   treeDefaultExpandAll
-                  value={values.projectId} // Gán giá trị hiện tại từ formik
                   onChange={
-                    value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
+                    value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
                   }
                   filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
-                  treeData={gprojectId.map(project => ({
-                    ...project,
-                    title: project.projectName,
-                    value: project.id,
+                  treeData={userAsign.map(user => ({
+                    ...user,
+                    title: user.name,
+                    value: user.userId,
                   }))}
                 />
               </div>
+              <div>
+                <label
+                  className="text-lg block text-black font-semibold"
+                  htmlFor=""
+                >
+                  Time Tracking
+                </label>
+                <Slider
+                  value={timeTracking}
+                  onChange={handleSliderChange}
+                  tooltipVisible={false}
+                />
+                <div className="flex justify-between">
+                  <p className="text-md font-medium">
+                    {values.timeTrackingSpent}h logged
+                  </p>
+                  <p className="text-md font-medium">
+                    {values.timeTrackingRemaining}h remaining
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-5">
               <InputCustom
-                label="Task Name"
-                name="taskName"
-                handleChange={handleFieldChange}
-                handleBlur={handleBlur}
-                placeholder="Vui lòng nhập tên"
-                error={errors.taskName}
-                touched={touched.taskName}
-                value={values.taskName}
-                labelColor="text-black"
-              />
-              <SelectCustom
-                label="Status"
-                name="statusId"
+                label="Original Estimate"
+                name="originalEstimate"
                 handleChange={handleChange}
-                value={values.statusId}
-                options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+                handleBlur={handleBlur}
+                error={errors.originalEstimate}
+                touched={touched.originalEstimate}
+                value={values.originalEstimate}
                 labelColor="text-black"
-                valueProp="statusId"
-                labelProp="statusName"
               />
-              <div className="grid grid-cols-2 gap-5">
-                <SelectCustom
-                  label="Priority"
-                  name="priorityId"
-                  handleChange={handleChange}
-                  value={values.priorityId}
-                  options={gpriority} // Truyền danh sách loại người dùng từ API vào options
-                  labelColor="text-black"
-                  valueProp="priorityId"
-                  labelProp="priority"
-                />
-
-                <SelectCustom
-                  label="Task Type"
-                  name="typeId"
-                  handleChange={handleChange}
-                  value={values.typeId}
-                  options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
-                  labelColor="text-black"
-                  valueProp="id"
-                  labelProp="taskType"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-5">
-                <div>
-                  <label
-                    className="text-lg mb-2 block font-semibold text-black"
-                    htmlFor=""
-                  >
-                    Assignees
-                  </label>
-                  <TreeSelect
-                    showSearch
-                    style={{ width: '100%' }}
-                    value={values.listUserAsign}
-                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    placeholder="Please select"
-                    allowClear
-                    multiple
-                    treeDefaultExpandAll
-                    onChange={
-                      value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
-                    }
-                    filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
-                    treeData={userAsign.map(user => ({
-                      ...user,
-                      title: user.name,
-                      value: user.userId,
-                    }))}
-                  />
-                </div>
-                <div>
-                  <label
-                    className="text-lg block text-black font-semibold"
-                    htmlFor=""
-                  >
-                    Time Tracking
-                  </label>
-                  <Slider
-                    value={timeTracking}
-                    onChange={handleSliderChange}
-                    tooltipVisible={false}
-                  />
-                  <div className="flex justify-between">
-                    <p className="text-md font-medium">
-                      {values.timeTrackingSpent}h logged
-                    </p>
-                    <p className="text-md font-medium">
-                      {values.timeTrackingRemaining}h remaining
-                    </p>
-                  </div>
-                </div>
-              </div>
               <div className="grid grid-cols-2 gap-5">
                 <InputCustom
-                  label="Original Estimate"
-                  name="originalEstimate"
-                  handleChange={handleChange}
+                  label="Time Spent (Hours)"
+                  name="timeTrackingSpent"
+                  handleChange={handleFieldChange}
                   handleBlur={handleBlur}
-                  error={errors.originalEstimate}
-                  touched={touched.originalEstimate}
-                  value={values.originalEstimate}
+                  error={errors.timeTrackingSpent}
+                  touched={touched.timeTrackingSpent}
+                  value={values.timeTrackingSpent}
                   labelColor="text-black"
                 />
-                <div className="grid grid-cols-2 gap-5">
-                  <InputCustom
-                    label="Time Spent (Hours)"
-                    name="timeTrackingSpent"
-                    handleChange={handleFieldChange}
-                    handleBlur={handleBlur}
-                    error={errors.timeTrackingSpent}
-                    touched={touched.timeTrackingSpent}
-                    value={values.timeTrackingSpent}
-                    labelColor="text-black"
-                  />
-                  <InputCustom
-                    label="Time Remaining (Hours)"
-                    name="timeTrackingRemaining"
-                    handleChange={handleFieldChange}
-                    handleBlur={handleBlur}
-                    error={errors.timeTrackingRemaining}
-                    touched={touched.timeTrackingRemaining}
-                    value={values.timeTrackingRemaining}
-                    labelColor="text-black"
-                  />
-                </div>
+                <InputCustom
+                  label="Time Remaining (Hours)"
+                  name="timeTrackingRemaining"
+                  handleChange={handleFieldChange}
+                  handleBlur={handleBlur}
+                  error={errors.timeTrackingRemaining}
+                  touched={touched.timeTrackingRemaining}
+                  value={values.timeTrackingRemaining}
+                  labelColor="text-black"
+                />
               </div>
+            </div>
 
-              <EditorTiny
-                name="description"
-                handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-                value={values.description}
-              />
-              <div className="">
-                <button
-                  className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-                  type="submit"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </Modal>
-      </div>
-      <div className="grid grid-cols-4 gap-5">
-        <DragDropContext onDragEnd={handleDragEnd}>
-          {Object.values(columns).map(column => (
-            <Droppable key={column.id} droppableId={column.id}>
-              {provided => (
+            <EditorTiny
+              name="description"
+              handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+              value={values.description}
+            />
+            <div className="">
+              <button
+                className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
+
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-4 gap-4 ">
+          {Object.entries(columns).map(([columnId, column]) => (
+            <Droppable key={columnId} droppableId={columnId}>
+              {(provided, snapshot) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="column droppable-column space-y-2 divide-y p-5 text-center"
+                  className={`p-4 bg-gray-200 rounded  ${
+                    snapshot.isDraggingOver ? 'bg-gray-300' : ''
+                  }`}
                 >
-                  <h2 className="text-left mb-2 font-medium">{column.title}</h2>
+                  <h2 className="font-semibold text-lg mb-4">{column.title}</h2>
                   {column.taskIds.map((taskId, index) => {
                     const task = tasks.find(task => task.id === taskId);
-                   
                     return (
                       <Draggable
-                        key={task.id}
-                        draggableId={task.id}
+                        key={taskId}
+                        draggableId={taskId}
                         index={index}
                       >
-                        {provided => (
+                        {(provided, snapshot) => (
                           <div
+                            ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            ref={provided.innerRef}
+                            className={`p-4 mb-2 bg-white rounded shadow-md hover:bg-gray-300 ${
+                              snapshot.isDragging ? 'bg-gray-100' : ''
+                            }`}
                             // onClick={showLoading}
-                            // onClick={() => handleTaskClick(task.taskId)}
-                            className="task hover:bg-gray-300 pt-5 px-5 pb-3 bg-white shadow-md rounded-md"
+                            onClick={() => {
+                              handleTaskClick(taskId);
+                              showLoading();
+                            }}
                           >
-                            <div className="text-left text-md font-medium">
-                              {task.content}
+                            <div className="flex justify-between items-center">
+                              <span>{task.content}</span>
                             </div>
-                            <div className="flex mt-4 justify-between items-center">
-                              <div className="flex space-x-2">
-                                <div className="task-type">
-                                  {getTaskTypeIcon(task.taskType)}
-                                </div>
-                                <div className="task-priority">
-                                  {getPriorityIcon(task.priority)}
-                                </div>
-                                <div className="task-priority">
-                                  {/* {getPriorityIcon(task.priorityId)} */}
-                                </div>
+                            <div className="flex justify-between items-center mt-2">
+                              <div className="flex">
+                                <span>{getTaskTypeIcon(task.taskType)}</span>
+                                <span>{getPriorityIcon(task.priority)}</span>
                               </div>
-                              <div className="flex flex-wrap gap-y-2 mt-2 justify-end">
+                              <span className="flex flex-wrap">
                                 {task.assignees.map(assignee => (
-                                  <img
+                                  <span
                                     key={assignee.id}
-                                    src={assignee.avatar}
-                                    alt={assignee.name}
-                                    className="w-7 h-7 rounded-full mr-2"
-                                  />
+                                    className="text-xs text-gray-500 "
+                                  >
+                                    {/* {assignee.avatar} */}
+                                    <img
+                                      className="w-7 h-7 rounded-full flex flex-wrap"
+                                      src={assignee.avatar}
+                                      alt={assignee.name}
+                                    />
+                                  </span>
                                 ))}
-                              </div>
+                              </span>
                             </div>
                           </div>
                         )}
@@ -574,9 +592,73 @@ const ProjectDetail = () => {
               )}
             </Droppable>
           ))}
-        </DragDropContext>
-      </div>
-     
+        </div>
+      </DragDropContext>
+
+      <Modal
+        title="Chi Tiết Công Việc"
+        width={1000}
+        // loading={loading}
+        visible={taskModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        {selectedTask && (
+          <div>
+            <h3 className="mb-4">{selectedTask.content}</h3>
+            <div className="grid grid-cols-2 gap-5">
+              {/* cột 1 */}
+              <div>
+              
+              <EditorTiny
+              name="description"
+              handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+              value={selectedTask.description}
+            />
+              </div>
+              {/* cột 2 */}
+              <div>
+                <div className="kanban-task-assignees  ">
+                  <p>Ưu tiên: {selectedTask.priority}</p>
+                  <p>Loại: {selectedTask.taskType}</p>
+
+                  <p>assignees</p>
+                  <div className=" flex flex-wrap">
+                    <TreeSelect
+                      showSearch
+                      style={{ width: '100%' }}
+                      value={selectedTask.assignees.map(user => user.name)}
+                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      placeholder="Please select"
+                      allowClear
+                      multiple
+                      treeDefaultExpandAll
+                      onChange={value => {
+                        const updatedAssignees = userAsign.filter(user =>
+                          value.includes(user.name)
+                        );
+                        setSelectedTask(prev => ({
+                          ...prev,
+                          assignees: updatedAssignees,
+                        }));
+                      }}
+                      filterTreeNode={(input, node) =>
+                        node.title.toLowerCase().indexOf(input.toLowerCase()) >=
+                        0
+                      }
+                      treeData={userAsign.map(user => ({
+                        title: user.name,
+                        value: user.name,
+                      }))}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
