@@ -153,7 +153,7 @@ const UserManage = () => {
   }
 
   const checkPhoneValid = (e) => {
-    const phoneRegex = /^(03\d{8}|09\d{8}|\+84\d{8})$/;
+    const phoneRegex = /^0.{9}$/;
     const value = e.target.value;
     setPhone(value);
     setIsValid(phoneRegex.test(value));
