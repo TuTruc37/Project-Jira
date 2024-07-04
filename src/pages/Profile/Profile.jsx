@@ -110,7 +110,7 @@ const Profile = () => {
         Thông tin tài khoản
       </h1>
       <form onSubmit={handleSubmit} className="space-y-5 w-full" noValidate>
-        <div className="grid grid-cols-2 gap-5 grid-flow-col">
+        <div className="grid grid-cols-2 gap-5 grid-flow-col border-dashed border-2	p-4">
           <div className="text-center">
             <Space direction="vertical" size={16}>
               <Space wrap size={16}>
@@ -121,6 +121,7 @@ const Profile = () => {
                 />
               </Space>
             </Space>
+            <h2 className="text-3xl mt-14">Xin chào {values.name}</h2>
           </div>
           <div>
             <InputProfile
@@ -161,12 +162,14 @@ const Profile = () => {
               touched={touched.phoneNumber}
             />
 
-            <button
-              type="submit"
-              className="bg-yellow-500 hover:bg-yellow-700 py-3 px-60 rounded-lg mt-3"
-            >
-              Sửa
-            </button>
+            <div>
+              <button
+                type="submit"
+                className="bg-yellow-500 hover:bg-yellow-700 py-2 px-56 rounded-lg mt-3 text-xl"
+              >
+                Sửa
+              </button>
+            </div>
           </div>
         </div>
       </form>
