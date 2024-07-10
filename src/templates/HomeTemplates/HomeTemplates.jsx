@@ -44,7 +44,7 @@ const HomeTemplates = () => {
         minHeight: '100vh',
       }}
     >
-      <Sider
+      {/* <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={value => setCollapsed(value)}
@@ -56,7 +56,7 @@ const HomeTemplates = () => {
           mode="inline"
           items={arrMenu}
         />
-      </Sider>
+      </Sider> */}
       <Layout>
         {/* header */}
         <Content

@@ -596,7 +596,7 @@ const ProjectDetail = () => {
       </DragDropContext>
 
       <Modal
-        title="Chi Tiết Công Việc"
+        title="Task Detail"
         width={1000}
         // loading={loading}
         visible={taskModalOpen}
@@ -610,19 +610,37 @@ const ProjectDetail = () => {
             <div className="grid grid-cols-2 gap-5">
               {/* cột 1 */}
               <div>
-              
-              <EditorTiny
-              name="description"
-              handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-              value={selectedTask.description}
-            />
+                <EditorTiny
+                  name="description"
+                  handleChange={values => setFieldValue('description', values)} // Cập nhật giá trị cho formik
+                  value={selectedTask.description}
+                />
               </div>
               {/* cột 2 */}
               <div>
                 <div className="kanban-task-assignees  ">
                   <p>Ưu tiên: {selectedTask.priority}</p>
-                  <p>Loại: {selectedTask.taskType}</p>
-
+                  <SelectCustom
+                    label="Priority"
+                    name="priorityId"
+                    handleChange={handleChange}
+                    value={selectedTask.priority}
+                    options={gpriority} // Truyền danh sách loại người dùng từ API vào options
+                    labelColor="text-black"
+                    valueProp="priorityId"
+                    labelProp="priority"
+                  />
+                  <p>Loại:</p>
+                  <SelectCustom
+                    label="Task Type"
+                    name="typeId"
+                    handleChange={handleChange}
+                    value={selectedTask.taskType}
+                    options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
+                    labelColor="text-black"
+                    valueProp="id"
+                    labelProp="taskType"
+                  />
                   <p>assignees</p>
                   <div className=" flex flex-wrap">
                     <TreeSelect
