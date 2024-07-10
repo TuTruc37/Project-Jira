@@ -7,7 +7,6 @@ import { path } from '../../../common/path';
 import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
 import EditorTiny from '../../../components/EditorTiny/EditorTiny';
 import './projectManage.scss';
-
 const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);

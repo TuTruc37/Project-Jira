@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { useRoutes } from 'react-router-dom';
 import { path } from '../common/path';
 import Login from '../pages/LoginAndRegister/Login';
@@ -11,6 +11,7 @@ import CreateTask from '../pages/CreateTask/CreateTask';
 import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
+import Profile from '../pages/Profile/Profile';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -49,6 +50,10 @@ const useRouteCustom = () => {
         {
           path: path.account.users,
           element: <UserManage />,
+        },
+        {
+          path: path.account.profile,
+          element: <Profile />,
         },
       ],
     },

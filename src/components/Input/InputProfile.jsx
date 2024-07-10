@@ -1,10 +1,10 @@
+// InputProfile.jsx
 import React from 'react';
 
-const InputCustom = ({
+const InputProfile = ({
   label,
   name,
-  handleChange,
-  handleBlur,
+  onBlur,
   type = 'text',
   placeholder,
   error,
@@ -12,8 +12,14 @@ const InputCustom = ({
   className,
   value,
   labelColor,
+  onChange,
+  readOnly,
 }) => {
-  const inputValue = value || ''; // Kiểm tra và đưa ra giá trị mặc định nếu không tồn tại
+  const inputValue = value || '';
+
+  const inputClassName = `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 ${
+    readOnly ? 'bg-gray-300 cursor-not-allowed' : ''
+  }`;
 
   return (
     <div className={className}>
@@ -25,16 +31,17 @@ const InputCustom = ({
       </label>
       <input
         name={name}
-        onChange={handleChange}
-        onBlur={handleBlur}
+        onChange={onChange}
+        onBlur={onBlur}
         type={type}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+        className={inputClassName}
         placeholder={placeholder}
-        value={inputValue} // Sử dụng giá trị đã kiểm tra
+        value={inputValue}
+        readOnly={readOnly}
       />
       {touched && error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 };
 
-export default InputCustom;
+export default InputProfile;

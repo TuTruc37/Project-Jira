@@ -3,23 +3,40 @@ import { NavLink } from 'react-router-dom';
 import { path } from '../../common/path';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
-const MenuProject = () => {
+const MenuProject = addDataUserLocal => {
+  // console.log(addDataUserLocal);
+  const handleRemoveUserFromLocalStorage = () => {
+    localStorage.removeItem('dataUser');
+  };
   return (
     <div>
       <div className="flex space-x-2">
         <Space direction="vertical" size={16}>
           <Space wrap size={16}>
-            <Avatar size="large" icon={<UserOutlined />} />
+            <Avatar
+              size="large"
+              icon={<UserOutlined />}
+              src={addDataUserLocal.addDataUserLocal.avatar}
+            />
           </Space>
         </Space>
         <div>
-          <h2>CyberLearn.vn</h2>
-          <h3>Report bugs</h3>
+          <h2>{addDataUserLocal.addDataUserLocal.name}</h2>
+          <NavLink to={path.dangNhap}>
+            <h3 onClick={handleRemoveUserFromLocalStorage}>Thoát tài khoản</h3>
+          </NavLink>
         </div>
       </div>
       <div className="mt-14">
         <ul className="space-y-3">
-          <li className="">
+          <li>
+            <NavLink to={path.account.profile}>
+              <div className=" font-semibold text-lg">
+                <i className="fa-solid fa-user"></i> Profile
+              </div>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to={path.account.trangChu}>
               <div className=" font-semibold text-lg">
                 <i className="fa-solid fa-list-check " /> Project Management
