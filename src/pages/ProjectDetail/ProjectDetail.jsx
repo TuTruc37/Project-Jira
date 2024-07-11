@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { path } from '../../common/path';
-import { Breadcrumb, Modal, TreeSelect, Slider } from 'antd';
+import { Breadcrumb, Modal, TreeSelect, Slider, Input } from 'antd';
 import './projectDetail.scss';
 import { Button } from 'antd/es/radio';
 import { useDispatch } from 'react-redux';
@@ -15,6 +15,7 @@ import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { addTask } from './../../redux/slice/taskSlice';
 import EditorTiny from '../../components/EditorTiny/EditorTiny';
+import TextArea from 'antd/es/input/TextArea';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -105,6 +106,7 @@ const ProjectDetail = () => {
         dispatch(addTask(newTask));
       } catch (err) {
         handleAlert('error', err.response.data.content);
+        console.log(err.response.data.content);
       }
     },
     validationSchema: Yup.object({
@@ -191,6 +193,7 @@ const ProjectDetail = () => {
               assignees: task.assigness,
               taskType: task.taskTypeDetail.taskType,
               priority: task.priorityTask.priority,
+              description: task.taskDescription,
             };
           });
         });
@@ -316,16 +319,20 @@ const ProjectDetail = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-4">Project Detail</h1>
+
       <Breadcrumb className="mb-4">
         <Breadcrumb.Item>
-          <Link to={path.dashboard}>Dashboard</Link>
+          <Link to={path.account.trangChu}>Project Manager</Link>
         </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to={path.projects}>Projects</Link>
-        </Breadcrumb.Item>
+
         <Breadcrumb.Item>Project Detail</Breadcrumb.Item>
       </Breadcrumb>
+      <Input
+        placeholder="Tìm kiếm mô tả trong dự án..."
+        // onChange={}
 
+        style={{ marginBottom: 16, width: 300 }}
+      />
       <div className="flex flex-row-reverse items-center mb-3 ">
         <Button
           className="py-3 px-4 bg-blue-500 text-white font-semibold rounded-sm flex items-center hover:text-white "
@@ -434,7 +441,7 @@ const ProjectDetail = () => {
                   style={{ width: '100%' }}
                   value={values.listUserAsign}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  placeholder="Please select"
+                  placeholder="Vui lòng chọn thành viên"
                   allowClear
                   multiple
                   treeDefaultExpandAll
@@ -566,11 +573,11 @@ const ProjectDetail = () => {
                                 <span>{getTaskTypeIcon(task.taskType)}</span>
                                 <span>{getPriorityIcon(task.priority)}</span>
                               </div>
-                              <span className="flex flex-wrap">
+                              <span className="flex flex-wrap space-x-1">
                                 {task.assignees.map(assignee => (
                                   <span
                                     key={assignee.id}
-                                    className="text-xs text-gray-500 "
+                                    className="text-xs text-gray-500   "
                                   >
                                     {/* {assignee.avatar} */}
                                     <img
@@ -607,19 +614,41 @@ const ProjectDetail = () => {
         {selectedTask && (
           <div>
             <h3 className="mb-4">{selectedTask.content}</h3>
+
             <div className="grid grid-cols-2 gap-5">
               {/* cột 1 */}
               <div>
                 <EditorTiny
                   name="description"
-                  handleChange={values => setFieldValue('description', values)} // Cập nhật giá trị cho formik
+                  handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
                   value={selectedTask.description}
                 />
+                <label htmlFor="" className="text-lg font-semibold">
+                  Comment
+                </label>
+                <div>
+                  <TextArea
+                    onResize={null}
+                    placeholder="Thêm bình luận"
+                    className="mt-2 text-area"
+                  ></TextArea>
+                  <button>save</button>
+                  <button>cancel</button>
+                </div>
               </div>
               {/* cột 2 */}
               <div>
                 <div className="kanban-task-assignees  ">
-                  <p>Ưu tiên: {selectedTask.priority}</p>
+                  <SelectCustom
+                    label="Status"
+                    name="statusId"
+                    handleChange={handleChange}
+                    value={selectedTask.priority}
+                    options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+                    labelColor="text-black"
+                    valueProp="statusId"
+                    labelProp="statusName"
+                  />
                   <SelectCustom
                     label="Priority"
                     name="priorityId"
@@ -630,7 +659,7 @@ const ProjectDetail = () => {
                     valueProp="priorityId"
                     labelProp="priority"
                   />
-                  <p>Loại:</p>
+
                   <SelectCustom
                     label="Task Type"
                     name="typeId"
@@ -641,14 +670,16 @@ const ProjectDetail = () => {
                     valueProp="id"
                     labelProp="taskType"
                   />
-                  <p>assignees</p>
                   <div className=" flex flex-wrap">
+                    <label htmlFor="" className="text-lg font-semibold">
+                      Assignees
+                    </label>
                     <TreeSelect
                       showSearch
                       style={{ width: '100%' }}
                       value={selectedTask.assignees.map(user => user.name)}
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                      placeholder="Please select"
+                      placeholder="Vui lòng chọn thành viên"
                       allowClear
                       multiple
                       treeDefaultExpandAll

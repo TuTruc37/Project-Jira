@@ -41,7 +41,7 @@ const HomeTemplates = () => {
       setTimeout(() => {
         window.location.href = redirectPath;
       }, 1000); // Chờ 3 giây trước khi chuyển hướng
-    }
+    }       
   }, [redirectPath]);
 
   const handleOk = () => {
@@ -57,6 +57,7 @@ const HomeTemplates = () => {
   return (
     <Layout
       style={{
+        
         minHeight: '100vh',
       }}
     >

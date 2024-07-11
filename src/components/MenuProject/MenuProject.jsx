@@ -1,13 +1,18 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { path } from '../../common/path';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Space } from 'antd';
-const MenuProject = addDataUserLocal => {
-  // console.log(addDataUserLocal);
+import { Avatar, Space, Menu } from 'antd';
+import "./menuProject.scss";
+const { SubMenu } = Menu;
+
+const MenuProject = ({ addDataUserLocal }) => {
+  const location = useLocation();
+
   const handleRemoveUserFromLocalStorage = () => {
     localStorage.removeItem('dataUser');
   };
+
   return (
     <div>
       <div className="flex space-x-2">
@@ -16,48 +21,54 @@ const MenuProject = addDataUserLocal => {
             <Avatar
               size="large"
               icon={<UserOutlined />}
-              src={addDataUserLocal.addDataUserLocal.avatar}
+              src={addDataUserLocal.avatar}
             />
           </Space>
         </Space>
         <div>
-          <h2>{addDataUserLocal.addDataUserLocal.name}</h2>
+          <h2>{addDataUserLocal.name}</h2>
           <NavLink to={path.dangNhap}>
             <h3 onClick={handleRemoveUserFromLocalStorage}>Thoát tài khoản</h3>
           </NavLink>
         </div>
       </div>
       <div className="mt-14">
-        <ul className="space-y-3">
-          <li>
+        <Menu
+        className='menu-project'
+          mode="inline"
+          defaultSelectedKeys={[location.pathname]}
+          selectedKeys={[location.pathname]}
+          style={{ borderRight: 0, background:"none", border:"none"}}
+        >
+          <Menu.Item style={{background:"none"}} className='' key={path.account.profile}>
             <NavLink to={path.account.profile}>
-              <div className=" font-semibold text-lg">
+              <span className="font-semibold text-lg">
                 <i className="fa-solid fa-user"></i> Profile
-              </div>
+              </span>
             </NavLink>
-          </li>
-          <li>
+          </Menu.Item>
+          <Menu.Item key={path.account.trangChu}>
             <NavLink to={path.account.trangChu}>
-              <div className=" font-semibold text-lg">
-                <i className="fa-solid fa-list-check " /> Project Management
-              </div>
+              <span className="font-semibold text-lg">
+                <i className="fa-solid fa-list-check"></i> Project Management
+              </span>
             </NavLink>
-          </li>
-          <li>
+          </Menu.Item>
+          <Menu.Item key={path.account.createProject}>
             <NavLink to={path.account.createProject}>
-              <div className="text-lg font-semibold">
-                <i className="fa-solid fa-file-circle-plus " /> Create Project
-              </div>
+              <span className="text-lg font-semibold">
+                <i className="fa-solid fa-file-circle-plus"></i> Create Project
+              </span>
             </NavLink>
-          </li>
-          <li>
+          </Menu.Item>
+          <Menu.Item key={path.account.users}>
             <NavLink to={path.account.users}>
-              <div className="text-lg font-semibold">
+              <span className="text-lg font-semibold">
                 <i className="fa-solid fa-users"></i> Users Management
-              </div>
+              </span>
             </NavLink>
-          </li>
-        </ul>
+          </Menu.Item>
+        </Menu>
       </div>
     </div>
   );

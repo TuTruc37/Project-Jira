@@ -2,9 +2,10 @@ import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import './editorTiny.scss';
 
-const EditorTiny = ({ value, handleChange }) => {
+const EditorTiny = ({ value, handleChange,name }) => {
   return (
     <Editor
+    name={name}
       value={value}
       apiKey="hps86wiugt0czru5hl76286ostqmiw59ph7m5jlswxubnwvd"
       init={{
