@@ -20,6 +20,7 @@ const arrMenu = [
 const HomeTemplates = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [addDataUser, setAddDataUser] = useState(null);
+  console.log(addDataUser);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [redirectPath, setRedirectPath] = useState('');
 

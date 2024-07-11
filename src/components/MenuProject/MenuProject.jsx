@@ -4,7 +4,7 @@ import { path } from '../../common/path';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
 const MenuProject = addDataUserLocal => {
-  // console.log(addDataUserLocal);
+  console.log(addDataUserLocal);
   const handleRemoveUserFromLocalStorage = () => {
     localStorage.removeItem('dataUser');
   };
@@ -16,7 +16,7 @@ const MenuProject = addDataUserLocal => {
             <Avatar
               size="large"
               icon={<UserOutlined />}
-              src={addDataUserLocal.addDataUserLocal.avatar}
+              src={`https://ui-avatars.com/api/?name=${addDataUserLocal.addDataUserLocal.name}`}
             />
           </Space>
         </Space>
