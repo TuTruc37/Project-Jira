@@ -11,12 +11,6 @@ const CustomProjectModal = ({
   projectId,
   onProjectUpdated,
 }) => {
-  // const [projectDetails, setProjectDetails] = useState({
-  //   id: '',
-  //   projectName: '',
-  //   projectCategory: { id: '', name: '' },
-  //   description: '',
-  // });
   const [projectDetails, setProjectDetails] = useState({
     id: 0,
     projectName: '',
