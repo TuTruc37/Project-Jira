@@ -25,7 +25,7 @@ const UserManage = () => {
       })
       .catch(err => {
         console.log(err);
-        message.error('Error fetching users');
+        message.error('Lỗi khi lấy danh sách người dùng');
       });
   };
 
@@ -114,13 +114,13 @@ const UserManage = () => {
     };
 
     if (name.length == 0) {
-      message.error("Name can not be empty!");
+      message.error("Tên không được để trống!");
     } else {
       if (isValid) {
         users.editUser(payload)
         .then(res => {
           if (res.data.statusCode == 200) {
-            message.success("Updated successfully!");
+            message.success("Cập nhật thành công!");
             fetchUsers();
             setIsOpenModal(false)
           } else {
@@ -132,14 +132,15 @@ const UserManage = () => {
   }
 
   const deleteUser = record => {
+  
     Swal.fire({
-      title: 'Delete this user?',
+      title: 'Bạn muốn xóa người dùng này không?',
       showCancelButton: true,
       confirmButtonText: 'Yes',
     }).then(result => {
       if (result.isConfirmed) {
-        users.deleteUser(record.id).then((response) => {
-          message.success("Deleted user successfully");
+        users.deleteUser(record.id).then(() => {
+          message.success("Xóa người dùng thành công!");
           fetchUsers();
         }).catch(err => {
           if (err.response && err.response.status === 400) {
@@ -153,7 +154,8 @@ const UserManage = () => {
   }
 
   const checkPhoneValid = (e) => {
-    const phoneRegex = /^(03|08|07)\d{7}$/;
+    const phoneRegex = /^(032|033|034|035|036|037|038|039|086|070|076|077|078|079|089|081|082|083|084|085|088|056|058|059|087)\d{7}$/;
+
     const value = e.target.value;
     setPhone(value);
     setIsValid(phoneRegex.test(value));
@@ -218,7 +220,7 @@ const UserManage = () => {
             outline: isValid ? 'initial' : 'bg-red-400',
           }}
         />
-        {!isValid && <p style={{ color: 'red' }}>Invalid phone number. Must start with 03, 09, or +84 and 10 characters.</p>}
+        {!isValid && <p style={{ color: 'red' }}>Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09, hoặc +84 và có 10 ký tự.</p>}
       </Modal>
     </>
   );
