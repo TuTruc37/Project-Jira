@@ -23,6 +23,7 @@ const ProjectManage = () => {
   console.log(arrProject);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState(null);
+  console.log(editingProjectId); // id đang truy cập và sửa
   const [userList, setUserList] = useState([]);
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
@@ -70,6 +71,7 @@ const ProjectManage = () => {
       .getAllProject()
       .then(res => {
         setArrProject(res.data.content);
+        // console.log(res.data.content);// danh sách dự án
         setIsLoading(false);
       })
       .catch(err => {

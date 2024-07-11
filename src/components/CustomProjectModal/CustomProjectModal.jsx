@@ -11,14 +11,21 @@ const CustomProjectModal = ({
   projectId,
   onProjectUpdated,
 }) => {
+  // const [projectDetails, setProjectDetails] = useState({
+  //   id: '',
+  //   projectName: '',
+  //   projectCategory: { id: '', name: '' },
+  //   description: '',
+  // });
   const [projectDetails, setProjectDetails] = useState({
-    id: '',
+    id: 0,
     projectName: '',
-    projectCategory: { id: '', name: '' },
+    creator: 0,
     description: '',
+    projectCategory: '', // categoryId là tên api của cái này
   });
-
   const [categories, setCategories] = useState([]);
+  console.log(categories);
 
   useEffect(() => {
     if (projectId) {
@@ -26,11 +33,13 @@ const CustomProjectModal = ({
         .getProjectDetails(projectId)
         .then(res => {
           const projectData = res.data.content;
+          console.log(projectData);
           setProjectDetails({
             id: projectData.id,
             projectName: projectData.projectName,
-            projectCategory: projectData.projectCategory,
+            creator: projectData.creator,
             description: projectData.description,
+            projectCategory: projectData.categoryId,
           });
         })
         .catch(err => {
@@ -50,14 +59,13 @@ const CustomProjectModal = ({
         message.error('Error loading project categories');
       });
   }, [projectId]);
-
   const handleSave = () => {
     console.log('Saving project details:', projectDetails);
 
     // Ensure all required fields are filled
     if (
       !projectDetails.projectName ||
-      !projectDetails.projectCategory.id ||
+      !projectDetails.projectCategory ||
       !projectDetails.description
     ) {
       message.error('Please fill out all required fields.');
@@ -65,8 +73,16 @@ const CustomProjectModal = ({
     }
 
     // Update project details via API call
+    const requestData = {
+      id: projectDetails.id,
+      projectName: projectDetails.projectName,
+      creator: projectDetails.creator,
+      description: projectDetails.description,
+      categoryId: projectDetails.projectCategory,
+    };
+
     projectMan
-      .updateProject(projectDetails.id, projectDetails)
+      .updateProject(projectDetails.id, requestData)
       .then(res => {
         console.log('API response:', res);
         message.success('Project updated successfully');
@@ -80,29 +96,12 @@ const CustomProjectModal = ({
         message.error('Error updating project');
       });
   };
-
   const handleChange = (field, value) => {
-    if (field === 'projectCategoryName') {
-      const selectedCategory = categories.find(
-        category => category.projectCategoryName === value
-      );
-      console.log('Selected category:', selectedCategory);
-      setProjectDetails({
-        ...projectDetails,
-        projectCategory: {
-          id: selectedCategory.id,
-          name: selectedCategory.projectCategoryName,
-        },
-      });
-    } else {
-      console.log('Field:', field, 'Value:', value);
-      setProjectDetails({
-        ...projectDetails,
-        [field]: value,
-      });
-    }
+    setProjectDetails(prevDetails => ({
+      ...prevDetails,
+      [field]: value,
+    }));
   };
-
   return (
     <div className="space-y-5">
       <AntdModal
@@ -111,7 +110,7 @@ const CustomProjectModal = ({
         onCancel={onCancel}
         width={1000}
         footer={
-          <Button className='mt-10' type="primary" onClick={handleSave}>
+          <Button className="mt-10" type="primary" onClick={handleSave}>
             Save
           </Button>
         }
@@ -136,7 +135,7 @@ const CustomProjectModal = ({
           <div className="w-[30%] flex flex-col space-y-2">
             <label className="font-semibold">Project Category</label>
             <Select
-              value={projectDetails.projectCategory.name}
+              value={projectDetails.projectCategory}
               onChange={value => handleChange('projectCategoryName', value)}
               placeholder="Select Category"
             >

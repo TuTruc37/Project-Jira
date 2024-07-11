@@ -4,7 +4,7 @@ import { path } from '../../common/path';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
 const MenuProject = addDataUserLocal => {
-  console.log(addDataUserLocal);
+  // console.log(addDataUserLocal);
   const handleRemoveUserFromLocalStorage = () => {
     localStorage.removeItem('dataUser');
   };
