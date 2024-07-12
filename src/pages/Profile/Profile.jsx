@@ -7,6 +7,8 @@ import { AlertContext } from '../../App';
 import InputProfile from '../../components/Input/InputProfile';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
+import { path } from '../../common/path';
+import { useNavigate } from 'react-router-dom';
 const Profile = () => {
   const dataUsers = handleGetValueLocalStore('dataUser');
   const [dataUser, setDataUser] = useState([]);
@@ -44,6 +46,7 @@ const Profile = () => {
   };
 
   const { handleAlert } = useContext(AlertContext);
+  const navigate = useNavigate();
 
   const onSubmit = async values => {
     console.log('Gửi giá trị:', values);
@@ -55,6 +58,8 @@ const Profile = () => {
       const updatedDataUsers = { ...dataUsers, ...values };
       handleSetValueLocalStore('dataUser', updatedDataUsers);
       // Reload lại trang
+
+      navigate(path.account.trangChu);
       Main_reload();
     } catch (err) {
       console.error('Lỗi khi sửa thông tin:', err);
