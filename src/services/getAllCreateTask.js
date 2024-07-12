@@ -34,6 +34,9 @@ export const getAllCreateTask = {
   getProjectDetails: projectId => {
     return http.get(`Project/getProjectDetail?id=${projectId}`);
   },
+  deleteTask: taskId => {
+    return http.delete(`Project/removeTask?taskId=${taskId}`);
+  }
 
   // Other methods as per your requirements
 };

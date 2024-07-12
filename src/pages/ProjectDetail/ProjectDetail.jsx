@@ -59,6 +59,7 @@ const ProjectDetail = () => {
       console.error('Error fetching data:', error);
     }
   };
+
   const showLoading = () => {
     setOpen(true);
     setLoading(true);
@@ -66,7 +67,7 @@ const ProjectDetail = () => {
     // Simple loading mock. You should add cleanup logic in real world.
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 3000);
   };
   const { handleAlert } = useContext(AlertContext);
   const {
@@ -120,6 +121,23 @@ const ProjectDetail = () => {
   //     assignees: selectedUsers,
   //   }));
   // };
+  const handleDeleteTask = async () => {
+    try {
+      // Gọi API để xóa task
+      const res = await getAllCreateTask.deleteTask(selectedTask.id);
+      handleAlert('success', 'Xóa task thành công');
+
+      // Cập nhật lại state tasks sau khi xóa
+      const updatedTasks = tasks.filter(task => task.id !== selectedTask.id);
+      setTasks(updatedTasks);
+
+      // Đóng modal chi tiết task sau khi xóa thành công (nếu cần)
+      setTaskModalOpen(false);
+    } catch (error) {
+      handleAlert('error', 'Xóa task không thành công');
+      console.error('Error deleting task:', error);
+    }
+  };
 
   const handleSliderChange = value => {
     const newRemaining = values.originalEstimate - value;
@@ -192,6 +210,7 @@ const ProjectDetail = () => {
               taskType: task.taskTypeDetail.taskType,
               priority: task.priorityTask.priority,
               description: task.taskDescription,
+              creator: task.creator,
             };
           });
         });
@@ -275,19 +294,27 @@ const ProjectDetail = () => {
         content: taskDetails.taskName,
         column: taskDetails.statusId,
         assignees: taskDetails.assigness,
-        taskType: taskDetails.taskTypeDetail.taskType, // Ensure taskType is properly accessed
+        taskType: taskDetails.taskTypeDetail.taskType,
         priority: taskDetails.priorityTask.priority,
         description: taskDetails.description,
         originalEstimate: taskDetails.originalEstimate,
         timeTrackingSpent: taskDetails.timeTrackingSpent,
         timeTrackingRemaining: taskDetails.timeTrackingRemaining,
-        comments: taskDetails.lstComment, // Assuming lstComment is an array of comments
+        comments: taskDetails.lstComment,
       });
 
+      // Mở modal sửa task khi click vào tiêu đề task
       setTaskModalOpen(true);
     } catch (error) {
       console.error('Error fetching task details:', error);
     }
+  };
+
+  const handleTaskFieldChange = (field, value) => {
+    setSelectedTask(prevTask => ({
+      ...prevTask,
+      [field]: value,
+    }));
   };
 
   const getTaskTypeIcon = taskType => {
@@ -617,125 +644,130 @@ const ProjectDetail = () => {
         </div>
       </DragDropContext>
       <Modal
-        title="Task Detail"
-        width={1000}
-        visible={taskModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={
-          <div className="">
-            <button
-              className="bg-blue-500 text-white py-1 px-4 rounded"
-              onClick={handleOk}
-            >
-              Save
-            </button>
-            <button
-              className="py-1 px-4 font-medium rounded-sm hover:bg-gray-200"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
+        width={900}
+        style={{ top: 20 }}
+        title={
+          <div className="flex justify-between items-center">
+            <p className='font-semibold text-xl'>Task detail</p>
+            <i
+              onClick={handleDeleteTask}
+              className="fa-solid fa-trash-can mr-10 hover:bg-gray-200 rounded py-2 px-3 cursor-pointer"
+            />
           </div>
         }
+        open={taskModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        loading={loading}
+        footer={null}
       >
         {selectedTask && (
           <div>
-            <h3 className="mb-4">{selectedTask.content}</h3>
+            {/* <h1 className="text-3xl font-bold">{selectedTask.content}</h1> */}
+            <textarea className="w-full  pt-1 px-2 text-md" name="" id="">
+              {selectedTask.content}
+            </textarea>
 
-            <div className="grid grid-cols-2 gap-5">
-              {/* Cột 1 */}
-              <div>
-                <EditorTiny
-                  name="description"
-                  handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-                  value={selectedTask.description}
+            <form className="space-y-3  w-full">
+              <div className="grid grid-cols-2 gap-5">
+                <SelectCustom
+                  label="Status"
+                  name="statusId"
+                  handleChange={e =>
+                    handleTaskFieldChange('statusId', e.target.value)
+                  }
+                  value={selectedTask.column}
+                  options={gstatusName}
+                  labelColor="text-black"
+                  valueProp="statusId"
+                  labelProp="statusName"
                 />
-                <label htmlFor="" className="text-lg font-semibold">
-                  Comment
-                </label>
-                <p>{selectedTask.priority}</p>
-                <p>{selectedTask.taskType}</p>
-                {/* <InputCustom value={selectedTask.taskType}></InputCustom> */}
-                <Select>
-                  <Select.Option value="">
-                    {selectedTask.taskType}
-                  </Select.Option>
-                </Select>
 
                 <SelectCustom
                   label="Priority"
                   name="priorityId"
-                  handleChange={handleChange}
-                  value={selectedTask?.priorityId} // Sử dụng optional chaining
+                  handleChange={e =>
+                    setSelectedTask({ ...selectedTask, priorityId: e })
+                  }
+                  value={selectedTask.column}
                   options={gpriority}
                   labelColor="text-black"
                   valueProp="priorityId"
                   labelProp="priority"
                 />
+              </div>
 
+              <div className="grid grid-cols-2 gap-5">
                 <SelectCustom
                   label="Task Type"
                   name="typeId"
-                  handleChange={handleChange}
-                  value={selectedTask.taskType} // Sử dụng optional chaining
+                  onChange={handleChange}
+                  value={selectedTask.column}
                   options={gtaskType}
                   labelColor="text-black"
                   valueProp="id"
                   labelProp="taskType"
                 />
-
                 <div>
-                  <TextArea
-                    onResize={null}
-                    placeholder="Thêm bình luận"
-                    className="mt-2 text-area"
-                  ></TextArea>
+                  <label
+                    className="block text-lg font-semibold text-black mb-2"
+                    htmlFor=""
+                  >
+                    Assignees
+                  </label>
+
+                  <TreeSelect
+                    showSearch
+                    style={{ width: '100%' }}
+                    value={selectedTask.assignees.map(user => user.name)}
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    placeholder="Vui lòng chọn thành viên"
+                    allowClear
+                    multiple
+                    treeDefaultExpandAll
+                    onChange={value => {
+                      const updatedAssignees = userAsign.filter(user =>
+                        value.includes(user.name)
+                      );
+                      setSelectedTask(prev => ({
+                        ...prev,
+                        assignees: updatedAssignees,
+                      }));
+                    }}
+                    filterTreeNode={(input, node) =>
+                      node.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                    treeData={userAsign.map(user => ({
+                      title: user.name,
+                      value: user.name,
+                    }))}
+                  />
                 </div>
               </div>
 
-              {/* Cột 2 */}
-              <div>
-                <div className="kanban-task-assignees">
-                  <div className="flex flex-wrap">
-                    <label htmlFor="" className="text-lg font-semibold">
-                      Assignees
-                    </label>
-                    <TreeSelect
-                      showSearch
-                      style={{ width: '100%' }}
-                      value={selectedTask.assignees.map(user => user.name)}
-                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                      placeholder="Vui lòng chọn thành viên"
-                      allowClear
-                      multiple
-                      treeDefaultExpandAll
-                      onChange={value => {
-                        const updatedAssignees = userAsign.filter(user =>
-                          value.includes(user.name)
-                        );
-                        setSelectedTask(prev => ({
-                          ...prev,
-                          assignees: updatedAssignees,
-                        }));
-                      }}
-                      filterTreeNode={(input, node) =>
-                        node.title.toLowerCase().indexOf(input.toLowerCase()) >=
-                        0
-                      }
-                      treeData={userAsign.map(user => ({
-                        title: user.name,
-                        value: user.name,
-                      }))}
-                    />
-                  </div>
-                </div>
+              <EditorTiny
+                name="description"
+                handleChange={value =>
+                  setSelectedTask(prevTask => ({
+                    ...prevTask,
+                    description: value,
+                  }))
+                }
+                value={selectedTask.description}
+              />
+
+              <div className="mt-4">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
+                  type="submit"
+                >
+                  Update Task
+                </button>
               </div>
-            </div>
+            </form>
           </div>
         )}
       </Modal>
-      ;
     </div>
   );
 };

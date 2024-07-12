@@ -30,6 +30,17 @@
 label {
   margin-top: 0 !important;
 }
-.text-area{
+.text-area {
   resize: none !important;
+}
+textarea {
+  resize: none !important;
+
+  &:active {
+  }
+
+  &:focus-visible {
+    // border: 1px solid #3cace1;
+    outline: 2px solid #2a90c0;
+  }
 }

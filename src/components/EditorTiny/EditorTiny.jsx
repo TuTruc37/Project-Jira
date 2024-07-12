@@ -2,10 +2,10 @@ import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import './editorTiny.scss';
 
-const EditorTiny = ({ value, handleChange,name }) => {
+const EditorTiny = ({ value, handleChange, name }) => {
   return (
     <Editor
-    name={name}
+      name={name}
       value={value}
       apiKey="hps86wiugt0czru5hl76286ostqmiw59ph7m5jlswxubnwvd"
       init={{
@@ -21,7 +21,7 @@ const EditorTiny = ({ value, handleChange,name }) => {
           alignleft aligncenter alignright alignjustify | \
           bullist numlist outdent indent | removeformat | help',
       }}
-      onEditorChange={(content) => handleChange(content)}
+      onEditorChange={content => handleChange(content)}
     />
   );
 };
