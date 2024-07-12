@@ -1,50 +1,68 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu, theme, Modal } from 'antd';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { path } from '../../common/path';
 import { handleGetValueLocalStore } from '../../utils/utils';
 import MenuProject from '../../components/MenuProject/MenuProject';
+
 const { Content, Sider } = Layout;
 const arrMenu = [
   {
-    label: <NavLink NavLink path={path.account.createTask}>Create Task</NavLink>,
+    label: <NavLink to={path.account.createTask}>Create Task</NavLink>,
     icon: <i className="fa-solid fa-plus"></i>,
   },
   {
-    label: <Link>Search</Link>,
+    label: <Link to={path.search}>Search</Link>,
     icon: <i className="fa-solid fa-magnifying-glass"></i>,
   },
 ];
+
 const HomeTemplates = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [addDataUser, setAddDataUser] = useState(null);
+  console.log(addDataUser);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [redirectPath, setRedirectPath] = useState('');
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // useEffect(() => {
-  //   // lấy dữ liệu từ local lên để kiểm tra
-  //   // Nếu như localStore không có dữ liệu ==> Đá mông người dùng đi mất
-  //   // Nếu như có dữ liệu và maLoaiNguoiDung không đúng ==> Đá mông người dùng đi mất
-  //   const dataUser = handleGetValueLocalStore('dataUser');
-  //   if (!dataUser) {
-  //     window.location.href = 'https://google.com';
-  //   } else {
-  //     if (dataUser.maLoaiNguoiDung !== 'QuanTri') {
-  //       window.location.href = 'https://google.com';
-  //     }
-  //   }
-  //   // return () => {
+  useEffect(() => {
+    const dataUser = handleGetValueLocalStore('dataUser');
+    if (!dataUser) {
+      setIsModalVisible(true);
+    } else {
+      setAddDataUser(dataUser);
+    }
+  }, []);
 
-  //   // }
-  // }, []);
+  useEffect(() => {
+    if (redirectPath) {
+      setTimeout(() => {
+        window.location.href = redirectPath;
+      }, 1000); // Chờ 3 giây trước khi chuyển hướng
+    }       
+  }, [redirectPath]);
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    setRedirectPath(path.dangKy);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setRedirectPath(path.dangNhap);
+  };
 
   return (
     <Layout
       style={{
+        
         minHeight: '100vh',
       }}
     >
-      <Sider
+      {/* <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={value => setCollapsed(value)}
@@ -56,22 +74,11 @@ const HomeTemplates = () => {
           mode="inline"
           items={arrMenu}
         />
-      </Sider>
+      </Sider> */}
       <Layout>
-        {/* header */}
-        <Content
-          style={{
-            // margin: '0 16px',
-            display: 'flex',
-          }}
-        >
-          <div
-            style={{
-              padding: 24,
-              width: '17%',
-            }}
-          >
-            <MenuProject />
+        <Content style={{ display: 'flex' }}>
+          <div style={{ padding: 24, width: '17%' }}>
+            {addDataUser && <MenuProject addDataUserLocal={addDataUser} />}
           </div>
           <div
             style={{
@@ -84,6 +91,16 @@ const HomeTemplates = () => {
           </div>
         </Content>
       </Layout>
+      <Modal
+        className=""
+        centered
+        title="Vui lòng đăng nhập để trải nghiệm đầy đủ tính năng"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Đăng ký"
+        cancelText="Đăng nhập"
+      ></Modal>
     </Layout>
   );
 };

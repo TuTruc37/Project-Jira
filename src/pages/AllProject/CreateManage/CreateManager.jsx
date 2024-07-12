@@ -3,14 +3,16 @@ import InputCustom from '../../../components/Input/InputCustom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../../App';
-import Description from '../../../components/Description/Description';
 import { projectCategory } from '../../../services/projectCategory';
 import SelectCustom from '../../../components/SelectCustom/SelectCustom';
 import { projectMan } from '../../../services/projectMan';
-import "./createManager.scss"
+import './createManager.scss';
+import EditorTiny from '../../../components/EditorTiny/EditorTiny';
+import TextEditor from '../../../components/TextEditor/TextEditor';
 
 const CreateManager = () => {
   const [projectCateName, setProjectCateName] = useState([]);
+  const [loading, setLoading] = useState(true); // Trạng thái loading
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +22,8 @@ const CreateManager = () => {
         setProjectCateName(data);
       } catch (error) {
         console.error('Error fetching project categories:', error);
+      } finally {
+        setLoading(false); // Kết thúc loading sau khi dữ liệu đã được tải
       }
     };
 
@@ -61,6 +65,10 @@ const CreateManager = () => {
     }),
   });
 
+  if (loading) {
+    return <div>Loading...</div>; // Hiển thị khi đang tải dữ liệu
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-12">Create Project</h1>
@@ -79,13 +87,18 @@ const CreateManager = () => {
         <h2 className="block mt-5 mb-3 font-medium text-black text-lg">
           Description
         </h2>
-        <Description
+        <EditorTiny
           name="description"
           value={formik.values.description}
           handleChange={value => formik.setFieldValue('description', value)}
         />
-        <h2 className="block heading mt-28 mb-3 font-medium text-black text-lg">
-          Project Category 
+        {/* <TextEditor
+          name="description"
+          value={formik.values.description}
+          handleChange={value => formik.setFieldValue('description', value)}
+        /> */}
+        <h2 className="block heading  mb-3 font-medium text-black text-lg">
+          Project Category
         </h2>
         <SelectCustom
           className=" "

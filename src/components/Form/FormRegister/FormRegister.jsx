@@ -39,8 +39,8 @@ const FormRegister = () => {
           // đưa tất cả dữ liệu về mặc định
           resetForm();
         } catch (err) {
-          console.log(err);
-          handleAlert('error', err.response.data.content);
+          console.log(err.response.data.message);
+          handleAlert('error', err.response.data.message);
         }
       },
       validationSchema: Yup.object({
@@ -60,8 +60,8 @@ const FormRegister = () => {
           .required('Vui lòng không bỏ trống')
           .matches(
             // tạo một mật khẩu có ít nhất 8 ký tự bao gồm 1 ký tự viết hoa 1 ký tự đặc biệt và số
-            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/,
-            'Vui lòng nhập mật khẩu bao gồm ít nhất 1 ký tự viết hoa và số'
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z0-9\W]{8,}$/,
+            'Vui lòng nhập mật khẩu ít nhất 8 ký tự bao gồm 1 ký tự viết hoa 1 ký tự đặc biệt và số'
           ),
         nhapLaiMatKhau: Yup.string()
           .required('Vui lòng không bỏ trống')
@@ -70,7 +70,7 @@ const FormRegister = () => {
     });
   return (
     <div
-      className={`flex items-center justify-center h-full lg:w-2/3 text-black md:w-11/12 ${styles.endBeautiful}`}
+      className={`flex items-center justify-center h-full lg:w-11/12 text-black md:w-11/12 ${styles.endBeautiful}`}
     >
       <form onSubmit={handleSubmit} className="space-y-5 w-full ">
         <h1 className="md:text-2xl font-bold leading-tight mt-12">
