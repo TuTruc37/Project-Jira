@@ -12,17 +12,41 @@ const UserManage = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [search, setSearch] = useState('');
-  const [isValid, setIsValid] = useState(true);
   const [isNew, setIsNew] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isNameValid, setIsNameValid] = useState(true);
+  const [isPhoneValid, setIsPhoneValid] = useState(true);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
 
 
+
+  const handleOk = () => {
+    if (isNew) {
+      const checkemail = checkEmailValid(email);
+      const checkname = checkNameValid(name);
+      const checkphone = checkPhoneValid(phone);
+      const checkpassword = checkPassWordValid(password);
+      if (checkemail && checkname && checkphone && checkpassword) {
+        newUser();
+      } else {
+        message.error("Vui lòng kiểm tra lại thông tin.");
+      }
+    } else {
+      const checkname = checkNameValid(name);
+      const checkphone = checkPhoneValid(phone);
+      if (checkname && checkphone) {
+        saveDataUser();
+      } else {
+        message.error("Vui lòng kiểm tra lại thông tin.");
+      }
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = () => {
-
     users
       .getUsers()
       .then(res => {
@@ -81,25 +105,14 @@ const UserManage = () => {
     },
   ];
 
-  const NewOrEdit = () => {
-    if (isNew) {
-      newUser();
-    } else {
-      saveDataUser();
-    }
-  };
-
-
-
   const newUser = async () => {
     const checkmail = dataUsers.filter(
-      item => item.email = email
+      item => item.email === email
     );
-    if (checkmail.length) {
+    if (checkmail.length > 0) {
       message.error("Email đã tồn tại!");
       return;
     }
-
     try {
       await users.dangKy({
         email: email,
@@ -126,7 +139,10 @@ const UserManage = () => {
     setName("");
     setPhone("");
     setPassword("");
-    setIsValid(true);
+    setIsPhoneValid(true);
+    setIsEmailValid(true);
+    setIsNameValid(true);
+    setIsPasswordValid(true);
   };
 
   let dataSource = [];
@@ -159,6 +175,7 @@ const UserManage = () => {
 
   useEffect(() => {
     if (currentUser) {
+      resetForm();
       console.log(currentUser);
       setEmail(currentUser.email);
       setName(currentUser.name);
@@ -177,7 +194,7 @@ const UserManage = () => {
     if (name.length == 0) {
       message.error("Tên không được để trống!");
     } else {
-      if (isValid) {
+      if (isPhoneValid) {
         users.editUser(payload)
           .then(res => {
             if (res.data.statusCode == 200) {
@@ -214,12 +231,32 @@ const UserManage = () => {
     });
   }
 
-  const checkPhoneValid = (e) => {
+  const checkPhoneValid = (value) => {
     const phoneRegex = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
-    const value = e.target.value;
-    setPhone(value);
-    setIsValid(phoneRegex.test(value));
+    const valid = phoneRegex.test(value);
+    setIsPhoneValid(valid);
+    return valid;
   }
+
+  const checkNameValid = (value) => {
+    const valid = value.length > 4;
+    setIsNameValid(valid);
+    return valid;
+  };
+
+  const checkPassWordValid = (value) => {
+    const Regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z0-9\W]{8,}$/;
+    const valid = Regex.test(value);
+    setIsPasswordValid(valid);
+    return valid;
+  };
+
+  const checkEmailValid = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const valid = emailRegex.test(value);
+    setIsEmailValid(valid);
+    return valid;
+  };
 
   dataSource = dataSource.filter(item =>
     Object.values(item).some(value =>
@@ -240,82 +277,97 @@ const UserManage = () => {
         </Button>
       </div>
 
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          pagination={{
-            showQuickJumper: false,
-            size: 'small',
-            showTitle: 'trang',
-            defaultPageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '30', '40', '50', '100']
-          }}
-        />
-
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        pagination={{
+          showQuickJumper: false,
+          size: 'small',
+          showTitle: 'trang',
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '30', '40', '50', '100']
+        }}
+      />
 
       <Modal
-        title={(isNew ? "Thêm người dùng" : "Chỉnh sửa người dùng")}
+        title={isNew ? "Thêm người dùng" : "Chỉnh sửa người dùng"}
         open={isOpenModal}
-        onOk={() => NewOrEdit()}
+        onOk={handleOk}
         onCancel={() => {
           resetForm();
-          setIsOpenModal(false)
+          setIsOpenModal(false);
         }}
-        okText={"Lưu"}
-        cancelText={"Hủy"}
+        okText="Lưu"
+        cancelText="Hủy"
       >
-
         <Typography.Title level={5}>Email</Typography.Title>
         <Input
           type="email"
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => {
+            setEmail(e.target.value);
+            checkEmailValid(e.target.value);
+          }
+          }
           placeholder="Nhập Địa Chỉ Email"
           value={email}
           disabled={!isNew}
           style={{
-            borderColor: 'initial',
-            outline: 'initial',
+            borderColor: isEmailValid ? 'initial' : 'red',
+            outline: isEmailValid ? 'initial' : 'red',
           }}
         />
-
+        {!isEmailValid && <p style={{ color: 'red' }}>Email không hợp lệ.</p>}
         <Typography.Title level={5}>Tên Người Dùng</Typography.Title>
         <Input
           type="text"
-          onChange={e => setName(e.target.value)}
+          onChange={e => {
+            setName(e.target.value);
+            checkNameValid(e.target.value);
+          }}
           placeholder="Nhập Tên Người Dùng"
           value={name}
           style={{
-            borderColor: 'initial',
-            outline: 'initial',
+            borderColor: isNameValid ? 'initial' : 'red',
+            outline: isNameValid ? 'initial' : 'red',
           }}
         />
-
+        {!isNameValid && <p style={{ color: 'red' }}>Tên người dùng không được để trống. Vui lòng nhập tối thiêu 5 ký tự</p>}
         <Typography.Title level={5}>Số Điện Thoại</Typography.Title>
         <Input
-          type="Number"
-          onChange={e => checkPhoneValid(e)}
+          type="text"
+          onChange={e => {
+            setPhone(e.target.value);
+            checkPhoneValid(e.target.value);
+          }
+          }
           placeholder="Nhập Số Điện Thoại"
           value={phone}
           style={{
-            borderColor: isValid ? 'initial' : 'red',
-            outline: isValid ? 'initial' : 'red',
+            borderColor: isPhoneValid ? 'initial' : 'red',
+            outline: isPhoneValid ? 'initial' : 'red',
           }}
         />
-        {!isValid && <p style={{ color: 'red' }}>Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09, hoặc +84 và có 10 ký tự.</p>}
-
-
-        <Typography.Title level={5}>{(isNew ? "Mật Khẩu" : "")}</Typography.Title>
-        <Input
-          type={(isNew ? "password" : "hidden")}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="Nhập Mật Khẩu"
-          value={password}
-          style={{
-            borderColor: 'initial',
-            outline: 'initial',
-          }}
-        />
+        {!isPhoneValid && <p style={{ color: 'red' }}>Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09, hoặc +84 và có 10 ký tự.</p>}
+        {isNew && (
+          <>
+            <Typography.Title level={5}>Mật Khẩu</Typography.Title>
+            <Input
+              type="password"
+              onChange={e => {
+                setPassword(e.target.value);
+                checkPassWordValid(e.target.value);
+              }}
+              placeholder="Nhập Mật Khẩu"
+              value={password}
+              style={{
+                borderColor: isPasswordValid ? 'initial' : 'red',
+                outline: isPasswordValid ? 'initial' : 'red',
+              }}
+            />
+            {!isPasswordValid && <p style={{ color: 'red' }}>Vui lòng nhập mật khẩu ít nhất 8 ký tự bao gồm 1 ký tự viết hoa 1 ký tự đặc biệt và số.</p>}
+          </>
+        )}
       </Modal>
     </>
   );
