@@ -32,7 +32,15 @@ const CreateManager = () => {
 
   const { handleAlert } = useContext(AlertContext);
 
-  const formik = useFormik({
+  const {
+    values,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    errors,
+    touched,
+  } = useFormik({
     initialValues: {
       projectName: '',
       description: '',
@@ -71,17 +79,17 @@ const CreateManager = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-12">Create Project</h1>
-      <form onSubmit={formik.handleSubmit} className="space-y-3 w-full">
+      <h1 className="text-2xl font-bold">Create Project</h1>
+      <form onSubmit={handleSubmit} className="space-y-5 w-full">
         <InputCustom
           label="Name"
           name="projectName"
-          handleChange={formik.handleChange}
-          handleBlur={formik.handleBlur}
+          handleChange={handleChange}
+          handleBlur={handleBlur}
           placeholder="Vui lòng nhập tên"
-          error={formik.errors.projectName}
-          touched={formik.touched.projectName}
-          value={formik.values.projectName}
+          error={errors.projectName}
+          touched={touched.projectName}
+          value={values.projectName}
           labelColor="text-black"
         />
         <h2 className="block mt-5 mb-3 font-medium text-black text-lg">
@@ -89,23 +97,20 @@ const CreateManager = () => {
         </h2>
         <EditorTiny
           name="description"
-          value={formik.values.description}
-          handleChange={value => formik.setFieldValue('description', value)}
+          value={values.description}
+          handleChange={value => setFieldValue('description', value)}
         />
         {/* <TextEditor
           name="description"
           value={formik.values.description}
           handleChange={value => formik.setFieldValue('description', value)}
         /> */}
-        <h2 className="block heading  mb-3 font-medium text-black text-lg">
-          Project Category
-        </h2>
         <SelectCustom
           className=" "
           label=""
           name="categoryId"
-          handleChange={formik.handleChange}
-          value={formik.values.categoryId}
+          handleChange={handleChange}
+          value={values.categoryId}
           options={projectCateName}
           labelColor="text-black"
           valueProp="id"

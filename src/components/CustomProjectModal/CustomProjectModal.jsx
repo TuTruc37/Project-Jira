@@ -13,12 +13,18 @@ const CustomProjectModal = ({
   onProjectUpdated,
 }) => {
   const [projectDetails, setProjectDetails] = useState({
-    id: '',
+    id: 0,
     projectName: '',
-    projectCategory: { id: '', name: '' },
+    creator: 0,
     description: '',
+    projectCategory: '',
   });
-
+  // khi bấm sửa (save) thì reload lại
+  function Main_reload() {
+    setInterval(function () {
+      window.location.reload();
+    }, 2000);
+  }
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -27,11 +33,13 @@ const CustomProjectModal = ({
         .getProjectDetails(projectId)
         .then(res => {
           const projectData = res.data.content;
+          console.log(projectData);
           setProjectDetails({
             id: projectData.id,
             projectName: projectData.projectName,
-            projectCategory: projectData.projectCategory,
+            creator: projectData.creator.id, // Lấy creator.id từ dữ liệu
             description: projectData.description,
+            projectCategory: projectData.projectCategory, // đây là dữ liệu đã được tạo sẵn
           });
         })
         .catch(err => {
@@ -58,7 +66,7 @@ const CustomProjectModal = ({
     // Ensure all required fields are filled
     if (
       !projectDetails.projectName ||
-      !projectDetails.projectCategory.id ||
+      !projectDetails.projectCategory ||
       !projectDetails.description
     ) {
       message.error('Please fill out all required fields.');
@@ -74,6 +82,7 @@ const CustomProjectModal = ({
         if (onProjectUpdated) {
           onProjectUpdated();
         }
+        Main_reload();
         onCancel();
       })
       .catch(err => {
@@ -83,25 +92,12 @@ const CustomProjectModal = ({
   };
 
   const handleChange = (field, value) => {
-    if (field === 'projectCategoryName') {
-      const selectedCategory = categories.find(
-        category => category.projectCategoryName === value
-      );
-      console.log('Selected category:', selectedCategory);
-      setProjectDetails({
-        ...projectDetails,
-        projectCategory: {
-          id: selectedCategory.id,
-          name: selectedCategory.projectCategoryName,
-        },
-      });
-    } else {
-      console.log('Field:', field, 'Value:', value);
-      setProjectDetails({
-        ...projectDetails,
-        [field]: value,
-      });
-    }
+    console.log(value);
+
+    setProjectDetails({
+      ...projectDetails,
+      [field]: value,
+    });
   };
 
   return (
@@ -138,8 +134,17 @@ const CustomProjectModal = ({
           <div className="w-[30%] flex flex-col space-y-2">
             <label className="font-semibold">Project Category</label>
             <Select
-              value={projectDetails.projectCategory.name}
-              onChange={value => handleChange('projectCategoryName', value)}
+              value={
+                projectDetails.projectCategory.name
+                  ? projectDetails.projectCategory.name
+                  : projectDetails.projectCategory.value
+              }
+              onChange={(value, option) => {
+                return handleChange('projectCategory', option);
+              }}
+              // onChange={value => {
+              //   handleChange('projectCategory', value);
+              // }}
               placeholder="Select Category"
             >
               {categories.map(category => (
