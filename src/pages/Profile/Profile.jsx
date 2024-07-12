@@ -61,7 +61,15 @@ const Profile = () => {
     }
   };
 
-  const formik = useFormik({
+  const {
+    values,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    errors,
+    touched,
+  } = useFormik({
     initialValues: {
       id: '',
       email: '',
@@ -82,17 +90,6 @@ const Profile = () => {
         ),
     }),
   });
-
-  // Giải phóng các thuộc tính cần thiết từ formik
-  const {
-    values,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setFieldValue,
-    errors,
-    touched,
-  } = formik;
 
   useEffect(() => {
     if (matchedUser) {

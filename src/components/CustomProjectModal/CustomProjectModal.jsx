@@ -18,7 +18,12 @@ const CustomProjectModal = ({
     description: '',
     projectCategory: '',
   });
-
+  // khi bấm sửa (save) thì reload lại
+  function Main_reload() {
+    setInterval(function () {
+      window.location.reload();
+    }, 2000);
+  }
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -76,6 +81,7 @@ const CustomProjectModal = ({
         if (onProjectUpdated) {
           onProjectUpdated();
         }
+        Main_reload();
         onCancel();
       })
       .catch(err => {
