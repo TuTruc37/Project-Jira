@@ -32,7 +32,7 @@ const FormRegister = () => {
           const res = await users.dangKy(values);
           // console.log(res);
           handleAlert('success', 'Đăng ký thành công');
-          navigate(path.dangNhap);
+          navigate(path.account.dangNhap);
           // gọi hàm xử lí load lại dữ liệu mới từ backend
           handleSetValueLocalStore('dataUser', res.data.content);
           dispatch(handleGetValue(res.data.content));
@@ -146,7 +146,7 @@ const FormRegister = () => {
           <p className="mt-8">
             Bạn đã có tài khoản?
             <Link
-              to={path.dangNhap}
+              to={path.account.dangNhap}
               className="text-blue-500 hover:text-blue-700 font-semibold ml-2"
             >
               Đăng nhập ngay

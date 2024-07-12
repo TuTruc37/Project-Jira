@@ -1,6 +1,4 @@
 export const path = {
-  dangNhap: '/login',
-  dangKy: '/register',
   account: {
     trangChu: '/',
     createProject: '/createProject',
@@ -9,5 +7,7 @@ export const path = {
     projectDetail: '/projectDetail',
     users: '/users',
     profile: '/profile',
+    dangNhap: '/login',
+    dangKy: '/register',
   },
 };

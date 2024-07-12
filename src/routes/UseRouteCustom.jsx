@@ -58,11 +58,11 @@ const useRouteCustom = () => {
       ],
     },
     {
-      path: path.dangNhap,
+      path: path.account.dangNhap,
       element: <Login />,
     },
     {
-      path: path.dangKy,
+      path: path.account.dangKy,
       element: <Register />,
     },
     {

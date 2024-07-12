@@ -28,7 +28,7 @@ const MenuProject = ({ addDataUserLocal }) => {
         </Space>
         <div>
           <h2>{addDataUserLocal.name}</h2>
-          <NavLink to={path.dangNhap}>
+          <NavLink to={path.account.dangNhap}>
             <h3 onClick={handleRemoveUserFromLocalStorage}>Thoát tài khoản</h3>
           </NavLink>
         </div>
