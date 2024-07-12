@@ -266,14 +266,15 @@ const UserManage = () => {
 
   return (
     <>
+    <h2 className='mb-4 text-2xl font-semibold'>User Manager</h2>
       <div className="flex justify-between items-center">
         <Input type="text" onChange={(e) => setSearch(e.target.value)} className="flex justify-end mb-5 w-1/4" size="medium" placeholder="Tìm kiếm ..." />
         <Button
           onClick={() => handleAddNewUser()}
           type="secondary"
-          className="bg-green-500 text-white mr-20 hover:bg-green-600">
+          className="bg-blue-500 text-white mr-20 ">
           <i className="fa-solid fa-user-plus"></i>
-          Thêm Người Dùng
+        <p>thêm người dùng</p>
         </Button>
       </div>
 
