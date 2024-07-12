@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import UseRouteCustom from './routes/UseRouteCustom';
-
-import { message } from 'antd';
+import viVN from 'antd/lib/locale/vi_VN';
+import { message, ConfigProvider } from 'antd';
 export const AlertContext = createContext();
 function App() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -13,10 +13,12 @@ function App() {
     });
   };
   return (
-    <AlertContext.Provider value={{ handleAlert }}>
-      {contextHolder}
-      {myRoutes}
-    </AlertContext.Provider>
+    <ConfigProvider locale={viVN}>
+      <AlertContext.Provider value={{ handleAlert }}>
+        {contextHolder}
+        {myRoutes}
+      </AlertContext.Provider>
+    </ConfigProvider>
   );
 }
 
