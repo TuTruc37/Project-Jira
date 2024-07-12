@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, Table, Modal, message, Input, Typography, ConfigProvider } from 'antd';
+import { Button, Table, Modal, message, Input, Typography } from 'antd';
 import Swal from 'sweetalert2';
 import { users } from '../../../services/users';
-import viVN from 'antd/lib/locale/vi_VN';
 
 const UserManage = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -88,7 +87,7 @@ const UserManage = () => {
     } else {
       saveDataUser();
     }
-  }
+  };
 
 
 
@@ -120,14 +119,15 @@ const UserManage = () => {
       console.log(err);
       message.error(err.response.data.content);
     }
-  }
+  };
 
   const resetForm = () => {
     setEmail("");
     setName("");
     setPhone("");
     setPassword("");
-  }
+    setIsValid(true);
+  };
 
   let dataSource = [];
   dataUsers.map((user, index) => {
@@ -141,6 +141,7 @@ const UserManage = () => {
   });
 
   const handleEditUser = record => {
+    resetForm();
     setIsOpenModal(true);
     setCurrentUser(record);
     setIsNew(false);
@@ -150,14 +151,10 @@ const UserManage = () => {
   };
 
   const handleAddNewUser = () => {
+    resetForm();
     setIsOpenModal(true);
     setCurrentUser(null);
     setIsNew(true);
-    setEmail("");
-    setName("");
-    setPhone("");
-    setPassword("");
-
   };
 
   useEffect(() => {
@@ -196,7 +193,6 @@ const UserManage = () => {
   }
 
   const deleteUser = record => {
-
     Swal.fire({
       title: 'Bạn muốn xóa người dùng này không?',
       showCancelButton: true,
@@ -219,7 +215,7 @@ const UserManage = () => {
   }
 
   const checkPhoneValid = (e) => {
-    const phoneRegex = /^(032|033|034|035|036|037|038|039|086|070|076|077|078|079|089|081|082|083|084|085|088|056|058|059|087)\d{7}$/;
+    const phoneRegex = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
     const value = e.target.value;
     setPhone(value);
     setIsValid(phoneRegex.test(value));
@@ -235,20 +231,15 @@ const UserManage = () => {
     <>
       <div className="flex justify-between items-center">
         <Input type="text" onChange={(e) => setSearch(e.target.value)} className="flex justify-end mb-5 w-1/4" size="medium" placeholder="Tìm kiếm ..." />
-
         <Button
           onClick={() => handleAddNewUser()}
           type="secondary"
-          className="bg-green-500 text-white mr-20 hover:bg-green-600"
-
-        >
+          className="bg-green-500 text-white mr-20 hover:bg-green-600">
           <i className="fa-solid fa-user-plus"></i>
           Thêm Người Dùng
         </Button>
-
       </div>
 
-      <ConfigProvider locale={viVN}>
         <Table
           columns={columns}
           dataSource={dataSource}
@@ -258,24 +249,23 @@ const UserManage = () => {
             showTitle: 'trang',
             defaultPageSize: 10,
             showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '30', '40', '50', '100'],
-            showTotal: total => {
-              return `Tổng Trang: ${total}`;
-            },
-          }
-
-          }
+            pageSizeOptions: ['10', '20', '30', '40', '50', '100']
+          }}
         />
-      </ConfigProvider>
+
 
       <Modal
         title={(isNew ? "Thêm người dùng" : "Chỉnh sửa người dùng")}
         open={isOpenModal}
         onOk={() => NewOrEdit()}
-        onCancel={() => setIsOpenModal(false)}
+        onCancel={() => {
+          resetForm();
+          setIsOpenModal(false)
+        }}
         okText={"Lưu"}
         cancelText={"Hủy"}
       >
+
         <Typography.Title level={5}>Email</Typography.Title>
         <Input
           type="email"
@@ -316,7 +306,6 @@ const UserManage = () => {
 
 
         <Typography.Title level={5}>{(isNew ? "Mật Khẩu" : "")}</Typography.Title>
-
         <Input
           type={(isNew ? "password" : "hidden")}
           onChange={e => setPassword(e.target.value)}
