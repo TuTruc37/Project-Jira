@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { path } from '../../common/path';
-import { Breadcrumb, Modal, TreeSelect, Slider, Input } from 'antd';
+import { Breadcrumb, Modal, TreeSelect, Slider, Input, Select } from 'antd';
 import './projectDetail.scss';
 import { Button } from 'antd/es/radio';
 import { useDispatch } from 'react-redux';
@@ -151,23 +151,21 @@ const ProjectDetail = () => {
 
   const handleOk = async () => {
     try {
-      // Save the updated assignees (you might need to call an API to update the task details)
       const updatedTask = {
-        ...selectedTask,
+        id: selectedTask.id,
+        content: selectedTask.content,
+        column: selectedTask.column,
         assignees: selectedTask.assignees,
+        taskType: selectedTask.taskType,
+        priority: selectedTask.priority,
         description: selectedTask.description,
       };
 
-      // Assuming you have an updateTask API function
-      await projectMan.updateTask(updatedTask);
-
-      // Update the state with the updated task
-      setTasks(prevTasks =>
-        prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
-      );
-
+      const res = await getAllCreateTask.postCreateTask(updatedTask);
+      handleAlert('success', 'Task updated successfully');
       setIsModalOpen(false);
     } catch (error) {
+      handleAlert('error', 'Failed to update task');
       console.error('Error updating task:', error);
     }
   };
@@ -180,7 +178,7 @@ const ProjectDetail = () => {
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        const res = await projectMan.getProjectDetails(projectId);
+        const res = await getAllCreateTask.getProjectDetails(projectId);
         const projectData = res.data.content;
 
         const taskMap = {};
@@ -267,10 +265,29 @@ const ProjectDetail = () => {
     }
   };
 
-  const handleTaskClick = taskId => {
-    const selected = tasks.find(task => task.id === taskId);
-    setSelectedTask(selected);
-    setTaskModalOpen(true);
+  const handleTaskClick = async taskId => {
+    try {
+      const res = await getAllCreateTask.getTaskDetails(taskId);
+      const taskDetails = res.data.content;
+
+      setSelectedTask({
+        id: taskDetails.taskId.toString(),
+        content: taskDetails.taskName,
+        column: taskDetails.statusId,
+        assignees: taskDetails.assigness,
+        taskType: taskDetails.taskTypeDetail.taskType, // Ensure taskType is properly accessed
+        priority: taskDetails.priorityTask.priority,
+        description: taskDetails.description,
+        originalEstimate: taskDetails.originalEstimate,
+        timeTrackingSpent: taskDetails.timeTrackingSpent,
+        timeTrackingRemaining: taskDetails.timeTrackingRemaining,
+        comments: taskDetails.lstComment, // Assuming lstComment is an array of comments
+      });
+
+      setTaskModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching task details:', error);
+    }
   };
 
   const getTaskTypeIcon = taskType => {
@@ -319,7 +336,6 @@ const ProjectDetail = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-4">Project Detail</h1>
-
       <Breadcrumb className="mb-4">
         <Breadcrumb.Item>
           <Link to={path.account.trangChu}>Project Manager</Link>
@@ -529,7 +545,6 @@ const ProjectDetail = () => {
           </form>
         </div>
       </Modal>
-
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-4 gap-4 ">
           {Object.entries(columns).map(([columnId, column]) => (
@@ -601,22 +616,35 @@ const ProjectDetail = () => {
           ))}
         </div>
       </DragDropContext>
-
       <Modal
         title="Task Detail"
         width={1000}
-        // loading={loading}
         visible={taskModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={null}
+        footer={
+          <div className="">
+            <button
+              className="bg-blue-500 text-white py-1 px-4 rounded"
+              onClick={handleOk}
+            >
+              Save
+            </button>
+            <button
+              className="py-1 px-4 font-medium rounded-sm hover:bg-gray-200"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        }
       >
         {selectedTask && (
           <div>
             <h3 className="mb-4">{selectedTask.content}</h3>
 
             <div className="grid grid-cols-2 gap-5">
-              {/* cột 1 */}
+              {/* Cột 1 */}
               <div>
                 <EditorTiny
                   name="description"
@@ -626,51 +654,50 @@ const ProjectDetail = () => {
                 <label htmlFor="" className="text-lg font-semibold">
                   Comment
                 </label>
+                <p>{selectedTask.priority}</p>
+                <p>{selectedTask.taskType}</p>
+                {/* <InputCustom value={selectedTask.taskType}></InputCustom> */}
+                <Select>
+                  <Select.Option value="">
+                    {selectedTask.taskType}
+                  </Select.Option>
+                </Select>
+
+                <SelectCustom
+                  label="Priority"
+                  name="priorityId"
+                  handleChange={handleChange}
+                  value={selectedTask?.priorityId} // Sử dụng optional chaining
+                  options={gpriority}
+                  labelColor="text-black"
+                  valueProp="priorityId"
+                  labelProp="priority"
+                />
+
+                <SelectCustom
+                  label="Task Type"
+                  name="typeId"
+                  handleChange={handleChange}
+                  value={selectedTask.taskType} // Sử dụng optional chaining
+                  options={gtaskType}
+                  labelColor="text-black"
+                  valueProp="id"
+                  labelProp="taskType"
+                />
+
                 <div>
                   <TextArea
                     onResize={null}
                     placeholder="Thêm bình luận"
                     className="mt-2 text-area"
                   ></TextArea>
-                  <button>save</button>
-                  <button>cancel</button>
                 </div>
               </div>
-              {/* cột 2 */}
-              <div>
-                <div className="kanban-task-assignees  ">
-                  <SelectCustom
-                    label="Status"
-                    name="statusId"
-                    handleChange={handleChange}
-                    value={selectedTask.priority}
-                    options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
-                    labelColor="text-black"
-                    valueProp="statusId"
-                    labelProp="statusName"
-                  />
-                  <SelectCustom
-                    label="Priority"
-                    name="priorityId"
-                    handleChange={handleChange}
-                    value={selectedTask.priority}
-                    options={gpriority} // Truyền danh sách loại người dùng từ API vào options
-                    labelColor="text-black"
-                    valueProp="priorityId"
-                    labelProp="priority"
-                  />
 
-                  <SelectCustom
-                    label="Task Type"
-                    name="typeId"
-                    handleChange={handleChange}
-                    value={selectedTask.taskType}
-                    options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
-                    labelColor="text-black"
-                    valueProp="id"
-                    labelProp="taskType"
-                  />
-                  <div className=" flex flex-wrap">
+              {/* Cột 2 */}
+              <div>
+                <div className="kanban-task-assignees">
+                  <div className="flex flex-wrap">
                     <label htmlFor="" className="text-lg font-semibold">
                       Assignees
                     </label>
@@ -708,6 +735,7 @@ const ProjectDetail = () => {
           </div>
         )}
       </Modal>
+      ;
     </div>
   );
 };
