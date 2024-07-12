@@ -18,11 +18,11 @@ const arrMenu = [
 ];
 
 const HomeTemplates = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  // const [collapsed, setCollapsed] = useState(false);
   const [addDataUser, setAddDataUser] = useState(null);
   console.log(addDataUser);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [redirectPath, setRedirectPath] = useState('');
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+  // const [redirectPath, setRedirectPath] = useState('');
 
   const {
     token: { colorBgContainer },
@@ -31,29 +31,30 @@ const HomeTemplates = () => {
   useEffect(() => {
     const dataUser = handleGetValueLocalStore('dataUser');
     if (!dataUser) {
-      setIsModalVisible(true);
+      // setIsModalVisible(true);
+      window.location.href = path.dangNhap;
     } else {
       setAddDataUser(dataUser);
     }
   }, []);
 
-  useEffect(() => {
-    if (redirectPath) {
-      setTimeout(() => {
-        window.location.href = redirectPath;
-      }, 1000); // Chờ 3 giây trước khi chuyển hướng
-    }
-  }, [redirectPath]);
+  // useEffect(() => {
+  //   if (redirectPath) {
+  //     setTimeout(() => {
+  //       window.location.href = redirectPath;
+  //     }, 1000); // Chờ 3 giây trước khi chuyển hướng
+  //   }
+  // }, [redirectPath]);
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-    setRedirectPath(path.dangKy);
-  };
+  // const handleOk = () => {
+  //   setIsModalVisible(false);
+  //   setRedirectPath(path.dangKy);
+  // };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setRedirectPath(path.dangNhap);
-  };
+  // const handleCancel = () => {
+  //   setIsModalVisible(false);
+  //   setRedirectPath(path.dangNhap);
+  // };
 
   return (
     <Layout
@@ -90,7 +91,7 @@ const HomeTemplates = () => {
           </div>
         </Content>
       </Layout>
-      <Modal
+      {/* <Modal
         className=""
         centered
         title="Vui lòng đăng nhập để trải nghiệm đầy đủ tính năng"
@@ -99,7 +100,7 @@ const HomeTemplates = () => {
         onCancel={handleCancel}
         okText="Đăng ký"
         cancelText="Đăng nhập"
-      ></Modal>
+      ></Modal> */}
     </Layout>
   );
 };
