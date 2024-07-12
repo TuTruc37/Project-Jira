@@ -14,10 +14,15 @@ export const projectMan = {
   updateProject: (projectId, projectDetails) => {
     console.log(projectId);
     console.log(projectDetails);
-    return http.put(
-      `/Project/updateProject?projectId=${projectId}`,
-      projectDetails
-    );
+    // Loc nhung key can thiet
+    let obj = {
+      id: projectId,
+      projectName: projectDetails.projectName,
+      creator: projectDetails.creator,
+      description: projectDetails.description,
+      categoryId: projectDetails.projectCategory.key,
+    };
+    return http.put(`/Project/updateProject?projectId=${projectId}`, obj);
   },
   getUserProjectId: projectId => {
     return http.get(`/Users/getUserByProjectId?idProject=${projectId}`);

@@ -16,10 +16,10 @@ const CustomProjectModal = ({
     projectName: '',
     creator: 0,
     description: '',
-    projectCategory: '', // categoryId là tên api của cái này
+    projectCategory: '',
   });
+
   const [categories, setCategories] = useState([]);
-  console.log(categories);
 
   useEffect(() => {
     if (projectId) {
@@ -31,9 +31,9 @@ const CustomProjectModal = ({
           setProjectDetails({
             id: projectData.id,
             projectName: projectData.projectName,
-            creator: projectData.creator,
+            creator: projectData.creator.id, // Lấy creator.id từ dữ liệu
             description: projectData.description,
-            projectCategory: projectData.categoryId,
+            projectCategory: projectData.projectCategory, // đây là dữ liệu đã được tạo sẵn
           });
         })
         .catch(err => {
@@ -53,6 +53,7 @@ const CustomProjectModal = ({
         message.error('Error loading project categories');
       });
   }, [projectId]);
+
   const handleSave = () => {
     console.log('Saving project details:', projectDetails);
 
@@ -67,16 +68,8 @@ const CustomProjectModal = ({
     }
 
     // Update project details via API call
-    const requestData = {
-      id: projectDetails.id,
-      projectName: projectDetails.projectName,
-      creator: projectDetails.creator,
-      description: projectDetails.description,
-      categoryId: projectDetails.projectCategory,
-    };
-
     projectMan
-      .updateProject(projectDetails.id, requestData)
+      .updateProject(projectDetails.id, projectDetails)
       .then(res => {
         console.log('API response:', res);
         message.success('Project updated successfully');
@@ -90,12 +83,16 @@ const CustomProjectModal = ({
         message.error('Error updating project');
       });
   };
+
   const handleChange = (field, value) => {
-    setProjectDetails(prevDetails => ({
-      ...prevDetails,
+    console.log(value);
+
+    setProjectDetails({
+      ...projectDetails,
       [field]: value,
-    }));
+    });
   };
+
   return (
     <div className="space-y-5">
       <AntdModal
@@ -129,8 +126,17 @@ const CustomProjectModal = ({
           <div className="w-[30%] flex flex-col space-y-2">
             <label className="font-semibold">Project Category</label>
             <Select
-              value={projectDetails.projectCategory}
-              onChange={value => handleChange('projectCategoryName', value)}
+              value={
+                projectDetails.projectCategory.name
+                  ? projectDetails.projectCategory.name
+                  : projectDetails.projectCategory.value
+              }
+              onChange={(value, option) => {
+                return handleChange('projectCategory', option);
+              }}
+              // onChange={value => {
+              //   handleChange('projectCategory', value);
+              // }}
               placeholder="Select Category"
             >
               {categories.map(category => (
