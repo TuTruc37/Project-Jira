@@ -162,7 +162,7 @@ const Profile = () => {
             <div>
               <button
                 type="submit"
-                className="bg-yellow-500 hover:bg-yellow-700 py-2 px-56 rounded-lg mt-3 text-xl"
+                className="bg-yellow-500 hover:bg-yellow-700 py-2 px-64 rounded-lg mt-3 text-xl"
               >
                 Sửa
               </button>

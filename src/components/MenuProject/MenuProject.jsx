@@ -3,12 +3,13 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { path } from '../../common/path';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space, Menu } from 'antd';
-import "./menuProject.scss";
+import './menuProject.scss';
+import { add } from 'lodash';
 const { SubMenu } = Menu;
 
 const MenuProject = ({ addDataUserLocal }) => {
   const location = useLocation();
-
+  console.log(addDataUserLocal);
   const handleRemoveUserFromLocalStorage = () => {
     localStorage.removeItem('dataUser');
   };
@@ -21,7 +22,7 @@ const MenuProject = ({ addDataUserLocal }) => {
             <Avatar
               size="large"
               icon={<UserOutlined />}
-              src={addDataUserLocal.avatar}
+              src={`https://ui-avatars.com/api/?name=${addDataUserLocal.name}`}
             />
           </Space>
         </Space>
@@ -34,13 +35,17 @@ const MenuProject = ({ addDataUserLocal }) => {
       </div>
       <div className="mt-14">
         <Menu
-        className='menu-project'
+          className="menu-project"
           mode="inline"
           defaultSelectedKeys={[location.pathname]}
           selectedKeys={[location.pathname]}
-          style={{ borderRight: 0, background:"none", border:"none"}}
+          style={{ borderRight: 0, background: 'none', border: 'none' }}
         >
-          <Menu.Item style={{background:"none"}} className='' key={path.account.profile}>
+          <Menu.Item
+            style={{ background: 'none' }}
+            className=""
+            key={path.account.profile}
+          >
             <NavLink to={path.account.profile}>
               <span className="font-semibold text-lg">
                 <i className="fa-solid fa-user"></i> Profile
