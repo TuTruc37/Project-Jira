@@ -7,17 +7,20 @@ import { AlertContext } from '../../App';
 import InputProfile from '../../components/Input/InputProfile';
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Space } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { path } from '../../common/path';
 const Profile = () => {
+  const navigate = useNavigate();
   const dataUsers = handleGetValueLocalStore('dataUser');
   const [dataUser, setDataUser] = useState([]);
   const [matchedUser, setMatchedUser] = useState(null);
   // làm reload không 404
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  console.log(isModalVisible);
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    Main_reload();
-  };
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+  // console.log(isModalVisible);
+  // const handleCancel = () => {
+  //   setIsModalVisible(false);
+
+  // };
   //cập nhập lại dữ liệu localStorage Khi đã bấm sửa
   const handleSetValueLocalStore = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
@@ -28,7 +31,7 @@ const Profile = () => {
       window.location.reload();
     }, 2000);
   }
-  //
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -62,7 +65,8 @@ const Profile = () => {
       const updatedDataUsers = { ...dataUsers, ...values };
       handleSetValueLocalStore('dataUser', updatedDataUsers);
       // Reload lại trang
-      handleCancel();
+      navigate(path.account.trangChu);
+      Main_reload();
     } catch (err) {
       console.error('Lỗi khi sửa thông tin:', err);
     }
