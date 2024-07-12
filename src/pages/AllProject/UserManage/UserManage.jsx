@@ -64,8 +64,8 @@ const UserManage = () => {
         <div className="flex space-x-3">
           <Button
             onClick={() => handleEditUser(record)}
-            type="primary"
-            className="bg-info-400 text-white"
+            type="secondary"
+            className="bg-amber-400 text-white  hover:bg-amber-600"
           >
             <i className="fa-solid fa-user-pen" />
           </Button>
@@ -238,8 +238,8 @@ const UserManage = () => {
 
         <Button
           onClick={() => handleAddNewUser()}
-          type="primary"
-          className="bg-info-400 text-white mr-20"
+          type="secondary"
+          className="bg-green-500 text-white mr-20 hover:bg-green-600"
 
         >
           <i className="fa-solid fa-user-plus"></i>
@@ -283,6 +283,10 @@ const UserManage = () => {
           placeholder="Nhập Địa Chỉ Email"
           value={email}
           disabled={!isNew}
+          style={{
+            borderColor: 'initial',
+            outline: 'initial',
+          }}
         />
 
         <Typography.Title level={5}>Tên Người Dùng</Typography.Title>
@@ -291,6 +295,10 @@ const UserManage = () => {
           onChange={e => setName(e.target.value)}
           placeholder="Nhập Tên Người Dùng"
           value={name}
+          style={{
+            borderColor: 'initial',
+            outline: 'initial',
+          }}
         />
 
         <Typography.Title level={5}>Số Điện Thoại</Typography.Title>
@@ -300,8 +308,8 @@ const UserManage = () => {
           placeholder="Nhập Số Điện Thoại"
           value={phone}
           style={{
-            borderColor: isValid ? 'initial' : 'bg-red-400',
-            outline: isValid ? 'initial' : 'bg-red-400',
+            borderColor: isValid ? 'initial' : 'red',
+            outline: isValid ? 'initial' : 'red',
           }}
         />
         {!isValid && <p style={{ color: 'red' }}>Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09, hoặc +84 và có 10 ký tự.</p>}
@@ -314,6 +322,10 @@ const UserManage = () => {
           onChange={e => setPassword(e.target.value)}
           placeholder="Nhập Mật Khẩu"
           value={password}
+          style={{
+            borderColor: 'initial',
+            outline: 'initial',
+          }}
         />
       </Modal>
     </>
