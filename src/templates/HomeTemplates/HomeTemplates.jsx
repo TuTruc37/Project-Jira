@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu, theme, Modal } from 'antd';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { path } from '../../common/path';
 import { handleGetValueLocalStore } from '../../utils/utils';
 import MenuProject from '../../components/MenuProject/MenuProject';
@@ -18,12 +18,13 @@ const arrMenu = [
 ];
 
 const HomeTemplates = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  // const [collapsed, setCollapsed] = useState(false);
   const [addDataUser, setAddDataUser] = useState(null);
   console.log(addDataUser);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [redirectPath, setRedirectPath] = useState('');
-
+  // const [redirectPath, setRedirectPath] = useState('');
+  // console.log(redirectPath);
+  const navigate = useNavigate();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -37,22 +38,25 @@ const HomeTemplates = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (redirectPath) {
-      setTimeout(() => {
-        window.location.href = redirectPath;
-      }, 1000); // Chờ 3 giây trước khi chuyển hướng
-    }
-  }, [redirectPath]);
+  // useEffect(() => {
+  //   if (redirectPath) {
+  //     setTimeout(() => {
+  //       window.location.href = redirectPath;
+  //     }, 1000); // Chờ 3 giây trước khi chuyển hướng
+  //   }
+  // }, [redirectPath]);
 
   const handleOk = () => {
     setIsModalVisible(false);
-    setRedirectPath(path.account.dangKy);
+    // setRedirectPath(path.dangKy);
+    navigate(path.dangKy);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    setRedirectPath(path.account.dangNhap);
+    navigate(path.dangNhap);
+
+    // setRedirectPath(path.dangNhap);
   };
 
   return (

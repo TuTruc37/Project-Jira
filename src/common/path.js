@@ -1,8 +1,8 @@
 export const path = {
+  dangNhap: '/login',
+  dangKy: '/register',
   account: {
     trangChu: '/',
-    dangNhap: '/login',
-    dangKy: '/register',
     createProject: '/createProject',
     createTask: '/create/task',
     editTask: '/edit/task',

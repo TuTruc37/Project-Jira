@@ -55,17 +55,16 @@ const useRouteCustom = () => {
           path: path.account.profile,
           element: <Profile />,
         },
-        {
-          path: path.account.dangNhap,
-          element: <Login />,
-        },
-        {
-          path: path.account.dangKy,
-          element: <Register />,
-        },
       ],
     },
-
+    {
+      path: path.dangNhap,
+      element: <Login />,
+    },
+    {
+      path: path.dangKy,
+      element: <Register />,
+    },
     {
       path: '*',
       element: <NotFound />,

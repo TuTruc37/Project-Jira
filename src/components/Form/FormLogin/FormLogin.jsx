@@ -97,7 +97,7 @@ const FormLogin = () => {
           <p className="mt-8">
             Bạn cần một tài khoản?
             <Link
-              to={path.account.dangKy}
+              to={path.dangKy}
               className="text-blue-500 hover:text-blue-700 font-semibold ml-2"
             >
               đăng ký tài khoản
