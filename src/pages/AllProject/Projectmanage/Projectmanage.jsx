@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, message, Modal, Avatar, Input, List, Tag } from 'antd';
+import {
+  Table,
+  Button,
+  message,
+  Modal,
+  Avatar,
+  Input,
+  List,
+  Tag,
+  Flex,
+  Spin,
+  Empty,
+} from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
 import { path } from '../../../common/path';
 import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
+import EditorTiny from '../../../components/EditorTiny/EditorTiny';
 import './projectManage.scss';
-
 const ProjectManage = () => {
   const [arrProject, setArrProject] = useState([]);
+  console.log(arrProject);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [userList, setUserList] = useState([]);
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
+
   // search dự án
   const [searchTerm, setSearchTerm] = useState('');
   const [searchedProjects, setSearchedProjects] = useState([]);
@@ -31,6 +45,17 @@ const ProjectManage = () => {
 
     return () => clearTimeout(delaySearch);
   }, [searchTerm]);
+
+  //
+  //làm spin để load dữ liệu thì biết là có dữ liệu và nó đang tải lên chứ không phải trống không
+  const [isLoading, setIsLoading] = useState(true);
+  console.log(isLoading);
+  const customSpin = (
+    <div>
+      <Spin size="large" />
+      <div>Loading...</div>
+    </div>
+  );
   //
   const showModal = projectId => {
     setIsModalVisible(true);
@@ -48,6 +73,7 @@ const ProjectManage = () => {
       .getAllProject()
       .then(res => {
         setArrProject(res.data.content);
+        setIsLoading(false);
       })
       .catch(err => {
         console.error('Lỗi khi tải danh sách dự án:', err);
@@ -253,17 +279,26 @@ const ProjectManage = () => {
   return (
     <div>
       <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
-
+      
       {/* Search dự án */}
       <Input.Search
         placeholder="Tìm kiếm dự án..."
         onChange={handleSearchTermChange}
         style={{ marginBottom: 16 }}
       />
+
       <Table
         columns={columns}
         dataSource={searchedProjects.length > 0 ? searchedProjects : arrProject}
         rowKey="id"
+        locale={{
+          emptyText:
+            arrProject.length > 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            ) : (
+              <Empty image={customSpin} description={null} />
+            ),
+        }}
       />
       {/*  */}
       <CustomProjectModal

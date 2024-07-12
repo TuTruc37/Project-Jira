@@ -8,5 +8,6 @@ export const path = {
     editTask: '/edit/task',
     projectDetail: '/projectDetail',
     users: '/users',
+    profile: '/profile',
   },
 };
