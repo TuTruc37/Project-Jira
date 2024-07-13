@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useParams, Link } from 'react-router-dom'; // Import useParams và Link
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
-import Description from '../../components/Description/Description';
+// import Description from '../../components/Description/Description';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
@@ -12,6 +12,7 @@ import { TreeSelect, Slider, Breadcrumb } from 'antd';
 import { addTask } from './../../redux/slice/taskSlice';
 import './createTask.scss';
 import { path } from '../../common/path';
+import EditorTiny from '../../components/EditorTiny/EditorTiny';
 
 const CreateTask = () => {
   const { projectId } = useParams(); // Lấy projectId từ URL
@@ -289,11 +290,16 @@ const CreateTask = () => {
             />
           </div>
         </div>
-        <Description
+        {/* <Description
           name="description"
           handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
           value={values.description}
-        />
+        /> */}
+          <EditorTiny
+              name="description"
+              handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+              value={values.description}
+            />
         <div className="">
           <button
             className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"

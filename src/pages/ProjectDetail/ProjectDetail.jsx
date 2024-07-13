@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
+import { commentInTasks } from '../../services/commentInTask';
 import { path } from '../../common/path';
 import { Breadcrumb, Modal, TreeSelect, Slider, Input, Select } from 'antd';
 import './projectDetail.scss';
@@ -26,6 +27,8 @@ const ProjectDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([]);
 
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
@@ -38,6 +41,20 @@ const ProjectDetail = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  useEffect(() => {
+    // Example: Fetch comments for selected task when component mounts
+    if (selectedTask) {
+      commentInTasks.getAll(selectedTask.id)
+        .then(response => {
+          setComments(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching comments:', error);
+        });
+    }
+  }, [selectedTask]);
+
+  
 
   const fetchData = async () => {
     try {
@@ -121,6 +138,7 @@ const ProjectDetail = () => {
   //     assignees: selectedUsers,
   //   }));
   // };
+
   const handleDeleteTask = async () => {
     try {
       // Gọi API để xóa task
@@ -648,7 +666,7 @@ const ProjectDetail = () => {
         style={{ top: 20 }}
         title={
           <div className="flex justify-between items-center">
-            <p className='font-semibold text-xl'>Task detail</p>
+            <p className="font-semibold text-xl">Task detail</p>
             <i
               onClick={handleDeleteTask}
               className="fa-solid fa-trash-can mr-10 hover:bg-gray-200 rounded py-2 px-3 cursor-pointer"
@@ -659,7 +677,19 @@ const ProjectDetail = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         loading={loading}
-        footer={null}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button
+            key="update"
+            type="primary"
+            onClick={handleOk}
+            className="bg-blue-500 hover:bg-blue-700 text-white"
+          >
+            Update Task
+          </Button>,
+        ]}
       >
         {selectedTask && (
           <div>
@@ -755,15 +785,56 @@ const ProjectDetail = () => {
                 }
                 value={selectedTask.description}
               />
-
+              <TextArea
+                rows={4}
+                placeholder="Add a comment..."
+                value={values.comment}
+                onChange={handleChange}
+              />
+              <Button
+                className="mt-2 bg-blue-500 text-white"
+                onClick={() => {
+                  const newComment = {
+                    contentComment: values.comment,
+                    id: selectedTask.comments.length + 1,
+                    user: {
+                      name: 'Current User', // Replace with actual current user data
+                      avatar: 'path/to/avatar.jpg', // Replace with actual current user avatar
+                    },
+                  };
+                  setSelectedTask({
+                    ...selectedTask,
+                    comments: [...selectedTask.comments, newComment],
+                  });
+                }}
+              >
+                Thêm bình luận
+              </Button>
               <div className="mt-4">
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
-                  type="submit"
-                >
-                  Update Task
-                </button>
+                {selectedTask.comments.map(comment => (
+                  <div
+                    key={comment.id}
+                    className="flex items-start space-x-4 mb-4"
+                  >
+                    <img
+                      className="w-8 h-8 rounded-full"
+                      src={comment.user.avatar}
+                      alt={comment.user.name}
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-semibold">{comment.user.name}</h4>
+                        <span className="text-sm text-gray-500">
+                          {comment.date}
+                        </span>
+                      </div>
+                      <p>{comment.contentComment}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              <div className="mt-4"></div>
             </form>
           </div>
         )}

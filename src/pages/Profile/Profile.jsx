@@ -170,10 +170,10 @@ const Profile = () => {
               touched={touched.phoneNumber}
             />
 
-            <div>
+            <div className='flex justify-center'>
               <button
                 type="submit"
-                className="bg-yellow-500 hover:bg-yellow-700 py-2 px-64 rounded-lg mt-3 text-xl"
+                className="bg-blue-500 text-white font-semibold py-2 px-64 rounded-lg mt-3 text-xl"
               >
                 Sửa
               </button>

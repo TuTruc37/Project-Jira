@@ -4,7 +4,7 @@ import { TreeSelect, Slider } from 'antd';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import InputCustom from './../../../components/Input/InputCustom';
-import Description from './../../../components/Description/Description';
+// import Description from './../../../components/Description/Description';
 
 import SelectCustom from './../../../components/SelectCustom/SelectCustom';
 import { useEffect, useState, useContext } from 'react';
@@ -254,7 +254,7 @@ const EditProjectManager = () => {
             />
           </div>
         </div>
-        <Description />
+      
         <div>
           <button
             className="bg-blue-500   mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
