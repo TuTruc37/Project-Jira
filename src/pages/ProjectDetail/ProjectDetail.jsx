@@ -27,6 +27,7 @@ const ProjectDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [searchText, setSearchText] = useState('');
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
 
@@ -393,13 +394,14 @@ const ProjectDetail = () => {
 
         <Breadcrumb.Item>Project Detail</Breadcrumb.Item>
       </Breadcrumb>
+       <h1 className='font-bold mb-4'>Project ID: {projectId}</h1>
       <Input
         placeholder="Tìm kiếm mô tả trong dự án..."
-        // onChange={}
-
+        value={searchText}
+        onChange={e => setSearchText(e.target.value)}
         style={{ marginBottom: 16, width: 300 }}
       />
-      <div className="flex flex-row-reverse items-center mb-3 ">
+     <div className="flex flex-row-reverse items-center mb-3 ">
         <Button
           className="py-3 px-4 bg-blue-500 text-white font-semibold rounded-sm flex items-center hover:text-white "
           type="primary"
