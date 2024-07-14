@@ -44,7 +44,8 @@ const ProjectDetail = () => {
   useEffect(() => {
     // Example: Fetch comments for selected task when component mounts
     if (selectedTask) {
-      commentInTasks.getAll(selectedTask.id)
+      commentInTasks
+        .getAll(selectedTask.id)
         .then(response => {
           setComments(response.data);
         })
@@ -53,8 +54,6 @@ const ProjectDetail = () => {
         });
     }
   }, [selectedTask]);
-
-  
 
   const fetchData = async () => {
     try {
@@ -121,12 +120,18 @@ const ProjectDetail = () => {
           content: values.taskName,
           column: `column-${values.statusId}`,
         };
+
+        // Dispatch action to add new task to Redux store
         dispatch(addTask(newTask));
+
+        // Update local state 'tasks' with new task
+        setTasks(prevTasks => [...prevTasks, newTask]);
       } catch (err) {
         handleAlert('error', err.response.data.content);
         console.log(err.response.data.content);
       }
     },
+
     validationSchema: Yup.object({
       // taskName: Yup.string().required('Vui lòng không bỏ trống').min(5, 'Vui lòng nhập tối thiểu 5 ký tự'),
     }),

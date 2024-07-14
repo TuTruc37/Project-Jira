@@ -1,21 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams, Link } from 'react-router-dom'; // Import useParams và Link
+import { useParams, Link } from 'react-router-dom';
 import SelectCustom from '../../components/SelectCustom/SelectCustom';
 import InputCustom from '../../components/Input/InputCustom';
-// import Description from '../../components/Description/Description';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AlertContext } from '../../App';
 import { getAllCreateTask } from '../../services/getAllCreateTask';
 import { TreeSelect, Slider, Breadcrumb } from 'antd';
-import { addTask } from './../../redux/slice/taskSlice';
+import { fetchProjectDetails, addTask } from './../../redux/slice/taskSlice';
 import './createTask.scss';
 import { path } from '../../common/path';
 import EditorTiny from '../../components/EditorTiny/EditorTiny';
 
 const CreateTask = () => {
-  const { projectId } = useParams(); // Lấy projectId từ URL
+  const { projectId } = useParams();
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
   const [gstatusName, SetStatusName] = useState([]);
@@ -68,24 +67,19 @@ const CreateTask = () => {
       originalEstimate: 0,
       timeTrackingSpent: 0,
       timeTrackingRemaining: 0,
-      projectId: projectId, // Đặt giá trị projectId từ URL vào initialValues
+      projectId: projectId,
       typeId: '',
       priorityId: '',
     },
     onSubmit: async values => {
-      console.log('Submitted values:', values); // Log dữ liệu đã gửi đi
+      console.log('Submitted values:', values);
       try {
         const res = await getAllCreateTask.postCreateTask(values);
         handleAlert('success', 'Tạo Task thành công');
         resetForm();
 
-        // Dispatch addTask to Redux store
-        const newTask = {
-          id: `task-${res.data.taskId}`,
-          content: values.taskName,
-          column: `column-${values.statusId}`,
-        };
-        dispatch(addTask(newTask));
+        // Dispatch fetchProjectDetails to update state
+        dispatch(fetchProjectDetails(projectId));
       } catch (err) {
         if (err.response && err.response.data && err.response.data.content) {
           handleAlert('error', err.response.data.content);
@@ -113,11 +107,11 @@ const CreateTask = () => {
 
   const handleFieldChange = e => {
     const { name, value } = e.target;
-    handleChange(e); // Gọi hàm handleChange của Formik để cập nhật giá trị
+    handleChange(e);
     if (name === 'timeTrackingSpent' || name === 'timeTrackingRemaining') {
       const spent = parseInt(values.timeTrackingSpent, 10) || 0;
       const remaining = parseInt(values.timeTrackingRemaining, 10) || 0;
-      setTimeTracking(spent + remaining); // Tính tổng và cập nhật timeTracking
+      setTimeTracking(spent + remaining);
     }
   };
 
@@ -129,7 +123,9 @@ const CreateTask = () => {
     <div>
       <Breadcrumb separator="/">
         <Breadcrumb.Item>
-          <Link to={`${path.account.projectDetail}/${projectId}`} className=''>Project details</Link>
+          <Link to={`${path.account.projectDetail}/${projectId}`} className="">
+            Project details
+          </Link>
         </Breadcrumb.Item>
         <Breadcrumb.Item>Create task</Breadcrumb.Item>
       </Breadcrumb>
@@ -148,13 +144,10 @@ const CreateTask = () => {
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             placeholder="Please select a project"
             allowClear
-           
             treeDefaultExpandAll
-            value={values.projectId} // Gán giá trị hiện tại từ formik
-            onChange={
-              value => setFieldValue('projectId', value) // Cập nhật giá trị cho formik
-            }
-            filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
+            value={values.projectId}
+            onChange={value => setFieldValue('projectId', value)}
+            filterTreeNode={filterTreeNode}
             treeData={gprojectId.map(project => ({
               ...project,
               title: project.projectName,
@@ -178,7 +171,7 @@ const CreateTask = () => {
           name="statusId"
           handleChange={handleChange}
           value={values.statusId}
-          options={gstatusName} // Truyền danh sách loại người dùng từ API vào options
+          options={gstatusName}
           labelColor="text-black"
           valueProp="statusId"
           labelProp="statusName"
@@ -189,7 +182,7 @@ const CreateTask = () => {
             name="priorityId"
             handleChange={handleChange}
             value={values.priorityId}
-            options={gpriority} // Truyền danh sách loại người dùng từ API vào options
+            options={gpriority}
             labelColor="text-black"
             valueProp="priorityId"
             labelProp="priority"
@@ -200,7 +193,7 @@ const CreateTask = () => {
             name="typeId"
             handleChange={handleChange}
             value={values.typeId}
-            options={gtaskType} // Truyền danh sách loại người dùng từ API vào options
+            options={gtaskType}
             labelColor="text-black"
             valueProp="id"
             labelProp="taskType"
@@ -223,10 +216,8 @@ const CreateTask = () => {
               allowClear
               multiple
               treeDefaultExpandAll
-              onChange={
-                value => setFieldValue('listUserAsign', value) // Cập nhật giá trị cho formik
-              }
-              filterTreeNode={filterTreeNode} // Add filterTreeNode to enable search
+              onChange={value => setFieldValue('listUserAsign', value)}
+              filterTreeNode={filterTreeNode}
               treeData={userAsign.map(user => ({
                 ...user,
                 title: user.name,
@@ -269,7 +260,7 @@ const CreateTask = () => {
           />
           <div className="grid grid-cols-2 gap-5">
             <InputCustom
-              label="Time Spent (Hours)"
+              label="Time Spent"
               name="timeTrackingSpent"
               handleChange={handleFieldChange}
               handleBlur={handleBlur}
@@ -279,7 +270,7 @@ const CreateTask = () => {
               labelColor="text-black"
             />
             <InputCustom
-              label="Time Remaining (Hours)"
+              label="Time Remaining"
               name="timeTrackingRemaining"
               handleChange={handleFieldChange}
               handleBlur={handleBlur}
@@ -290,22 +281,18 @@ const CreateTask = () => {
             />
           </div>
         </div>
-        {/* <Description
+        <EditorTiny
           name="description"
-          handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
+          onEditorChange={value => setFieldValue('description', value)}
           value={values.description}
-        /> */}
-          <EditorTiny
-              name="description"
-              handleChange={value => setFieldValue('description', value)} // Cập nhật giá trị cho formik
-              value={values.description}
-            />
-        <div className="">
+          initialValue=""
+        />
+        <div className="flex justify-center">
           <button
-            className="bg-blue-500 mt-10 hover:bg-blue-700 text-white px-5 py-2 rounded-md w-full text-center"
             type="submit"
+            className="mt-4 py-3 px-6 w-full font-bold text-xl rounded-md bg-[#42526e] text-white"
           >
-            Submit
+            Create Task
           </button>
         </div>
       </form>
