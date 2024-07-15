@@ -394,14 +394,14 @@ const ProjectDetail = () => {
 
         <Breadcrumb.Item>Project Detail</Breadcrumb.Item>
       </Breadcrumb>
-       <h1 className='font-bold mb-4'>Project ID: {projectId}</h1>
+      <h1 className="font-bold mb-4">Project ID: {projectId}</h1>
       <Input
         placeholder="Tìm kiếm mô tả trong dự án..."
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
         style={{ marginBottom: 16, width: 300 }}
       />
-     <div className="flex flex-row-reverse items-center mb-3 ">
+      <div className="flex flex-row-reverse items-center mb-3 ">
         <Button
           className="py-3 px-4 bg-blue-500 text-white font-semibold rounded-sm flex items-center hover:text-white "
           type="primary"
@@ -683,7 +683,7 @@ const ProjectDetail = () => {
         open={taskModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        loading={loading}
+        // loading={loading}
         footer={[
           <Button key="cancel" onClick={handleCancel}>
             Cancel
@@ -707,44 +707,49 @@ const ProjectDetail = () => {
 
             <form className="space-y-3  w-full">
               <div className="grid grid-cols-2 gap-5">
-                <SelectCustom
+             <div>
+             <h2 className='text-lg mb-2 font-semibold'>Status</h2>
+                <Select
+                  className="w-full"
                   label="Status"
-                  name="statusId"
-                  handleChange={e =>
-                    handleTaskFieldChange('statusId', e.target.value)
-                  }
-                  value={selectedTask.column}
-                  options={gstatusName}
-                  labelColor="text-black"
-                  valueProp="statusId"
-                  labelProp="statusName"
+                  value={selectedTask.statusId}
+                  onChange={value => handleTaskFieldChange('statusId', value)}
+                  options={gstatusName.map(status => ({
+                    label: status.statusName,
+                    value: status.statusId,
+                  }))}
                 />
+             </div>
+                <div className="w-full">
+                  <h2 className='text-lg mb-2 font-semibold'>Priority</h2>
 
-                <SelectCustom
-                  label="Priority"
-                  name="priorityId"
-                  handleChange={e =>
-                    setSelectedTask({ ...selectedTask, priorityId: e })
-                  }
-                  value={selectedTask.column}
-                  options={gpriority}
-                  labelColor="text-black"
-                  valueProp="priorityId"
-                  labelProp="priority"
-                />
+                  <Select
+                    className="w-full"
+                    label="Priority"
+                    value={selectedTask.priority}
+                    onChange={value => handleTaskFieldChange('priority', value)}
+                    options={gpriority.map(priority => ({
+                      label: priority.priority,
+                      value: priority.priority,
+                    }))}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-5">
-                <SelectCustom
-                  label="Task Type"
-                  name="typeId"
-                  onChange={handleChange}
-                  value={selectedTask.column}
-                  options={gtaskType}
-                  labelColor="text-black"
-                  valueProp="id"
-                  labelProp="taskType"
-                />
+                <div>
+                  <h2 className='mb-2 text-lg font-semibold'>Task Type</h2>
+                  <Select
+                    className="w-full"
+                    label="Task Type"
+                    value={selectedTask.taskType}
+                    onChange={value => handleTaskFieldChange('taskType', value)}
+                    options={gtaskType.map(type => ({
+                      label: type.taskType,
+                      value: type.taskType,
+                    }))}
+                  />
+                </div>
                 <div>
                   <label
                     className="block text-lg font-semibold text-black mb-2"

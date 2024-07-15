@@ -1,6 +1,6 @@
 // InputProfile.jsx
 import React from 'react';
-
+import "./inputProfiles.scss"
 const InputProfile = ({
   label,
   name,

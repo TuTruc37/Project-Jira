@@ -35,7 +35,7 @@ const MenuProject = ({ addDataUserLocal }) => {
       </div>
       <div className="mt-14">
         <Menu
-          className="menu-project"
+          className="menu-project "
           mode="inline"
           defaultSelectedKeys={[location.pathname]}
           selectedKeys={[location.pathname]}
@@ -54,8 +54,9 @@ const MenuProject = ({ addDataUserLocal }) => {
           </Menu.Item>
           <Menu.Item key={path.account.trangChu}>
             <NavLink to={path.account.trangChu}>
-              <span className="font-semibold text-lg">
-                <i className="fa-solid fa-list-check"></i> Project Management
+              <span className="font-semibold   text-lg">
+                <i className="fa-solid fa-list-check project-icon"></i> Project
+                Management
               </span>
             </NavLink>
           </Menu.Item>

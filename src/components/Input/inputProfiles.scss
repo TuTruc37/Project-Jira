@@ -1,0 +1,14 @@
+input[name="phoneNumber"] {
+  background:#fff !important;
+}
+input[name="name"] {
+  background:#fff !important;
+}
+input[name="id"] {
+ @apply
+ bg-gray-200
+}
+input[name="email"] {
+  @apply
+  bg-gray-200
+}
