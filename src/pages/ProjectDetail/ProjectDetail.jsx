@@ -32,7 +32,8 @@ const ProjectDetail = () => {
   const [comments, setComments] = useState([]);
   const [members, setMembers] = useState([]);
   const [projectName, setProjectName] = useState('');
-  // const [statusName, setStatusName] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [statusNames, setStatusNames] = useState([]);
   const [creator, setCreator] = useState('');
 
   const dispatch = useDispatch();
@@ -222,11 +223,14 @@ const ProjectDetail = () => {
   };
 
   useEffect(() => {
+    // Function to fetch project details
     const fetchProjectDetails = async () => {
       try {
+        // Simulated API call to fetch project details
         const res = await getAllCreateTask.getProjectDetails(projectId);
         const projectData = res.data.content;
 
+        // Extracting tasks and columns from projectData
         const taskMap = {};
         projectData.lstTask.forEach(status => {
           status.lstTaskDeTail.forEach(task => {
@@ -237,7 +241,7 @@ const ProjectDetail = () => {
               assignees: task.assigness,
               taskType: task.taskTypeDetail.taskType,
               priority: task.priorityTask.priority,
-              description: task.description, // use the correct key here
+              description: task.description,
             };
           });
         });
@@ -259,8 +263,9 @@ const ProjectDetail = () => {
         setTasks(newTasks);
         setColumns(newColumns);
         setMembers(newMembers);
-        setProjectName(projectData.projectName); // Set the project name
-        setCreator(projectData.creator.name); // Set the creator name
+        setCreator(projectData.creator.name);
+        // Setting default selected status based on the first column
+        setSelectedStatus(Object.keys(newColumns)[0]); // Assuming the first key is the default column
       } catch (error) {
         console.error('Error fetching project details:', error);
       }
@@ -299,8 +304,8 @@ const ProjectDetail = () => {
       const sourceTaskIds = Array.from(sourceColumn.taskIds);
       const destinationTaskIds = Array.from(destinationColumn.taskIds);
 
-      const [removed] = sourceTaskIds.splice(result.source.index, 1);
-      destinationTaskIds.splice(result.destination.index, 0, removed);
+      const [draggedTask] = sourceTaskIds.splice(result.source.index, 1);
+      destinationTaskIds.splice(result.destination.index, 0, draggedTask);
 
       const updatedColumns = {
         ...columns,
@@ -315,6 +320,9 @@ const ProjectDetail = () => {
       };
 
       setColumns(updatedColumns);
+
+      // Update selectedStatus based on destinationColumnId
+      setSelectedStatus(destinationColumnId);
     }
   };
 
@@ -630,14 +638,14 @@ const ProjectDetail = () => {
         </div>
       </Modal>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-4 gap-4 ">
+        <div className="grid grid-cols-4 gap-4">
           {Object.entries(columns).map(([columnId, column]) => (
             <Droppable key={columnId} droppableId={columnId}>
               {(provided, snapshot) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className={`p-4 bg-gray-200 rounded  ${
+                  className={`p-4 bg-gray-200 rounded ${
                     snapshot.isDraggingOver ? 'bg-gray-300' : ''
                   }`}
                 >
@@ -658,7 +666,6 @@ const ProjectDetail = () => {
                             className={`p-4 mb-2 bg-white rounded shadow-md hover:bg-gray-300 ${
                               snapshot.isDragging ? 'bg-gray-100' : ''
                             }`}
-                            // onClick={showLoading}
                             onClick={() => {
                               handleTaskClick(taskId);
                               showLoading();
@@ -676,11 +683,10 @@ const ProjectDetail = () => {
                                 {task.assignees.map(assignee => (
                                   <span
                                     key={assignee.id}
-                                    className="text-xs text-gray-500   "
+                                    className="text-xs text-gray-500"
                                   >
-                                    {/* {assignee.avatar} */}
                                     <img
-                                      className="w-7 h-7 rounded-full flex flex-wrap"
+                                      className="w-7 h-7 rounded-full"
                                       src={assignee.avatar}
                                       alt={assignee.name}
                                     />
@@ -741,18 +747,24 @@ const ProjectDetail = () => {
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <h2 className="text-lg mb-2 font-semibold">Creator</h2>
-                  <Input readOnly className='bg-gray-100 hover:bg-gray-100 cursor-not-allowed' value={creator}></Input>
+                  <Input
+                    readOnly
+                    className="bg-gray-100 hover:bg-gray-100 cursor-not-allowed"
+                    value={creator}
+                  ></Input>
                   <h2 className="text-lg mb-2 font-semibold">Status</h2>
                   <Select
                     className="w-full"
                     label="Status"
-                    value={selectedTask.statusId}
-                    onChange={value => handleTaskFieldChange('statusId', value)}
-                    options={gstatusName.map(status => ({
-                      label: status.statusName,
-                      value: status.statusId,
-                    }))}
-                  />
+                    value={selectedStatus}
+                    onChange={value => setSelectedStatus(value)}
+                  >
+                    {Object.values(columns).map(column => (
+                      <Select.Option key={column.id} value={column.id}>
+                        {column.title}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 </div>
                 <div className="w-full mb-2">
                   <h2 className="text-lg mb-2 font-semibold">Priority</h2>
@@ -767,24 +779,25 @@ const ProjectDetail = () => {
                       value: priority.priority,
                     }))}
                   />
-                     <div>
-                  <h2 className="mb-2 text-lg font-semibold">Task Type</h2>
-                  <Select
-                    className="w-full"
-                    label="Task Type"
-                    value={selectedTask.taskType}
-                    onChange={value => handleTaskFieldChange('taskType', value)}
-                    options={gtaskType.map(type => ({
-                      label: type.taskType,
-                      value: type.taskType,
-                    }))}
-                  />
-                </div>
+                  <div>
+                    <h2 className="mb-2 text-lg font-semibold">Task Type</h2>
+                    <Select
+                      className="w-full"
+                      label="Task Type"
+                      value={selectedTask.taskType}
+                      onChange={value =>
+                        handleTaskFieldChange('taskType', value)
+                      }
+                      options={gtaskType.map(type => ({
+                        label: type.taskType,
+                        value: type.taskType,
+                      }))}
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-5">
-             
                 <div>
                   <label
                     className="block text-lg font-semibold text-black mb-2"
