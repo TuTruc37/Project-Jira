@@ -219,9 +219,9 @@ const ProjectManage = () => {
       title: 'Dự án',
       dataIndex: 'projectName',
       render: (text, record) => (
-        <NavLink to={`${path.account.projectDetail}/${record.id}`}>
-          {text}
-        </NavLink>
+        <NavLink to={{ pathname: `${path.account.projectDetail}/${record.id}`, state: { projectName: record.projectName } }}>
+        {text}
+      </NavLink>
       ),
       sorter: (a, b) => a.projectName.localeCompare(b.projectName),
     },

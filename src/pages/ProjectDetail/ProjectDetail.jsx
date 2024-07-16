@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { commentInTasks } from '../../services/commentInTask';
@@ -30,6 +30,10 @@ const ProjectDetail = () => {
   const [searchText, setSearchText] = useState('');
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [projectName, setProjectName] = useState('');
+  // const [statusName, setStatusName] = useState('');
+  const [creator, setCreator] = useState('');
 
   const dispatch = useDispatch();
   const [gprojectId, setProjectId] = useState([]);
@@ -129,7 +133,7 @@ const ProjectDetail = () => {
         setTasks(prevTasks => [...prevTasks, newTask]);
       } catch (err) {
         handleAlert('error', err.response.data.content);
-        console.log(err.response.data.content);
+        console.log(err);
       }
     },
 
@@ -233,8 +237,7 @@ const ProjectDetail = () => {
               assignees: task.assigness,
               taskType: task.taskTypeDetail.taskType,
               priority: task.priorityTask.priority,
-              description: task.taskDescription,
-              creator: task.creator,
+              description: task.description, // use the correct key here
             };
           });
         });
@@ -248,9 +251,16 @@ const ProjectDetail = () => {
           };
           return acc;
         }, {});
-
+        const newMembers = projectData.members.map(member => ({
+          id: member.userId,
+          name: member.name,
+          avatar: member.avatar,
+        }));
         setTasks(newTasks);
         setColumns(newColumns);
+        setMembers(newMembers);
+        setProjectName(projectData.projectName); // Set the project name
+        setCreator(projectData.creator.name); // Set the creator name
       } catch (error) {
         console.error('Error fetching project details:', error);
       }
@@ -385,22 +395,44 @@ const ProjectDetail = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-semibold mb-4">Project Detail</h1>
-      <Breadcrumb className="mb-4">
+    <div className="container mx-auto p-0">
+      <h1 className="text-2xl font-bold mb-14 ">Project Detail</h1>
+      {/* <Breadcrumb className="mb-14">
         <Breadcrumb.Item>
           <Link to={path.account.trangChu}>Project Manager</Link>
         </Breadcrumb.Item>
 
         <Breadcrumb.Item>Project Detail</Breadcrumb.Item>
-      </Breadcrumb>
-      <h1 className="font-bold mb-4">Project ID: {projectId}</h1>
-      <Input
-        placeholder="Tìm kiếm mô tả trong dự án..."
-        value={searchText}
-        onChange={e => setSearchText(e.target.value)}
-        style={{ marginBottom: 16, width: 300 }}
-      />
+      </Breadcrumb> */}
+      {/* <h1 className="font-semibold mb-2 ">Project ID: {projectId}</h1> */}
+      <h1 className=" font-semibold text-xl mb-2"> {projectName}</h1>
+
+      {/* treeData={gprojectId.map(project => ({
+                  ...project,
+                  title: project.projectName,
+                  value: project.id,
+                }))} */}
+      <div className="flex space-x-2">
+        <div>
+          <Input
+            placeholder="Tìm kiếm mô tả trong dự án..."
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            style={{ marginBottom: 16, width: 300 }}
+          />
+        </div>
+        <div className="flex space-x-1">
+          {members.map(member => (
+            <div key={member.id}>
+              <img
+                className="w-8 h-8 rounded-full"
+                src={member.avatar}
+                alt={member.name}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="flex flex-row-reverse items-center mb-3 ">
         <Button
           className="py-3 px-4 bg-blue-500 text-white font-semibold rounded-sm flex items-center hover:text-white "
@@ -707,21 +739,23 @@ const ProjectDetail = () => {
 
             <form className="space-y-3  w-full">
               <div className="grid grid-cols-2 gap-5">
-             <div>
-             <h2 className='text-lg mb-2 font-semibold'>Status</h2>
-                <Select
-                  className="w-full"
-                  label="Status"
-                  value={selectedTask.statusId}
-                  onChange={value => handleTaskFieldChange('statusId', value)}
-                  options={gstatusName.map(status => ({
-                    label: status.statusName,
-                    value: status.statusId,
-                  }))}
-                />
-             </div>
-                <div className="w-full">
-                  <h2 className='text-lg mb-2 font-semibold'>Priority</h2>
+                <div>
+                  <h2 className="text-lg mb-2 font-semibold">Creator</h2>
+                  <Input readOnly className='bg-gray-100 hover:bg-gray-100 cursor-not-allowed' value={creator}></Input>
+                  <h2 className="text-lg mb-2 font-semibold">Status</h2>
+                  <Select
+                    className="w-full"
+                    label="Status"
+                    value={selectedTask.statusId}
+                    onChange={value => handleTaskFieldChange('statusId', value)}
+                    options={gstatusName.map(status => ({
+                      label: status.statusName,
+                      value: status.statusId,
+                    }))}
+                  />
+                </div>
+                <div className="w-full mb-2">
+                  <h2 className="text-lg mb-2 font-semibold">Priority</h2>
 
                   <Select
                     className="w-full"
@@ -733,12 +767,8 @@ const ProjectDetail = () => {
                       value: priority.priority,
                     }))}
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-5">
-                <div>
-                  <h2 className='mb-2 text-lg font-semibold'>Task Type</h2>
+                     <div>
+                  <h2 className="mb-2 text-lg font-semibold">Task Type</h2>
                   <Select
                     className="w-full"
                     label="Task Type"
@@ -750,6 +780,11 @@ const ProjectDetail = () => {
                     }))}
                   />
                 </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-5">
+             
                 <div>
                   <label
                     className="block text-lg font-semibold text-black mb-2"
