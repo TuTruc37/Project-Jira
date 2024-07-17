@@ -42,8 +42,8 @@ const CustomProjectModal = ({
           });
         })
         .catch(err => {
-          console.error('Error loading project details:', err);
-          message.error('Error loading project details');
+          console.error('Lỗi tải chi tiết dự án:', err);
+          message.error('Lỗi tải chi tiết dự án');
         });
     }
 
@@ -54,13 +54,13 @@ const CustomProjectModal = ({
         setCategories(categoriesData);
       })
       .catch(err => {
-        console.error('Error loading project categories:', err);
-        message.error('Error loading project categories');
+        console.error('Lỗi khi tải danh mục dự án:', err);
+        message.error('Lỗi khi tải danh mục dự án');
       });
   }, [projectId]);
 
   const handleSave = () => {
-    console.log('Saving project details:', projectDetails);
+    console.log('Lưu chi tiết dự án:', projectDetails);
 
     // Ensure all required fields are filled
     if (
@@ -68,7 +68,7 @@ const CustomProjectModal = ({
       !projectDetails.projectCategory ||
       !projectDetails.description
     ) {
-      message.error('Please fill out all required fields.');
+      message.error('Vui lòng điền vào tất cả các trường bắt buộc.');
       return;
     }
 
@@ -76,8 +76,8 @@ const CustomProjectModal = ({
     projectMan
       .updateProject(projectDetails.id, projectDetails)
       .then(res => {
-        console.log('API response:', res);
-        message.success('Project updated successfully');
+        console.log('Phản hồi API:', res);
+        message.success('Dự án được cập nhật thành công');
         if (onProjectUpdated) {
           onProjectUpdated();
         }
@@ -85,20 +85,19 @@ const CustomProjectModal = ({
         onCancel();
       })
       .catch(err => {
-        console.error('Error updating project:', err);
-        message.error('Error updating project');
+        console.error('Lỗi cập nhật dự án:', err);
+        message.error('Đây là dự án của người khác, bạn không thể sửa được!!!');
       });
   };
 
   const handleChange = (field, value) => {
     console.log(value);
-
+    console.log(field);
     setProjectDetails({
       ...projectDetails,
       [field]: value,
     });
   };
-
   return (
     <div className="space-y-5">
       <AntdModal

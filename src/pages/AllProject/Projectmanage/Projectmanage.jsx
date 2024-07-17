@@ -8,8 +8,6 @@ import {
   Input,
   List,
   Tag,
-  Spin,
-  Empty,
 } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
@@ -17,7 +15,18 @@ import { debounce } from 'lodash';
 import { path } from '../../../common/path';
 import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
 import './projectManage.scss';
+import { handleGetValueLocalStore } from '../../../utils/utils';
+import Loader from '../../../components/Loader/Loader';
 const ProjectManage = () => {
+  // loading
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+  }, []);
+  //
   const [arrProject, setArrProject] = useState([]);
   console.log(arrProject);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -30,6 +39,15 @@ const ProjectManage = () => {
   // search dự án
   const [searchTerm, setSearchTerm] = useState('');
   const [searchedProjects, setSearchedProjects] = useState([]);
+  // button dự án cá nhân
+  const dataUsers = handleGetValueLocalStore('dataUser');
+  // console.log(dataUsers);
+  //lấy dữ liệu dự án project
+  const [personalProjectsVisible, setPersonalProjectsVisible] = useState(false);
+  const [personalProjects, setPersonalProjects] = useState([]);
+  console.log(personalProjects);
+
+  // search dự án
   const handleSearchTermChange = event => {
     setSearchTerm(event.target.value);
   };
@@ -44,16 +62,7 @@ const ProjectManage = () => {
     return () => clearTimeout(delaySearch);
   }, [searchTerm]);
   //
-  //làm spin để load dữ liệu thì biết là có dữ liệu và nó đang tải lên chứ không phải trống không
-  const [isLoading, setIsLoading] = useState(true);
-  console.log(isLoading);
-  const customSpin = (
-    <div>
-      <Spin size="large" />
-      <div>Loading...</div>
-    </div>
-  );
-  //
+  
   const showModal = projectId => {
     setIsModalVisible(true);
     setEditingProjectId(projectId);
@@ -71,7 +80,7 @@ const ProjectManage = () => {
       .then(res => {
         setArrProject(res.data.content);
         // console.log(res.data.content);// danh sách dự án
-        setIsLoading(false);
+        // setIsLoading(false);
       })
       .catch(err => {
         console.error('Lỗi khi tải danh sách dự án:', err);
@@ -273,100 +282,153 @@ const ProjectManage = () => {
       ),
     },
   ];
+  // button dự án cá nhân
+
+  const DuAnCaNhan = () => {
+    const projectsWithMatchingCreators = arrProject.filter(project => {
+      const creatorName = project.creator.name;
+      const userName = dataUsers.name;
+      return creatorName === userName;
+    });
+
+    setPersonalProjects(projectsWithMatchingCreators);
+    setPersonalProjectsVisible(true);
+  };
+
+  const selectAllOrCaNhan = () => {
+    if (personalProjectsVisible && personalProjects.length <= 0) {
+      // console.log('không có dữ liệu');
+      return personalProjects;
+    } else if (personalProjectsVisible && personalProjects.length > 0) {
+      return personalProjects;
+    } else {
+      return arrProject;
+    }
+  };
+
+  const handleToggleProjects = () => {
+    setPersonalProjectsVisible(!personalProjectsVisible);
+  };
 
   return (
-    <div>
-      <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
-
-      {/* Search dự án */}
-      <Input.Search
-        placeholder="Tìm kiếm dự án..."
-        onChange={handleSearchTermChange}
-        style={{ marginBottom: 16 }}
-      />
-
-      <Table
-        columns={columns}
-        dataSource={searchedProjects.length > 0 ? searchedProjects : arrProject}
-        rowKey="id"
-        locale={{
-          emptyText:
-            arrProject.length > 0 ? (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            ) : (
-              <Empty image={customSpin} description={null} />
-            ),
-        }}
-      />
-      {/*  */}
-      <CustomProjectModal
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        projectId={editingProjectId}
-        onProjectUpdated={handleGetAllProject}
-      />
-      <Modal
-        title="Thành viên"
-        visible={isUserModalVisible}
-        onCancel={() => setIsUserModalVisible(false)}
-        footer={null}
-      >
-        <Input.Search
-          placeholder="Tìm kiếm người dùng..."
-          value={searchKeyword}
-          onChange={handleSearchChange}
-          onSearch={handleSearchUser}
-          style={{ marginBottom: 16 }}
-        />
-        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          <List
-            dataSource={searchResult}
-            renderItem={item => (
-              <List.Item
-                actions={[
-                  <Button
-                    type="primary"
-                    onClick={() => handleAddUserToProject(item.userId)}
-                  >
-                    <i className="fa-solid fa-user-plus" />
-                  </Button>,
-                ]}
+    <>
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <div>
+            <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
+            <div className="flex justify-center items-center">
+              <button
+                className="shadow shadow-xl px-10 py-3 w-3/6 mx-5 mb-5 font-bold"
+                onClick={
+                  personalProjectsVisible ? handleToggleProjects : DuAnCaNhan
+                }
               >
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={item.name}
-                  description={item.email}
-                />
-              </List.Item>
+                {personalProjectsVisible
+                  ? 'Trở lại quản lý danh sách dự án'
+                  : `Dự án cá nhân của ${dataUsers.name}`}
+              </button>
+              {/* Search dự án */}
+              <Input.Search
+                placeholder="Tìm kiếm dự án..."
+                onChange={handleSearchTermChange}
+                style={{ marginBottom: 16 }}
+              />
+            </div>
+            {arrProject.length > 0 && (
+              <Table
+                columns={columns}
+                dataSource={
+                  searchedProjects.length > 0
+                    ? searchedProjects
+                    : selectAllOrCaNhan()
+                }
+                rowKey="id"
+                
+              />
             )}
-          />
-        </div>
-        <div
-          style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}
-        >
-          <h2 className="text-xl font-semibold">Người dùng trong dự án</h2>
-          <List
-            dataSource={userList}
-            renderItem={item => (
-              <List.Item className="flex justify-center items-center">
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={item.name}
+            {/*  */}
+            <CustomProjectModal
+              visible={isModalVisible}
+              onCancel={handleCancel}
+              projectId={editingProjectId}
+              onProjectUpdated={handleGetAllProject}
+            />
+            <Modal
+              title="Thành viên"
+              visible={isUserModalVisible}
+              onCancel={() => setIsUserModalVisible(false)}
+              footer={null}
+            >
+              <Input.Search
+                placeholder="Tìm kiếm người dùng..."
+                value={searchKeyword}
+                onChange={handleSearchChange}
+                onSearch={handleSearchUser}
+                style={{ marginBottom: 16 }}
+              />
+              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <List
+                  dataSource={searchResult}
+                  renderItem={item => (
+                    <List.Item
+                      actions={[
+                        <Button
+                          type="primary"
+                          onClick={() => handleAddUserToProject(item.userId)}
+                        >
+                          <i className="fa-solid fa-user-plus" />
+                        </Button>,
+                      ]}
+                    >
+                      <List.Item.Meta
+                        avatar={<Avatar src={item.avatar} />}
+                        title={item.name}
+                        description={item.email}
+                      />
+                    </List.Item>
+                  )}
                 />
-                <div className="space-x-2">
-                  <i
-                    className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
-                    onClick={() =>
-                      handleDeleteUserFromProject(editingProjectId, item.userId)
-                    }
-                  />
-                </div>
-              </List.Item>
-            )}
-          />
-        </div>
-      </Modal>
-    </div>
+              </div>
+              <div
+                style={{
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  marginTop: '16px',
+                }}
+              >
+                <h2 className="text-xl font-semibold">
+                  Người dùng trong dự án
+                </h2>
+                <List
+                  dataSource={userList}
+                  renderItem={item => (
+                    <List.Item className="flex justify-center items-center">
+                      <List.Item.Meta
+                        avatar={<Avatar src={item.avatar} />}
+                        title={item.name}
+                      />
+                      <div className="space-x-2">
+                        <i
+                          className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
+                          onClick={() =>
+                            handleDeleteUserFromProject(
+                              editingProjectId,
+                              item.userId
+                            )
+                          }
+                        />
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </div>
+            </Modal>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 

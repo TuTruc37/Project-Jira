@@ -99,5 +99,4 @@ const HomeTemplates = () => {
     </Layout>
   );
 };
-
 export default HomeTemplates;

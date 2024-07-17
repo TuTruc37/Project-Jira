@@ -20,7 +20,9 @@ export const projectMan = {
       projectName: projectDetails.projectName,
       creator: projectDetails.creator,
       description: projectDetails.description,
-      categoryId: projectDetails.projectCategory.key,
+      categoryId: projectDetails?.projectCategory?.key
+        ? projectDetails?.projectCategory?.key
+        : projectDetails?.projectCategory?.id,
     };
     return http.put(`/Project/updateProject?projectId=${projectId}`, obj);
   },
