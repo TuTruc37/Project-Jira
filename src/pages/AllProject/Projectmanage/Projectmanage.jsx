@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  Button,
-  message,
-  Modal,
-  Avatar,
-  Input,
-  List,
-  Tag,
-} from 'antd';
+import { Table, Button, message, Modal, Avatar, Input, List, Tag } from 'antd';
 import { projectMan } from '../../../services/projectMan';
 import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
@@ -65,7 +56,7 @@ const ProjectManage = () => {
   }, [searchTerm]);
 
   //
-  
+
   const showModal = projectId => {
     setIsModalVisible(true);
     setEditingProjectId(projectId);
@@ -228,9 +219,14 @@ const ProjectManage = () => {
       title: 'Dự án',
       dataIndex: 'projectName',
       render: (text, record) => (
-        <NavLink to={{ pathname: `${path.account.projectDetail}/${record.id}`, state: { projectName: record.projectName } }}>
-        {text}
-      </NavLink>
+        <NavLink
+          to={{
+            pathname: `${path.account.projectDetail}/${record.id}`,
+            state: { projectName: record.projectName },
+          }}
+        >
+          {text}
+        </NavLink>
       ),
       sorter: (a, b) => a.projectName.localeCompare(b.projectName),
     },
@@ -348,7 +344,6 @@ const ProjectManage = () => {
                     : selectAllOrCaNhan()
                 }
                 rowKey="id"
-                
               />
             )}
             {/*  */}
