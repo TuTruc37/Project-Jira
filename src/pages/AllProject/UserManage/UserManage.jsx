@@ -18,8 +18,6 @@ const UserManage = () => {
   const [isPhoneValid, setIsPhoneValid] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
 
-
-
   const handleOk = () => {
     if (isNew) {
       const checkemail = checkEmailValid(email);
@@ -29,7 +27,7 @@ const UserManage = () => {
       if (checkemail && checkname && checkphone && checkpassword) {
         newUser();
       } else {
-        message.error("Vui lòng kiểm tra lại thông tin.");
+        message.error('Vui lòng kiểm tra lại thông tin.');
       }
     } else {
       const checkname = checkNameValid(name);
@@ -37,7 +35,7 @@ const UserManage = () => {
       if (checkname && checkphone) {
         saveDataUser();
       } else {
-        message.error("Vui lòng kiểm tra lại thông tin.");
+        message.error('Vui lòng kiểm tra lại thông tin.');
       }
     }
   };
@@ -45,7 +43,6 @@ const UserManage = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
-
   const fetchUsers = () => {
     users
       .getUsers()
@@ -98,7 +95,6 @@ const UserManage = () => {
             className="bg-red-400 text-white hover:bg-red-600"
           >
             <i className="fa-solid fa-trash-can" />
-
           </Button>
         </div>
       ),
@@ -106,28 +102,25 @@ const UserManage = () => {
   ];
 
   const newUser = async () => {
-    const checkmail = dataUsers.filter(
-      item => item.email === email
-    );
+    const checkmail = dataUsers.filter(item => item.email === email);
     if (checkmail.length > 0) {
-      message.error("Email đã tồn tại!");
+      message.error('Email đã tồn tại!');
       return;
     }
     try {
-      await users.dangKy({
-        email: email,
-        passWord: password,
-        name: name,
-        phoneNumber: phone,
-      }).then(() => {
-        message.success("Thêm người dùng mới thành công");
-        fetchUsers();
-        resetForm();
-        setIsOpenModal(false);
-      }
-
-      );
-
+      await users
+        .dangKy({
+          email: email,
+          passWord: password,
+          name: name,
+          phoneNumber: phone,
+        })
+        .then(() => {
+          message.success('Thêm người dùng mới thành công');
+          fetchUsers();
+          resetForm();
+          setIsOpenModal(false);
+        });
     } catch (err) {
       console.log(err);
       message.error(err.response.data.content);
@@ -135,10 +128,10 @@ const UserManage = () => {
   };
 
   const resetForm = () => {
-    setEmail("");
-    setName("");
-    setPhone("");
-    setPassword("");
+    setEmail('');
+    setName('');
+    setPhone('');
+    setPassword('');
     setIsPhoneValid(true);
     setIsEmailValid(true);
     setIsNameValid(true);
@@ -182,7 +175,6 @@ const UserManage = () => {
       setPhone(currentUser.phone);
     }
   }, [currentUser]);
-
   const saveDataUser = () => {
     let payload = {
       id: currentUser.id,
@@ -192,66 +184,68 @@ const UserManage = () => {
     };
 
     if (name.length == 0) {
-      message.error("Tên không được để trống!");
+      message.error('Tên không được để trống!');
     } else {
       if (isPhoneValid) {
-        users.editUser(payload)
-          .then(res => {
-            if (res.data.statusCode == 200) {
-              message.success("Cập nhật thành công!");
-              fetchUsers();
-              setIsOpenModal(false)
-            } else {
-              message.error('Cập nhật thất bại!');
-            }
-          })
+        users.editUser(payload).then(res => {
+          if (res.data.statusCode == 200) {
+            message.success('Cập nhật thành công!');
+            fetchUsers();
+            setIsOpenModal(false);
+          } else {
+            message.error('Cập nhật thất bại!');
+          }
+        });
       }
     }
-  }
+  };
 
   const deleteUser = record => {
     Swal.fire({
       title: 'Bạn muốn xóa người dùng này không?',
       showCancelButton: true,
       confirmButtonText: 'Đồng Ý',
-      cancelButtonText: 'Hủy'
+      cancelButtonText: 'Hủy',
     }).then(result => {
       if (result.isConfirmed) {
-        users.deleteUser(record.id).then(() => {
-          message.success("Xóa người dùng thành công!");
-          fetchUsers();
-        }).catch(err => {
-          if (err.response && err.response.status === 400) {
-            message.error(err.response.data.content)
-          } else {
-            message.error('Xóa Người Dùng Thất Bại!')
-          }
-        })
+        users
+          .deleteUser(record.id)
+          .then(() => {
+            message.success('Xóa người dùng thành công!');
+            fetchUsers();
+          })
+          .catch(err => {
+            if (err.response && err.response.status === 400) {
+              message.error(err.response.data.content);
+            } else {
+              message.error('Xóa Người Dùng Thất Bại!');
+            }
+          });
       }
     });
-  }
+  };
 
-  const checkPhoneValid = (value) => {
+  const checkPhoneValid = value => {
     const phoneRegex = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
     const valid = phoneRegex.test(value);
     setIsPhoneValid(valid);
     return valid;
-  }
+  };
 
-  const checkNameValid = (value) => {
+  const checkNameValid = value => {
     const valid = value.length > 4;
     setIsNameValid(valid);
     return valid;
   };
 
-  const checkPassWordValid = (value) => {
+  const checkPassWordValid = value => {
     const Regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z0-9\W]{8,}$/;
     const valid = Regex.test(value);
     setIsPasswordValid(valid);
     return valid;
   };
 
-  const checkEmailValid = (value) => {
+  const checkEmailValid = value => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const valid = emailRegex.test(value);
     setIsEmailValid(valid);
@@ -262,19 +256,26 @@ const UserManage = () => {
     Object.values(item).some(value =>
       value?.toString()?.toLowerCase()?.includes(search.toLowerCase())
     )
-  )
+  );
 
   return (
     <>
-    <h2 className='mb-4 text-2xl font-semibold'>User Manager</h2>
+      <h2 className="mb-4 text-2xl font-semibold">User Manager</h2>
       <div className="flex justify-between items-center">
-        <Input type="text" onChange={(e) => setSearch(e.target.value)} className="flex justify-end mb-5 w-1/4" size="medium" placeholder="Tìm kiếm ..." />
+        <Input
+          type="text"
+          onChange={e => setSearch(e.target.value)}
+          className="flex justify-end mb-5 w-1/4"
+          size="medium"
+          placeholder="Tìm kiếm ..."
+        />
         <Button
           onClick={() => handleAddNewUser()}
           type="secondary"
-          className="bg-blue-500 text-white mr-20 ">
+          className="bg-blue-500 text-white mr-20 "
+        >
           <i className="fa-solid fa-user-plus"></i>
-        <p>thêm người dùng</p>
+          <p>thêm người dùng</p>
         </Button>
       </div>
 
@@ -287,12 +288,12 @@ const UserManage = () => {
           showTitle: 'trang',
           defaultPageSize: 10,
           showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '30', '40', '50', '100']
+          pageSizeOptions: ['10', '20', '30', '40', '50', '100'],
         }}
       />
 
       <Modal
-        title={isNew ? "Thêm người dùng" : "Chỉnh sửa người dùng"}
+        title={isNew ? 'Thêm người dùng' : 'Chỉnh sửa người dùng'}
         open={isOpenModal}
         onOk={handleOk}
         onCancel={() => {
@@ -308,8 +309,7 @@ const UserManage = () => {
           onChange={e => {
             setEmail(e.target.value);
             checkEmailValid(e.target.value);
-          }
-          }
+          }}
           placeholder="Nhập Địa Chỉ Email"
           value={email}
           disabled={!isNew}
@@ -333,15 +333,18 @@ const UserManage = () => {
             outline: isNameValid ? 'initial' : 'red',
           }}
         />
-        {!isNameValid && <p style={{ color: 'red' }}>Tên người dùng không được để trống. Vui lòng nhập tối thiêu 5 ký tự</p>}
+        {!isNameValid && (
+          <p style={{ color: 'red' }}>
+            Tên người dùng không được để trống. Vui lòng nhập tối thiêu 5 ký tự
+          </p>
+        )}
         <Typography.Title level={5}>Số Điện Thoại</Typography.Title>
         <Input
           type="text"
           onChange={e => {
             setPhone(e.target.value);
             checkPhoneValid(e.target.value);
-          }
-          }
+          }}
           placeholder="Nhập Số Điện Thoại"
           value={phone}
           style={{
@@ -349,7 +352,12 @@ const UserManage = () => {
             outline: isPhoneValid ? 'initial' : 'red',
           }}
         />
-        {!isPhoneValid && <p style={{ color: 'red' }}>Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09, hoặc +84 và có 10 ký tự.</p>}
+        {!isPhoneValid && (
+          <p style={{ color: 'red' }}>
+            Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, 09,
+            hoặc +84 và có 10 ký tự.
+          </p>
+        )}
         {isNew && (
           <>
             <Typography.Title level={5}>Mật Khẩu</Typography.Title>
@@ -366,7 +374,12 @@ const UserManage = () => {
                 outline: isPasswordValid ? 'initial' : 'red',
               }}
             />
-            {!isPasswordValid && <p style={{ color: 'red' }}>Vui lòng nhập mật khẩu ít nhất 8 ký tự bao gồm 1 ký tự viết hoa 1 ký tự đặc biệt và số.</p>}
+            {!isPasswordValid && (
+              <p style={{ color: 'red' }}>
+                Vui lòng nhập mật khẩu ít nhất 8 ký tự bao gồm 1 ký tự viết hoa
+                1 ký tự đặc biệt và số.
+              </p>
+            )}
           </>
         )}
       </Modal>
