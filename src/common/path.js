@@ -9,5 +9,6 @@ export const path = {
     projectDetail: '/projectDetail',
     users: '/users',
     profile: '/profile',
+    repositories: '/repositories',
   },
 };

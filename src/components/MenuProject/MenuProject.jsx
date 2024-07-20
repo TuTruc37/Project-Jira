@@ -37,6 +37,13 @@ const MenuProject = addDataUserLocal => {
             </NavLink>
           </li>
           <li>
+            <NavLink to={path.account.repositories}>
+              <div className=" font-semibold text-lg">
+                <i className="fa-solid fa-clipboard-user"></i> Repositories
+              </div>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to={path.account.trangChu}>
               <div className=" font-semibold text-lg">
                 <i className="fa-solid fa-list-check " /> Project Management

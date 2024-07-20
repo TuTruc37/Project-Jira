@@ -12,6 +12,7 @@ import ProjectDetail from '../pages/ProjectDetail/ProjectDetail';
 import EditProjectManager from '../pages/AllProject/EditProjectManager/EditProjectManager';
 import UserManage from '../pages/AllProject/UserManage/UserManage';
 import Profile from '../pages/Profile/Profile';
+import Repositories from '../pages/Repositories/Repositories';
 
 const useRouteCustom = () => {
   const route = useRoutes([
@@ -50,6 +51,10 @@ const useRouteCustom = () => {
         {
           path: path.account.profile,
           element: <Profile />,
+        },
+        {
+          path: path.account.repositories,
+          element: <Repositories />,
         },
       ],
     },
