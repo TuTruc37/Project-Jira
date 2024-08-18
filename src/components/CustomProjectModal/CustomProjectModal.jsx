@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal as AntdModal, Input, Button, message, Select } from 'antd';
-import TextEditor from '../TextEditor/TextEditor';
+// import TextEditor from '../TextEditor/TextEditor';
 import { projectMan } from '../../services/projectMan';
 import EditorTiny from '../EditorTiny/EditorTiny';
 
@@ -64,21 +64,21 @@ const CustomProjectModal = ({
     console.log('Saving project details:', projectDetails);
 
     // Ensure all required fields are filled
-    if (
-      !projectDetails.projectName ||
-      !projectDetails.projectCategory ||
-      !projectDetails.description
-    ) {
-      message.error('Please fill out all required fields.');
-      return;
-    }
+    // if (
+    //   !projectDetails.projectName ||
+    //   !projectDetails.projectCategory ||
+    //   !projectDetails.description
+    // ) {
+    //   message.error('Please fill out all required fields.');
+    //   return;
+    // }
 
     // Update project details via API call
     projectMan
       .updateProject(projectDetails.id, projectDetails)
       .then(res => {
         console.log('API response:', res);
-        message.success('Project updated successfully');
+        message.success('Dự án được cập nhật thành công');
         if (onProjectUpdated) {
           onProjectUpdated();
         }
@@ -86,8 +86,8 @@ const CustomProjectModal = ({
         onCancel();
       })
       .catch(err => {
-        console.error('Error updating project:', err);
-        message.error('Error updating project');
+        console.error('Lỗi cập nhật dự án', err);
+        message.error('Đây là dự án của người khác, bạn không thể sửa');
       });
   };
 

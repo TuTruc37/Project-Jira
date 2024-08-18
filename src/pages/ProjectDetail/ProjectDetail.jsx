@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { UserOutlined } from '@ant-design/icons';
+
 import { projectMan } from './../../services/projectMan'; // Make sure to import your service
 import { commentInTasks } from '../../services/commentInTask';
 import { path } from '../../common/path';
-import { Breadcrumb, Modal, TreeSelect, Slider, Input, Select } from 'antd';
+import {
+  Breadcrumb,
+  Modal,
+  TreeSelect,
+  Slider,
+  Input,
+  Select,
+  Avatar,
+} from 'antd';
 import './projectDetail.scss';
 import { Button } from 'antd/es/radio';
 import { useDispatch } from 'react-redux';
@@ -28,12 +38,12 @@ const ProjectDetail = () => {
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [newComment, setNewComment] = useState('');
+  // const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [commentInput, setCommentInput] = useState('');
   const [members, setMembers] = useState([]);
   const [projectName, setProjectName] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [statusNames, setStatusNames] = useState([]);
   const [creator, setCreator] = useState('');
 
   const dispatch = useDispatch();
@@ -47,19 +57,80 @@ const ProjectDetail = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
   useEffect(() => {
-    // Example: Fetch comments for selected task when component mounts
+    // Fetch comments for the selected task when the component mounts
     if (selectedTask) {
       commentInTasks
         .getAll(selectedTask.id)
         .then(response => {
-          setComments(response.data);
+          setComments(response.data.content);
         })
         .catch(error => {
           console.error('Error fetching comments:', error);
         });
     }
   }, [selectedTask]);
+
+  const handleDeleteComment = async (event, commentId) => {
+    event.preventDefault(); // Ngăn hành động mặc định
+    try {
+      await commentInTasks.deleteComment(commentId);
+      // Cập nhật state hoặc làm mới danh sách bình luận
+      setComments(prevComments =>
+        prevComments.filter(comment => comment.id !== commentId)
+      );
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi xóa bình luận:', error);
+    }
+  };
+  const handleEditComment = async (event, commentId, newContent) => {
+    event.preventDefault();
+    try {
+      await commentInTasks.putComment(commentId, newContent);
+      // Cập nhật state hoặc làm mới danh sách bình luận sau khi cập nhật thành công
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment.id === commentId
+            ? { ...comment, contentComment: newContent }
+            : comment
+        )
+      );
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi cập nhật bình luận:', error);
+    }
+  };
+
+  const handleAddComment = () => {
+    const newComment = {
+      contentComment: commentInput,
+      taskId: selectedTask.id,
+    };
+
+    // Send the new comment to the backend
+    commentInTasks
+      .postInsertComment(newComment)
+      .then(response => {
+        console.log('Comment added successfully:', response.data);
+        setComments(prevComments => [
+          ...prevComments,
+          {
+            id: response.data.content.id,
+            userId: response.data.content.userId,
+            contentComment: newComment.contentComment,
+            date: new Date().toLocaleString(),
+            user: {
+              name: `${creator}`, // Replace with actual current user data
+              avatar: 'path/to/avatar.jpg', // Replace with actual current user avatar
+            },
+          },
+        ]);
+        setCommentInput('');
+      })
+      .catch(error => {
+        console.error('Error adding comment:', error);
+      });
+  };
 
   const fetchData = async () => {
     try {
@@ -845,50 +916,85 @@ const ProjectDetail = () => {
                 }
                 value={selectedTask.description}
               />
-              <TextArea
-                rows={4}
-                placeholder="Add a comment..."
-                value={values.comment}
-                onChange={handleChange}
-              />
-              <Button
-                className="mt-2 bg-blue-500 text-white"
-                onClick={() => {
-                  const newComment = {
-                    contentComment: values.comment,
-                    id: selectedTask.comments.length + 1,
-                    user: {
-                      name: 'Current User', // Replace with actual current user data
-                      avatar: 'path/to/avatar.jpg', // Replace with actual current user avatar
-                    },
-                  };
-                  setSelectedTask({
-                    ...selectedTask,
-                    comments: [...selectedTask.comments, newComment],
-                  });
-                }}
-              >
-                Thêm bình luận
-              </Button>
-              <div className="mt-4">
-                {selectedTask.comments.map(comment => (
-                  <div
-                    key={comment.id}
-                    className="flex items-start space-x-4 mb-4"
-                  >
-                    <img
-                      className="w-8 h-8 rounded-full"
-                      src={comment.user.avatar}
-                      alt={comment.user.name}
-                    />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-semibold">{comment.user.name}</h4>
-                        <span className="text-sm text-gray-500">
-                          {comment.date}
-                        </span>
+              {/* <p className='w-7 h-7 bg-red-500 rounded-full'>{creator}</p> */}
+              <div className=" flex">
+                <Avatar
+                  className="w-7 h-7"
+                  size="large"
+                  icon={<UserOutlined />}
+                  src={`https://ui-avatars.com/api/?name=${name}`}
+                />
+                <TextArea
+                  value={commentInput}
+                  onChange={e => setCommentInput(e.target.value)}
+                  placeholder="Thêm bình luận"
+                />
+              </div>
+              <div className="mt-1">
+                <Button
+                  className=" rounded-md bg-blue-500 text-md font-semibold text-white hover:text-white"
+                  onClick={handleAddComment}
+                >
+                  Thêm{' '}
+                </Button>
+              </div>
+              <div className="comments ">
+                {comments.map(comment => (
+                  <div key={comment.id} className="comment ">
+                    <div className="flex  mt-3  ">
+                      <div className="  ">
+                        <div className="flex items-center ">
+                          <div className="flex items-center  space-x-1">
+                            <Avatar
+                              className="w-7 h-7"
+                              size="large"
+                              icon={<UserOutlined />}
+                              src={`https://ui-avatars.com/api/?name=${comment.name}`}
+                            />
+                            <p>
+                              <strong className="text-lg">
+                                {comment.user.name}
+                              </strong>{' '}
+                            </p>
+                          </div>
+                          <p className="ml-3">
+                            <small>{comment.date}</small>
+                          </p>
+                        </div>
+                        <p className="ml-8  mt-1 font-medium text-md">
+                          {comment.contentComment}
+                        </p>
+                        {/* <input className='ml-8  mt-1 font-medium text-md' type="text" value={comment.contentComment} /> */}
+
+                        <div className=" ml-10  ">
+                          <button
+                            onClick={event =>
+                              handleDeleteComment(event, comment.id)
+                            }
+                            className="font-medium text-sm hover:bg-gray-100 py-1 px-2 "
+                          >
+                            Xóa
+                          </button>
+                          <button
+                            onClick={event => {
+                              const newContent = prompt(
+                                'Nhập nội dung mới:',
+                                comment.contentComment
+                              );
+                              if (newContent) {
+                                handleEditComment(
+                                  event,
+                                  comment.id,
+                                  newContent
+                                );
+                              }
+                            }}
+                            className="font-medium text-sm hover:bg-gray-100 py-1 px-2"
+                          >
+                            Sửa
+                          </button>
+                        </div>
                       </div>
-                      <p>{comment.contentComment}</p>
                     </div>
                   </div>
                 ))}
