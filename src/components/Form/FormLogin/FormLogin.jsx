@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useFormik } from 'formik';
 import InputCustom from '../../Input/InputCustom';
 import * as Yup from 'yup';
@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { handleGetValue } from '../../../redux/slice/userSlice';
 import styles from '../FormRegister/formRegister.module.scss';
 import { users } from '../../../services/users';
+
 const FormLogin = () => {
   function Main_reload() {
     setInterval(function () {
@@ -32,11 +33,11 @@ const FormLogin = () => {
           console.log(res);
           handleAlert('success', 'Đăng nhập thành công');
           navigate(path.account.trangChu);
+
           let dataUser = handleSetValueLocalStore('dataUser', res.data.content);
           if (dataUser == null) {
             Main_reload();
           }
-
           dispatch(handleGetValue(res.data.content));
         } catch (error) {
           console.log(error.response.data.message);

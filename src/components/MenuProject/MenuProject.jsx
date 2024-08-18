@@ -52,6 +52,19 @@ const MenuProject = ({ addDataUserLocal }) => {
               </span>
             </NavLink>
           </Menu.Item>
+          {/* menu repositories */}
+          <Menu.Item
+            style={{ background: 'none' }}
+            className=""
+            key={path.account.repositories}
+          >
+            <NavLink to={path.account.repositories}>
+              <div className=" font-semibold text-lg">
+                <i className="fa-solid fa-clipboard-user"></i> Repositories
+              </div>
+            </NavLink>
+          </Menu.Item>
+          {/*  */}
           <Menu.Item key={path.account.trangChu}>
             <NavLink to={path.account.trangChu}>
               <span className="font-semibold   text-lg">

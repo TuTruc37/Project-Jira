@@ -8,45 +8,22 @@ import {
   Input,
   List,
   Tag,
-  Spin,
+  Space,
+  Select,
   Empty,
+  Spin,
 } from 'antd';
-import { projectMan } from '../../../services/projectMan';
-import CustomProjectModal from '../../../components/CustomProjectModal/CustomProjectModal';
+import { projectMan } from '../../services/projectMan';
+import CustomProjectModal from '../../components/CustomProjectModal/CustomProjectModal';
 import { debounce } from 'lodash';
-import { path } from '../../../common/path';
+import { path } from '../../common/path';
 import { NavLink } from 'react-router-dom'; // Thay đổi từ Link sang NavLink
-import EditorTiny from '../../../components/EditorTiny/EditorTiny';
-import './projectManage.scss';
-const ProjectManage = () => {
-  const [arrProject, setArrProject] = useState([]);
-  console.log(arrProject);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingProjectId, setEditingProjectId] = useState(null);
-  console.log(editingProjectId); // id đang truy cập và sửa
-  const [userList, setUserList] = useState([]);
-  const [isUserModalVisible, setIsUserModalVisible] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
-  const [searchKeyword, setSearchKeyword] = useState('');
+// import './projectManage.scss';
+import { handleGetValueLocalStore } from '../../utils/utils';
+import Loader from '../../components/Loader/Loader';
 
-  // search dự án
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchedProjects, setSearchedProjects] = useState([]);
-  const handleSearchTermChange = event => {
-    setSearchTerm(event.target.value);
-  };
-  useEffect(() => {
-    const delaySearch = setTimeout(() => {
-      const filteredProjects = arrProject.filter(project =>
-        project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchedProjects(filteredProjects);
-    }, 300);
-
-    return () => clearTimeout(delaySearch);
-  }, [searchTerm]);
-
-  //
+const Repositories = () => {
+  // loading
   //làm spin để load dữ liệu thì biết là có dữ liệu và nó đang tải lên chứ không phải trống không
   const [isLoading, setIsLoading] = useState(true);
   console.log(isLoading);
@@ -57,9 +34,42 @@ const ProjectManage = () => {
     </div>
   );
   //
+  const [arrProject, setArrProject] = useState([]);
+  console.log(arrProject);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState(null);
+  console.log(editingProjectId); // id đang truy cập và sửa
+  const [userList, setUserList] = useState([]);
+  const [isUserModalVisible, setIsUserModalVisible] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  // search dự án
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchedProjects, setSearchedProjects] = useState([]);
+  // button dự án cá nhân
+  const dataUsers = handleGetValueLocalStore('dataUser');
+  const [personalProjects, setPersonalProjects] = useState([]);
+  console.log(personalProjects);
+  useEffect(() => {
+    DuAnCaNhan();
+  }, [arrProject]);
+  // search dự án
+  const handleSearchTermChange = event => {
+    setSearchTerm(event.target.value);
+  };
+
+  useEffect(() => {
+    const filteredProjects = personalProjects.filter(project =>
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setSearchedProjects(filteredProjects);
+  }, [searchTerm, personalProjects]);
+  //
+
   const showModal = projectId => {
     setIsModalVisible(true);
     setEditingProjectId(projectId);
+    handleGetAllProject();
   };
 
   const handleCancel = () => {
@@ -213,18 +223,14 @@ const ProjectManage = () => {
     {
       title: 'ID',
       dataIndex: 'id',
-      sorter: (a, b) => a.id - b.id,
+      // sorter: (a, b) => a.id - b.id,
+      sorter: (a, b) => b.id - a.id, // Sắp xếp theo thứ tự giảm dần của id
     },
     {
       title: 'Dự án',
       dataIndex: 'projectName',
       render: (text, record) => (
-        <NavLink
-          to={{
-            pathname: `${path.account.projectDetail}/${record.id}`,
-            state: { projectName: record.projectName },
-          }}
-        >
+        <NavLink to={`${path.account.projectDetail}/${record.id}`}>
           {text}
         </NavLink>
       ),
@@ -281,101 +287,161 @@ const ProjectManage = () => {
       ),
     },
   ];
+  // button dự án cá nhân
 
+  const DuAnCaNhan = () => {
+    // console.log(arrProject);
+    const projectsWithMatchingCreators = arrProject.filter(project => {
+      const creatorName = project.creator.name;
+      const userName = dataUsers.name;
+      return creatorName === userName;
+    });
+
+    setPersonalProjects(projectsWithMatchingCreators);
+  };
+  // select
+  const handleChange = value => {
+    const filteredProjects = personalProjects.filter(
+      project => project.categoryName === value
+    );
+    setSearchedProjects(filteredProjects);
+  };
+  const sortedProjects = personalProjects.sort((a, b) => b.id - a.id);
   return (
-    <div>
-      <div className="text-3xl font-bold mb-4">Quản lý dự án</div>
-
-      {/* Search dự án */}
-      <Input.Search
-        placeholder="Tìm kiếm dự án..."
-        onChange={handleSearchTermChange}
-        style={{ marginBottom: 16 }}
-      />
-
-      <Table
-        columns={columns}
-        dataSource={searchedProjects.length > 0 ? searchedProjects : arrProject}
-        rowKey="id"
-        locale={{
-          emptyText:
-            arrProject.length > 0 ? (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            ) : (
-              <Empty image={customSpin} description={null} />
-            ),
-        }}
-      />
-      {/*  */}
-      <CustomProjectModal
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        projectId={editingProjectId}
-        onProjectUpdated={handleGetAllProject}
-      />
-      <Modal
-        title="Thành viên"
-        visible={isUserModalVisible}
-        onCancel={() => setIsUserModalVisible(false)}
-        footer={null}
-      >
-        <Input.Search
-          placeholder="Tìm kiếm người dùng..."
-          value={searchKeyword}
-          onChange={handleSearchChange}
-          onSearch={handleSearchUser}
-          style={{ marginBottom: 16 }}
+    <>
+      <div>
+        <div className="text-3xl font-bold mb-4">Kho lưu trữ</div>
+        <div className="flex justify-center items-center">
+          {/* select  */}
+          <Space wrap style={{ padding: '0px 10px 16px 0px' }}>
+            <Select
+              defaultValue="Lựa chọn tên danh mục"
+              style={{
+                width: 200,
+              }}
+              onChange={handleChange}
+              options={[
+                {
+                  value: 'all',
+                  label: 'All',
+                },
+                {
+                  value: 'Dự án web',
+                  label: 'Dự án web',
+                },
+                {
+                  value: 'Dự án phần mềm',
+                  label: 'Dự án phần mềm',
+                },
+                {
+                  value: 'Dự án di động',
+                  label: 'Dự án di động',
+                },
+              ]}
+            />
+          </Space>
+          {/* Search dự án */}
+          <Input.Search
+            placeholder="Tìm kiếm dự án..."
+            onChange={handleSearchTermChange}
+            style={{ marginBottom: 16 }}
+          />
+        </div>
+        {/* {personalProjects.length > 0 && ( */}
+        <Table
+          columns={columns}
+          dataSource={
+            searchedProjects.length > 0 ? searchedProjects : sortedProjects
+          }
+          rowKey="id"
+          locale={{
+            emptyText:
+              arrProject.length > 0 ? (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              ) : (
+                <Empty image={customSpin} description={null} />
+              ),
+          }}
         />
-        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          <List
-            dataSource={searchResult}
-            renderItem={item => (
-              <List.Item
-                actions={[
-                  <Button
-                    type="primary"
-                    onClick={() => handleAddUserToProject(item.userId)}
-                  >
-                    <i className="fa-solid fa-user-plus" />
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={item.name}
-                  description={item.email}
-                />
-              </List.Item>
-            )}
-          />
-        </div>
-        <div
-          style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}
+        {/* )} */}
+        {/*  */}
+        <CustomProjectModal
+          visible={isModalVisible}
+          onCancel={handleCancel}
+          projectId={editingProjectId}
+          onProjectUpdated={handleGetAllProject}
+        />
+        <Modal
+          title="Thành viên"
+          visible={isUserModalVisible}
+          onCancel={() => setIsUserModalVisible(false)}
+          footer={null}
         >
-          <h2 className="text-xl font-semibold">Người dùng trong dự án</h2>
-          <List
-            dataSource={userList}
-            renderItem={item => (
-              <List.Item className="flex justify-center items-center">
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={item.name}
-                />
-                <div className="space-x-2">
-                  <i
-                    className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
-                    onClick={() =>
-                      handleDeleteUserFromProject(editingProjectId, item.userId)
-                    }
-                  />
-                </div>
-              </List.Item>
-            )}
+          <Input.Search
+            placeholder="Tìm kiếm người dùng..."
+            value={searchKeyword}
+            onChange={handleSearchChange}
+            onSearch={handleSearchUser}
+            style={{ marginBottom: 16 }}
           />
-        </div>
-      </Modal>
-    </div>
+          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+            <List
+              dataSource={searchResult}
+              renderItem={item => (
+                <List.Item
+                  actions={[
+                    <Button
+                      type="primary"
+                      onClick={() => handleAddUserToProject(item.userId)}
+                    >
+                      <i className="fa-solid fa-user-plus" />
+                    </Button>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={<Avatar src={item.avatar} />}
+                    title={item.name}
+                    description={item.email}
+                  />
+                </List.Item>
+              )}
+            />
+          </div>
+          <div
+            style={{
+              maxHeight: '400px',
+              overflowY: 'auto',
+              marginTop: '16px',
+            }}
+          >
+            <h2 className="text-xl font-semibold">Người dùng trong dự án</h2>
+            <List
+              dataSource={userList}
+              renderItem={item => (
+                <List.Item className="flex justify-center items-center">
+                  <List.Item.Meta
+                    avatar={<Avatar src={item.avatar} />}
+                    title={item.name}
+                  />
+                  <div className="space-x-2">
+                    <i
+                      className="fa-solid fa-trash-can px-4 py-3 text-white bg-red-500 rounded-md cursor-pointer"
+                      onClick={() =>
+                        handleDeleteUserFromProject(
+                          editingProjectId,
+                          item.userId
+                        )
+                      }
+                    />
+                  </div>
+                </List.Item>
+              )}
+            />
+          </div>
+        </Modal>
+      </div>
+    </>
   );
 };
 
-export default ProjectManage;
+export default Repositories;
